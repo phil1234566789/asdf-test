@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Restaurant – Bestellsystem v2</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0f0f0f;--surface:#1c1c1e;--surface2:#2c2c2e;--surface3:#3a3a3c;
+  --accent:#FF6B35;--accent-light:rgba(255,107,53,0.15);
+  --success:#30D158;--success-light:rgba(48,209,88,0.15);
+  --warn:#FFD60A;--warn-light:rgba(255,214,10,0.15);
+  --danger:#FF453A;--danger-light:rgba(255,69,58,0.15);
+  --text:#fff;--text2:rgba(235,235,245,0.8);--text3:rgba(235,235,245,0.4);
+  --border:rgba(255,255,255,0.08);--r:12px;--r-sm:8px;
+}
+body{background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;}
+@media(max-width:430px){body{background:var(--bg);align-items:flex-start;}.phone{width:100%;height:100dvh;border-radius:0;box-shadow:none;}.demo-nav{display:none!important;}}
+
+.phone{width:390px;height:844px;background:var(--bg);border-radius:50px;overflow:hidden;position:relative;box-shadow:0 0 0 8px #1a1a1a,0 0 0 10px #2a2a2a,0 50px 120px rgba(0,0,0,0.9);}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg);}
+.screen.active{display:flex;}
+
+/* ── Common ── */
+.sb{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0;}
+.sb-t{font-size:15px;font-weight:600;color:var(--text);}
+.sb-i{display:flex;gap:5px;align-items:center;color:var(--text);font-size:12px;}
+.nh{padding:2px 14px 10px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.back{color:var(--accent);font-size:17px;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px;}
+.nh-ttl{font-size:17px;font-weight:600;color:var(--text);flex:1;}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.chip::before{content:'●';font-size:7px;}
+.cg{background:var(--success-light);color:var(--success);}
+.cy{background:var(--warn-light);color:var(--warn);}
+.cr{background:var(--danger-light);color:var(--danger);}
+.lh{padding:6px 20px 14px;flex-shrink:0;}
+.lh h1{font-size:32px;font-weight:700;color:var(--text);}
+.lh-s{font-size:13px;color:var(--text3);margin-top:3px;}
+.sc{flex:1;overflow-y:auto;padding:0 16px;-webkit-overflow-scrolling:touch;}
+.sc::-webkit-scrollbar{display:none;}
+.sl{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;}
+.bb{padding:10px 16px 28px;border-top:1px solid var(--border);flex-shrink:0;}
+.btn-p{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:15px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
+
+/* ── Home screen ── */
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;}
+.agb{background:var(--surface);border:none;border-radius:var(--r);padding:16px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;}
+.agb:active{background:var(--surface2);}
+.agb-icon{font-size:28px;}
+.agb-label{font-size:14px;font-weight:600;color:var(--text);}
+.agb-sub{font-size:12px;color:var(--text3);}
+.tc{background:var(--surface);border-radius:var(--r);padding:13px 14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.tc:active{background:var(--surface2);}
+.tc-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0;}
+.tc-name{font-size:16px;font-weight:600;color:var(--text);}
+.tc-sub{font-size:13px;color:var(--text3);margin-top:2px;}
+
+/* ── Table sketch screen ── */
+.table-hdr{height:50px;display:flex;align-items:center;gap:8px;padding:0 12px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.tn-badge{background:var(--surface);border:none;border-radius:8px;padding:5px 10px;color:var(--text3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;min-width:52px;text-align:center;}
+.tn-badge.set{color:var(--text);}
+.snd-btn{margin-left:auto;background:var(--accent);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
+.snd-btn:disabled{background:var(--surface2);color:var(--text3);}
+
+/* Sketch area */
+.sketch-wrap{flex:1;position:relative;overflow:hidden;background:#0a0a0c;transition:flex .25s ease;}
+#sketch-cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;}
+#guest-layer{position:absolute;inset:0;pointer-events:none;z-index:10;}
+#guest-layer.interactive{pointer-events:all;}
+
+/* Guest dots */
+.gdot{position:absolute;width:42px;height:42px;border-radius:50%;background:var(--surface2);border:2.5px solid var(--surface3);color:var(--text2);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);cursor:pointer;z-index:20;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none;}
+.gdot.ref{border-color:var(--warn);}
+.gdot.active{background:var(--accent);border-color:var(--accent);color:#fff;width:48px;height:48px;font-size:15px;z-index:25;}
+.gdot.done::after{content:'';position:absolute;bottom:1px;right:1px;width:11px;height:11px;background:var(--success);border-radius:50%;border:2px solid #0a0a0c;}
+.order-tag{position:absolute;background:rgba(28,28,30,0.92);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;color:var(--accent);z-index:18;pointer-events:none;white-space:nowrap;backdrop-filter:blur(4px);}
+
+/* Overlays */
+.overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:30;pointer-events:none;}
+.overlay.on{display:flex;pointer-events:all;}
+.ov-hint{font-size:16px;color:var(--text3);text-align:center;padding:0 32px;line-height:1.5;}
+.ov-icon{font-size:40px;}
+.ov-btn{background:var(--accent);color:#fff;border:none;border-radius:24px;padding:10px 24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;display:none;}
+.ov-btn.show{display:block;}
+.ov-sub{font-size:13px;color:var(--text3);}
+
+/* Mode status bar */
+.mode-bar{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;border-top:1px solid var(--border);}
+.mode-txt{font-size:13px;color:var(--text3);}
+.mode-action{font-size:13px;color:var(--accent);font-weight:600;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px;}
+
+/* Code display */
+.cd{margin:0 16px 6px;background:var(--surface);border-radius:var(--r);padding:10px 14px;min-height:56px;flex-shrink:0;}
+.cd-row{display:flex;align-items:center;gap:10px;}
+.cd-code{font-size:24px;font-weight:700;color:var(--accent);min-width:52px;}
+.cd-info{flex:1;font-size:13px;color:var(--text2);line-height:1.4;}
+.cd-err{color:var(--danger);}
+.cd-hint{color:var(--text3);}
+.cd-who{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* Keypad */
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:4px 14px 12px;flex-shrink:0;}
+.k{background:var(--surface);border:none;border-radius:var(--r-sm);height:50px;font-size:20px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:background .08s;}
+.k:active{background:var(--surface3);}
+.k.kcat{font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-light);}
+.k.kcat.dim{color:var(--text3);background:var(--surface);opacity:.4;}
+.k.kdel{font-size:22px;color:var(--text2);background:var(--surface2);}
+.k.kok{background:var(--success);color:#fff;}
+.k.kok:disabled{background:var(--surface2);color:var(--text3);}
+
+/* ── Send screen ── */
+.si{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r-sm);margin-bottom:6px;}
+.si-dot{width:28px;height:28px;border-radius:50%;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.si-info{flex:1;}
+.si-name{font-size:14px;color:var(--text);}
+.si-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.si-price{font-size:14px;font-weight:600;color:var(--text);}
+.snd-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.sb2{border:none;border-radius:var(--r);padding:15px 10px;font-size:14px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:inherit;}
+.sb2-k{background:var(--accent);color:#fff;}
+.sb2-b{background:var(--surface2);color:var(--text);}
+.sb2-icon{font-size:24px;}
+.sb2-sub{font-size:11px;opacity:.75;}
+.empty{background:var(--surface);border-radius:var(--r-sm);padding:16px;text-align:center;color:var(--text3);font-size:14px;}
+.lo{position:absolute;inset:0;background:rgba(0,0,0,.75);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:100;}
+.lo.show{display:flex;}
+.spinner{width:40px;height:40px;border:3px solid var(--surface2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.lo-t{color:var(--text);font-size:15px;}
+.toast{position:absolute;bottom:90px;left:16px;right:16px;background:var(--surface2);border-radius:var(--r);padding:13px 16px;display:flex;align-items:center;gap:10px;z-index:200;box-shadow:0 4px 24px rgba(0,0,0,.6);transform:translateY(14px);opacity:0;transition:all .25s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{border-left:3px solid var(--success);}
+.toast-txt{flex:1;font-size:14px;color:var(--text);}
+
+/* ── Bill screen ── */
+.bgs{display:flex;gap:7px;padding:0 16px 10px;flex-shrink:0;overflow-x:auto;}
+.bgs::-webkit-scrollbar{display:none;}
+.bgb{background:var(--surface);border:2px solid transparent;border-radius:20px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit;}
+.bgb.sel{background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
+.bc{flex:1;overflow-y:auto;padding:0 16px;}
+.bc::-webkit-scrollbar{display:none;}
+.bi{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);}
+.bi-l .nm{font-size:15px;color:var(--text);}
+.bi-l .cd2{font-size:11px;color:var(--text3);margin-top:2px;}
+.bi-p{font-size:15px;font-weight:600;color:var(--text);}
+.btot{margin:12px 16px;padding:15px 16px;background:var(--surface);border-radius:var(--r);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.btot-l{font-size:17px;font-weight:600;color:var(--text);}
+.btot-a{font-size:26px;font-weight:700;color:var(--accent);}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 28px;flex-shrink:0;}
+.bab{background:var(--surface);border:none;border-radius:var(--r);padding:14px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;}
+.bab .icon{font-size:22px;}
+.bab.primary{background:var(--accent);color:#fff;}
+</style>
+</head>
+<body>
+
+<div class="phone" id="app">
+
+<!-- ════════════════════════════════
+     SCREEN 1 — Übersicht
+════════════════════════════════ -->
+<div class="screen active" id="s-home">
+  <div class="sb"><span class="sb-t">19:34</span><div class="sb-i"><span>▲</span><span>🔋</span></div></div>
+  <div class="lh"><h1>Übersicht</h1><div class="lh-s">3 aktive Tische · 1 Mitnahme</div></div>
+  <div class="sc">
+    <div class="ag">
+      <button class="agb" onclick="goTable('new')">
+        <span class="agb-icon">✏️</span>
+        <span class="agb-label">Neuer Tisch</span>
+        <span class="agb-sub">Tisch zeichnen</span>
+      </button>
+      <button class="agb" onclick="goTable('new')">
+        <span class="agb-icon">🥡</span>
+        <span class="agb-label">Mitnehmen</span>
+        <span class="agb-sub">#1 – 10</span>
+      </button>
+    </div>
+    <div class="sl">Aktive Tische</div>
+    <div class="tc" onclick="goTable('demo')">
+      <div class="tc-icon" style="background:rgba(255,107,53,.15);color:var(--accent);">3</div>
+      <div style="flex:1"><div class="tc-name">Tisch 3</div><div class="tc-sub">4 Gäste · 2 Gerichte</div></div>
+      <span class="chip cg">09:04</span>
+    </div>
+    <div class="tc" onclick="goTable('demo')">
+      <div class="tc-icon" style="background:rgba(255,214,10,.15);color:var(--warn);">7</div>
+      <div style="flex:1"><div class="tc-name">Tisch 7</div><div class="tc-sub">2 Gäste · gesendet</div></div>
+      <span class="chip cy">24:11</span>
+    </div>
+    <div class="tc" onclick="go('s-bill')">
+      <div class="tc-icon" style="background:rgba(255,69,58,.15);color:var(--danger);">12</div>
+      <div style="flex:1"><div class="tc-name">Tisch 12</div><div class="tc-sub">6 Gäste · Rechnung</div></div>
+      <span class="chip cr">38:47</span>
+    </div>
+    <div class="sl">Mitnahme</div>
+    <div class="tc" onclick="goTable('demo')">
+      <div class="tc-icon" style="background:rgba(255,69,58,.15);font-size:22px;">🥡</div>
+      <div style="flex:1"><div class="tc-name">Mitnahme #2</div><div class="tc-sub">1 Person · ausstehend</div></div>
+      <span class="chip cr">35:02</span>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     SCREEN 2 — Tischskizze (alles in einem)
+════════════════════════════════ -->
+<div class="screen" id="s-table">
+  <div class="sb"><span class="sb-t" id="tbl-clock">19:35</span><div class="sb-i"><span>▲</span><span>🔋</span></div></div>
+
+  <!-- Mini-Header: Back | Tischnummer | Timer | Senden -->
+  <div class="table-hdr">
+    <button class="back" onclick="go('s-home')">‹</button>
+    <button class="tn-badge" id="tn-badge" onclick="enterTnMode()" title="Tischnummer eingeben">T?</button>
+    <span class="chip cg" id="tbl-timer" style="margin-left:4px;display:none;">00:00</span>
+    <button class="snd-btn" id="snd-btn" onclick="go('s-send')">Senden →</button>
+  </div>
+
+  <!-- Canvas area: the whole experience -->
+  <div class="sketch-wrap" id="sketch-wrap">
+    <canvas id="sketch-cv"></canvas>
+
+    <!-- Guest dots + order tags live here (injected by JS) -->
+    <div id="guest-layer"></div>
+
+    <!-- OVERLAY A: Draw mode -->
+    <div class="overlay on" id="ov-draw">
+      <span class="ov-icon">✏️</span>
+      <div class="ov-hint">Zeichne den Tisch<br><span style="font-size:13px;color:var(--text3);">Finger halten und ziehen</span></div>
+      <button class="ov-btn" id="draw-done-btn" onclick="finishDraw()">Tisch fertig →</button>
+      <button onclick="goTable('demo')" style="background:var(--surface2);color:var(--text2);border:none;border-radius:20px;padding:9px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;">Demo laden</button>
+    </div>
+
+    <!-- OVERLAY B: Place mode -->
+    <div class="overlay" id="ov-place">
+      <div class="ov-hint">Tippe um Gäste zu platzieren</div>
+      <button class="ov-btn" id="place-done-btn" onclick="finishPlace()">Gäste fertig →</button>
+      <div class="ov-sub" id="place-count"></div>
+    </div>
+
+    <!-- OVERLAY C: Idle hint (fades) -->
+    <div id="ov-idle" style="position:absolute;bottom:12px;left:0;right:0;text-align:center;z-index:15;pointer-events:none;opacity:0;transition:opacity .3s;">
+      <span style="background:rgba(0,0,0,.6);color:var(--text3);font-size:13px;padding:6px 14px;border-radius:20px;backdrop-filter:blur(6px);">Gast antippen zum Bestellen · Lang drücken = Referenz</span>
+    </div>
+  </div>
+
+  <!-- Mode status strip -->
+  <div class="mode-bar" id="mode-bar">
+    <span class="mode-txt" id="mode-txt">Tisch zeichnen…</span>
+    <button class="mode-action" id="mode-action" onclick="modeAction()" style="display:none"></button>
+  </div>
+
+  <!-- "Bestellung aufgenommen" — nur im idle Modus sichtbar, startet Timer -->
+  <div id="order-confirm-bar" style="display:none;padding:8px 14px;flex-shrink:0;border-top:1px solid var(--border);">
+    <button onclick="confirmOrder()" style="width:100%;background:var(--success);color:#fff;border:none;border-radius:var(--r);padding:13px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">✓ Bestellung aufgenommen</button>
+  </div>
+
+  <!-- Code display + Keypad (hidden until guest selected or TN mode) -->
+  <div id="numpad-section" style="display:none;flex-direction:column;">
+    <div class="cd">
+      <div class="cd-row">
+        <span class="cd-code" id="cd-code">—</span>
+        <div>
+          <div class="cd-info" id="cd-info"><span class="cd-hint">Code eingeben…</span></div>
+          <div class="cd-who" id="cd-who"></div>
+        </div>
+      </div>
+    </div>
+    <div class="kp">
+      <button class="k kcat" id="k-hc" onclick="kIn('HC')">HC</button>
+      <button class="k kcat" id="k-rn" onclick="kIn('RN')">RN</button>
+      <button class="k kcat" id="k-c"  onclick="kIn('C')">C</button>
+      <button class="k" onclick="kIn('7')">7</button>
+      <button class="k" onclick="kIn('8')">8</button>
+      <button class="k" onclick="kIn('9')">9</button>
+      <button class="k" onclick="kIn('4')">4</button>
+      <button class="k" onclick="kIn('5')">5</button>
+      <button class="k" onclick="kIn('6')">6</button>
+      <button class="k" onclick="kIn('1')">1</button>
+      <button class="k" onclick="kIn('2')">2</button>
+      <button class="k" onclick="kIn('3')">3</button>
+      <button class="k kdel" onclick="kDel()">⌫</button>
+      <button class="k" onclick="kIn('0')">0</button>
+      <button class="k kok" id="k-ok" onclick="kOk()" disabled>✓</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     SCREEN 3 — Senden
+════════════════════════════════ -->
+<div class="screen" id="s-send">
+  <div class="sb"><span class="sb-t">19:41</span><div class="sb-i"><span>▲</span><span>🔋</span></div></div>
+  <div class="nh"><button class="back" onclick="go('s-table')">‹ Tisch</button><span class="nh-ttl">Senden · Tisch 3</span></div>
+  <div class="sc">
+    <div class="sl" style="margin-top:0">🍳 Küche <span style="font-weight:400;color:var(--text3)">(4 Speisen)</span></div>
+    <div class="si"><div class="si-dot" style="background:var(--accent)">2</div><div class="si-info"><div class="si-name">Hühnerfilet · Kokos Curry</div><div class="si-sub">Kombinieren · 33</div></div><div class="si-price">10,90 €</div></div>
+    <div class="si"><div class="si-dot" style="background:var(--accent)">2</div><div class="si-info"><div class="si-name">Thai Basilikum Huhn</div><div class="si-sub">Hotcooked · HC2</div></div><div class="si-price">12,90 €</div></div>
+    <div class="si"><div class="si-dot" style="background:var(--success)">3</div><div class="si-info"><div class="si-name">Knuspriges Hühnchen</div><div class="si-sub">Kombinieren · 61</div></div><div class="si-price">11,90 €</div></div>
+    <div class="si"><div class="si-dot" style="background:#8b5cf6">4</div><div class="si-info"><div class="si-name">Rindfleisch mit Zwiebeln</div><div class="si-sub">Hotcooked · HC1</div></div><div class="si-price">12,90 €</div></div>
+    <div class="sl">🍹 Bar</div>
+    <div class="empty">Keine Getränke erfasst</div>
+    <div style="height:16px"></div>
+  </div>
+  <div class="bb">
+    <div class="snd-row">
+      <button class="sb2 sb2-k" onclick="doSend('Küche')"><span class="sb2-icon">🍳</span><span>An Küche</span><span class="sb2-sub">4 Gerichte</span></button>
+      <button class="sb2 sb2-b" onclick="doSend('Bar')"><span class="sb2-icon">🍹</span><span>An Bar</span><span class="sb2-sub">leer</span></button>
+    </div>
+  </div>
+  <div class="lo" id="send-lo"><div class="spinner"></div><div class="lo-t" id="lo-txt">Sende…</div></div>
+  <div class="toast ok" id="send-toast"><span style="font-size:18px">✅</span><span class="toast-txt" id="toast-txt">Gesendet</span></div>
+</div>
+
+
+<!-- ════════════════════════════════
+     SCREEN 4 — Rechnung
+════════════════════════════════ -->
+<div class="screen" id="s-bill">
+  <div class="sb"><span class="sb-t">20:12</span><div class="sb-i"><span>▲</span><span>🔋</span></div></div>
+  <div class="nh"><button class="back" onclick="go('s-home')">‹</button><span class="nh-ttl">Rechnung · Tisch 12</span></div>
+  <div class="bgs">
+    <button class="bgb sel" onclick="selBg(this)">Gast 2+3</button>
+    <button class="bgb" onclick="selBg(this)">Gast 4+5</button>
+    <button class="bgb" onclick="selBg(this)">Gast 6</button>
+    <button class="bgb" onclick="selBg(this)">Alle</button>
+  </div>
+  <div class="bc">
+    <div class="sl" style="margin-top:0">Gast 2</div>
+    <div class="bi"><div class="bi-l"><div class="nm">Hühnerfilet · Kokos Curry</div><div class="cd2">Kombinieren 33</div></div><div class="bi-p">10,90 €</div></div>
+    <div class="bi"><div class="bi-l"><div class="nm">Thai Basilikum Huhn</div><div class="cd2">Hotcooked HC2</div></div><div class="bi-p">12,90 €</div></div>
+    <div class="sl">Gast 3</div>
+    <div class="bi"><div class="bi-l"><div class="nm">Knuspriges Hühnchen</div><div class="cd2">Kombinieren 61</div></div><div class="bi-p">11,90 €</div></div>
+    <div style="height:8px"></div>
+  </div>
+  <div class="btot"><span class="btot-l">Gesamt</span><span class="btot-a">35,70 €</span></div>
+  <div class="ba">
+    <button class="bab" onclick="go('s-home')"><span class="icon">✏️</span><span>Korrigieren</span></button>
+    <button class="bab primary"><span class="icon">🖨️</span><span>Drucken</span></button>
+  </div>
+</div>
+
+</div><!-- /phone -->
+
+<!-- Demo nav -->
+<div class="demo-nav" style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:5px;background:rgba(10,10,10,.9);padding:6px;border-radius:22px;backdrop-filter:blur(12px);">
+  <button onclick="go('s-home')"       style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">🏠 Home</button>
+  <button onclick="goTable('new')"     style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">✏️ Neu</button>
+  <button onclick="goTable('demo')"    style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">📋 Demo</button>
+  <button onclick="go('s-send')"       style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">📤 Senden</button>
+  <button onclick="go('s-bill')"       style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">🧾 Rechnung</button>
+</div>
+
+<script>
+// ── Menu data ──────────────────────────────────────────────
+const MENU = {
+  k:{m:{1:'Gemüse',2:'Tofu',3:'Hühnerfilet',4:'Pan. Hühnchen',5:'Rindfleisch',6:'Kn. Hühnchen',7:'Kn. Ente'},
+     s:{1:'Chop Suey',2:'Chili Sauce',3:'Kokos Curry',4:'Süßsauer',5:'Kanton Art',6:'Erdnuss',7:'Kokos Sauce'},
+     p:{1:9.9,2:10.9,3:10.9,4:11.9,5:11.9,6:11.9,7:12.9}},
+  hc:{HC1:{n:'Rindfleisch mit Zwiebeln',p:12.9},HC2:{n:'Thai Basilikum Huhn',p:12.9},HC3:{n:'Verschiedene Fleischsorten',p:12.9},HC4:{n:'Hong Kong Ente',p:13.9}},
+  rn:{RN1:{n:'Gebr. Reis/Nudel · Huhn',p:10.9},RN2:{n:'Gebr. Curryreis · Huhn',p:10.9},RN3:{n:'Kn. Hühnchen · Nudel/Reis',p:11.9},RN4:{n:'Kn. Ente · Nudel/Reis',p:12.9},RN5:{n:'Garnelen · Nudel/Reis',p:14.9}},
+  c:{C01:{n:'Kn. Hühnchen · Kokosmilch',p:14.9},C02:{n:'Kn. Hühnchen · Kokos Curry',p:14.9},C03:{n:'Seelachs · Süßsauer',p:14.9},C04:{n:'Seelachs · Kokos Sauce',p:14.9},C05:{n:'HC Rind & Huhn (vietn.)',p:15.9},C06:{n:'HC Fleischsorten · Kn. Ente',p:18.9},C07:{n:'Saigon Ente · Süßsauer',p:17.9},C08:{n:'Hue Ente · Orangen Sauce',p:17.9},C09:{n:'Hanoi Ente · Knoblauch',p:18.9},C10:{n:'Tai King Ente · Kanton Art',p:18.9},C11:{n:'Bangkok Ente · Kokos Curry',p:18.9},C12:{n:'Riesengarnelen · Kanton Art',p:24.9},C13:{n:'HC Garnelen · Chili',p:24.9},C14:{n:'Pho Xao · Reisbandnudel',p:14.9},C15:{n:'Pho Gion · Kn. Nudel',p:14.9},C16:{n:'Bun Bo · Rind',p:14.9},C17:{n:'Udon Xao · Reisnudel',p:14.9},C18:{n:'Mien Xao · Glasnudel',p:17.9},C19:{n:'Tofu · Pak Choi',p:14.9},C20:{n:'Pho · Nudelsuppe',p:12.9}}
+};
+
+function resolve(raw) {
+  const c = raw.toUpperCase().trim();
+  if (!c) return {hint:'Code eingeben…'};
+  if (c==='HC') return {hint:'Hotcooked: HC1–HC4'};
+  if (c==='RN') return {hint:'Reis/Nudeln: RN1–RN5'};
+  if (c==='C')  return {hint:'Chef Specials: C01–C20'};
+  if (/^HC/.test(c)){const x=MENU.hc[c];return x?{name:x.n,price:x.p}:{err:`"${c}" unbekannt`};}
+  if (/^RN/.test(c)){const x=MENU.rn[c];return x?{name:x.n,price:x.p}:{err:`"${c}" unbekannt`};}
+  if (/^C\d/.test(c)){const k='C'+String(parseInt(c.slice(1))).padStart(2,'0');const x=MENU.c[k];return x?{name:x.n,price:x.p}:{err:`"${c}" unbekannt`};}
+  if (/^\d$/.test(c)){const m=MENU.k.m[c];return m?{hint:`${m} + Sauce wählen (1–7)`}:{err:`Gericht "${c}" unbekannt`};}
+  if (/^\d{2}$/.test(c)){const m=MENU.k.m[c[0]],s=MENU.k.s[c[1]],p=MENU.k.p[c[0]];return(m&&s)?{name:`${m} · ${s}`,price:p}:{err:`Kombination "${c}" unbekannt`};}
+  return {err:`"${c}" nicht erkannt`};
+}
+
+// ── State ──────────────────────────────────────────────────
+let tMode = 'draw';   // draw | place | idle | selected | tn
+let guests = [];
+let activeGid = null;
+let inputCode = '';
+let tnInput = '';
+let tableNum = '';
+let timerSec = 0;
+let timerIv = null;
+let cvInited = false;
+let isDrawing = false;
+let drawnPaths = [];
+let curPath = [];
+
+// Canvas refs
+let cv, ctx, guestLayer, sketchWrap;
+
+// ── Navigation ──────────────────────────────────────────────
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goTable(type) {
+  go('s-table');
+  // Wait for screen to be visible before sizing canvas
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    initCanvas();
+    if (type === 'demo') loadDemo();
+    else resetTable();
+  }));
+}
+
+// ── Canvas init ──────────────────────────────────────────────
+function initCanvas() {
+  cv = document.getElementById('sketch-cv');
+  ctx = cv.getContext('2d');
+  guestLayer = document.getElementById('guest-layer');
+  sketchWrap = document.getElementById('sketch-wrap');
+
+  const W = sketchWrap.offsetWidth;
+  const H = sketchWrap.offsetHeight;
+  cv.width = W;
+  cv.height = H;
+
+  if (!cvInited) {
+    cvInited = true;
+    // Touch
+    cv.addEventListener('touchstart', onStart, {passive:false});
+    cv.addEventListener('touchmove',  onMove,  {passive:false});
+    cv.addEventListener('touchend',   onEnd,   {passive:false});
+    // Mouse (desktop) — use document for mouseup so release outside canvas is caught
+    cv.addEventListener('mousedown', e => { e.preventDefault(); onStart({touches:[{clientX:e.clientX,clientY:e.clientY}], preventDefault:()=>{}}); });
+    document.addEventListener('mousemove', e => { if (e.buttons === 1) onMove({touches:[{clientX:e.clientX,clientY:e.clientY}], preventDefault:()=>{}}); });
+    document.addEventListener('mouseup', onEnd);
+  }
+}
+
+function getXY(e) {
+  const r = cv.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return {x: t.clientX - r.left, y: t.clientY - r.top};
+}
+
+// ── Drawing ──────────────────────────────────────────────────
+function onStart(e) {
+  e.preventDefault();
+  const p = getXY(e);
+  if (tMode === 'draw') {
+    isDrawing = true;
+    curPath = [p];
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  } else if (tMode === 'place') {
+    placeGuest(p.x, p.y);
+  }
+}
+
+function onMove(e) {
+  e.preventDefault();
+  if (!isDrawing || tMode !== 'draw') return;
+  const p = getXY(e);
+  curPath.push(p);
+  if (curPath.length >= 3) {
+    const prev = curPath[curPath.length - 2];
+    const mid = {x:(prev.x+p.x)/2, y:(prev.y+p.y)/2};
+    ctx.quadraticCurveTo(prev.x, prev.y, mid.x, mid.y);
+    ctx.stroke();
+  }
+}
+
+function onEnd() {
+  if (!isDrawing) return;
+  isDrawing = false;
+  if (curPath.length > 3) {
+    drawnPaths.push([...curPath]);
+    curPath = [];
+    document.getElementById('draw-done-btn').classList.add('show');
+  }
+}
+
+function finishDraw() {
+  // Close + fill each drawn path to look like a table
+  drawnPaths.forEach(path => {
+    ctx.beginPath();
+    ctx.moveTo(path[0].x, path[0].y);
+    path.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(38,38,42,0.95)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  });
+  setMode('place');
+}
+
+// ── Guest placement ──────────────────────────────────────────
+function placeGuest(x, y) {
+  const id = guests.length + 1;
+  guests.push({id, x, y, orders:[], isRef: id===1});
+  renderGuests();
+  const el = document.getElementById('place-count');
+  el.textContent = `${guests.length} Gast${guests.length>1?'…e':''} platziert`;
+  document.getElementById('place-done-btn').classList.add('show');
+}
+
+function finishPlace() {
+  setMode('idle');
+  startTimer(0);
+}
+
+// ── Guest selection & ordering ────────────────────────────────
+function selectGuest(id) {
+  if (tMode === 'place') return;
+  activeGid = id;
+  inputCode = '';
+  setMode('selected');
+  updateCodeDisplay();
+  renderGuests();
+}
+
+function deselectGuest() {
+  activeGid = null;
+  setMode('idle');
+  renderGuests();
+}
+
+function setRef(id) {
+  guests.forEach(g => g.isRef = g.id === id);
+  renderGuests();
+}
+
+// ── Render guests ─────────────────────────────────────────────
+function renderGuests() {
+  guestLayer.innerHTML = '';
+  guests.forEach(g => {
+    const div = document.createElement('div');
+    div.className = 'gdot' +
+      (g.isRef ? ' ref' : '') +
+      (g.id === activeGid ? ' active' : '') +
+      (g.orders.length > 0 ? ' done' : '');
+    div.textContent = g.id;
+    div.style.left = g.x + 'px';
+    div.style.top  = g.y + 'px';
+
+    // Tap: select
+    div.addEventListener('click', e => { e.stopPropagation(); selectGuest(g.id); });
+    // Long press: set as reference
+    let lp;
+    div.addEventListener('touchstart', () => { lp = setTimeout(() => { setRef(g.id); vibrate(); }, 500); }, {passive:true});
+    div.addEventListener('touchend',   () => clearTimeout(lp));
+    div.addEventListener('touchmove',  () => clearTimeout(lp));
+    guestLayer.appendChild(div);
+
+    // Order tags next to guest
+    if (g.orders.length > 0) {
+      g.orders.forEach((o, i) => {
+        const tag = document.createElement('div');
+        tag.className = 'order-tag';
+        tag.textContent = o.code;
+        // Offset to avoid overlapping the dot
+        tag.style.left = (g.x + 26) + 'px';
+        tag.style.top  = (g.y - 8 + i * 17) + 'px';
+        guestLayer.appendChild(tag);
+      });
+    }
+  });
+
+  // Tap on empty area in idle → deselect
+  guestLayer.onclick = e => {
+    if (e.target === guestLayer && tMode === 'selected') deselectGuest();
+  };
+}
+
+function vibrate() {
+  if (navigator.vibrate) navigator.vibrate(30);
+}
+
+// ── Mode management ───────────────────────────────────────────
+function setMode(m) {
+  tMode = m;
+
+  const ovDraw   = document.getElementById('ov-draw');
+  const ovPlace  = document.getElementById('ov-place');
+  const ovIdle   = document.getElementById('ov-idle');
+  const numpad   = document.getElementById('numpad-section');
+  const modeBar  = document.getElementById('mode-bar');
+  const modeTxt  = document.getElementById('mode-txt');
+  const modeAct  = document.getElementById('mode-action');
+  const sndBtn   = document.getElementById('snd-btn');
+  const gl       = document.getElementById('guest-layer');
+  const confBar  = document.getElementById('order-confirm-bar');
+
+  // Reset all
+  ovDraw.classList.remove('on');
+  ovPlace.classList.remove('on');
+  ovIdle.style.opacity = '0';
+  numpad.style.display = 'none';
+  modeAct.style.display = 'none';
+  confBar.style.display = 'none';
+  gl.classList.remove('interactive');
+  cv.style.cursor = 'default';
+
+  if (m === 'draw') {
+    ovDraw.classList.add('on');
+    cv.style.cursor = 'crosshair';
+    modeTxt.textContent = 'Tisch zeichnen…';
+    sndBtn.disabled = false;
+  } else if (m === 'place') {
+    ovPlace.classList.add('on');
+    cv.style.cursor = 'crosshair';
+    modeTxt.textContent = 'Gäste platzieren…';
+    gl.classList.add('interactive');
+    sndBtn.disabled = false;
+  } else if (m === 'idle') {
+    gl.classList.add('interactive');
+    modeTxt.textContent = guests.length > 0
+      ? `${guests.length} Gäste · ${guests.reduce((a,g)=>a+g.orders.length,0)} Gerichte`
+      : 'Keine Gäste';
+    ovIdle.style.opacity = '1';
+    setTimeout(() => { if (tMode==='idle') ovIdle.style.opacity='0'; }, 2500);
+    modeAct.textContent = 'Neu zeichnen';
+    modeAct.style.display = 'block';
+    // Timer läuft noch nicht — Button zeigen
+    if (!timerIv) confBar.style.display = 'block';
+    sndBtn.disabled = false;
+  } else if (m === 'selected') {
+    gl.classList.add('interactive');
+    const g = guests.find(x => x.id === activeGid);
+    modeTxt.textContent = `Gast ${activeGid}${g && g.isRef ? ' 🟡' : ''}`;
+    modeAct.textContent = 'Schließen ✕';
+    modeAct.style.display = 'block';
+    numpad.style.display = 'flex';
+    // Update who label
+    document.getElementById('cd-who').textContent =
+      g ? `${g.orders.length} Gericht${g.orders.length!==1?'e':''} · Gast ${activeGid}` : '';
+    // Toggle category keys (active in order mode)
+    ['k-hc','k-rn','k-c'].forEach(id => document.getElementById(id).classList.remove('dim'));
+    sndBtn.disabled = false;
+  } else if (m === 'tn') {
+    gl.classList.add('interactive');
+    tnInput = tableNum;
+    inputCode = tnInput;
+    numpad.style.display = 'flex';
+    modeTxt.textContent = 'Tischnummer eingeben';
+    modeAct.textContent = 'Abbrechen';
+    modeAct.style.display = 'block';
+    // Dim category keys in TN mode
+    ['k-hc','k-rn','k-c'].forEach(id => document.getElementById(id).classList.add('dim'));
+    updateCodeDisplay();
+  }
+}
+
+function modeAction() {
+  if (tMode === 'selected') deselectGuest();
+  else if (tMode === 'tn') { tMode = 'idle'; setMode('idle'); }
+  else if (tMode === 'idle') resetTable();
+}
+
+// ── TN mode ───────────────────────────────────────────────────
+function enterTnMode() {
+  if (tMode === 'draw' || tMode === 'place') return;
+  setMode('tn');
+  inputCode = tableNum || '';
+  updateCodeDisplay();
+}
+
+// ── Keypad ────────────────────────────────────────────────────
+function kIn(key) {
+  if (tMode === 'tn') {
+    if (key === 'HC' || key === 'RN' || key === 'C') return; // disabled in TN mode
+    if (inputCode.length >= 2) return;
+    inputCode += key;
+  } else if (tMode === 'selected') {
+    if (key === 'HC' || key === 'RN') { inputCode = key; }
+    else if (key === 'C') { inputCode = 'C'; }
+    else { inputCode += key; }
+  }
+  updateCodeDisplay();
+}
+
+function kDel() {
+  inputCode = inputCode.slice(0, -1);
+  updateCodeDisplay();
+}
+
+function kOk() {
+  if (tMode === 'tn') {
+    const n = parseInt(inputCode);
+    if (n >= 1 && n <= 50) {
+      tableNum = inputCode;
+      const badge = document.getElementById('tn-badge');
+      badge.textContent = 'T' + tableNum;
+      badge.classList.add('set');
+    }
+    inputCode = '';
+    setMode('idle');
+    return;
+  }
+  if (tMode !== 'selected') return;
+  const r = resolve(inputCode);
+  if (!r.name) return;
+  const g = guests.find(x => x.id === activeGid);
+  if (g) {
+    g.orders.push({code: inputCode, name: r.name, price: r.price});
+    renderGuests();
+    // Brief success flash
+    const el = document.getElementById('cd-code');
+    el.style.color = 'var(--success)';
+    setTimeout(() => { el.style.color = 'var(--accent)'; inputCode = ''; updateCodeDisplay(); }, 320);
+  }
+}
+
+function updateCodeDisplay() {
+  const codeEl = document.getElementById('cd-code');
+  const infoEl = document.getElementById('cd-info');
+  const okBtn  = document.getElementById('k-ok');
+  if (!codeEl) return;
+
+  if (tMode === 'tn') {
+    codeEl.textContent = inputCode ? 'T' + inputCode : 'T?';
+    const n = parseInt(inputCode);
+    if (!inputCode) {
+      infoEl.innerHTML = '<span class="cd-hint">Tischnummer 1–50</span>';
+      okBtn.disabled = true;
+    } else if (n < 1 || n > 50) {
+      infoEl.innerHTML = '<span class="cd-err">Nur 1–50 möglich</span>';
+      okBtn.disabled = true;
+    } else {
+      infoEl.innerHTML = `<strong style="color:var(--success)">Tisch ${n} ✓</strong>`;
+      okBtn.disabled = false;
+    }
+    return;
+  }
+
+  codeEl.textContent = inputCode || '—';
+  if (!inputCode) {
+    infoEl.innerHTML = '<span class="cd-hint">Code eingeben…</span>';
+    okBtn.disabled = true;
+    return;
+  }
+  const r = resolve(inputCode);
+  if (r.name) {
+    infoEl.innerHTML = `${r.name} <strong style="color:var(--success)">${r.price.toFixed(2).replace('.',',')} €</strong>`;
+    okBtn.disabled = false;
+  } else if (r.err) {
+    infoEl.innerHTML = `<span class="cd-err">${r.err}</span>`;
+    okBtn.disabled = true;
+  } else {
+    infoEl.innerHTML = `<span class="cd-hint">${r.hint}</span>`;
+    okBtn.disabled = true;
+  }
+}
+
+// ── Bestellung aufgenommen ────────────────────────────────────
+function confirmOrder() {
+  const bar = document.getElementById('order-confirm-bar');
+  bar.style.display = 'none';
+  startTimer(0);
+  const chip = document.getElementById('tbl-timer');
+  chip.style.display = 'inline-flex';
+}
+
+// ── Timer ─────────────────────────────────────────────────────
+function startTimer(startSec) {
+  if (timerIv) clearInterval(timerIv);
+  timerSec = startSec || 0;
+  timerIv = setInterval(() => {
+    timerSec++;
+    const m = String(Math.floor(timerSec/60)).padStart(2,'0');
+    const s = String(timerSec%60).padStart(2,'0');
+    const el = document.getElementById('tbl-timer');
+    if (el) el.textContent = m+':'+s;
+    // Color escalation: <10min green, <25min yellow, else red
+    if (el) {
+      el.className = 'chip ' + (timerSec < 600 ? 'cg' : timerSec < 1500 ? 'cy' : 'cr');
+    }
+  }, 1000);
+}
+
+// ── Reset ─────────────────────────────────────────────────────
+function resetTable() {
+  guests = [];
+  activeGid = null;
+  inputCode = '';
+  tableNum = '';
+  drawnPaths = [];
+  curPath = [];
+  isDrawing = false;
+  if (ctx) ctx.clearRect(0, 0, cv.width, cv.height);
+  if (guestLayer) guestLayer.innerHTML = '';
+  document.getElementById('draw-done-btn').classList.remove('show');
+  document.getElementById('place-done-btn').classList.remove('show');
+  const badge = document.getElementById('tn-badge');
+  badge.textContent = 'T?';
+  badge.classList.remove('set');
+  setMode('draw');
+  if (timerIv) clearInterval(timerIv);
+  timerSec = 0;
+  const el = document.getElementById('tbl-timer');
+  if (el) { el.textContent = '00:00'; el.className = 'chip cg'; }
+}
+
+// ── Demo pre-loaded state ──────────────────────────────────────
+function loadDemo() {
+  const W = cv.width, H = cv.height;
+  guests = [];
+  activeGid = null;
+  inputCode = '';
+  tableNum = '3';
+  drawnPaths = [];
+  ctx.clearRect(0, 0, W, H);
+
+  // Draw a hand-drawn-style rectangle (table)
+  const mx=55, my=70, tw=W-mx*2, th=Math.min(H*0.44, 200);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,0.78)';
+  ctx.fillStyle   = 'rgba(38,38,44,0.95)';
+  ctx.lineWidth = 2.8;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(mx+3,    my+5);
+  ctx.lineTo(mx+tw-2, my+3);
+  ctx.lineTo(mx+tw+4, my+th-4);
+  ctx.lineTo(mx-2,    my+th+3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  // Badge
+  const badge = document.getElementById('tn-badge');
+  badge.textContent = 'T3';
+  badge.classList.add('set');
+
+  // Place guests around the table
+  const cx = W/2, cy = my + th/2;
+  guests = [
+    {id:1, x:mx-16, y:my+th*0.35, orders:[{code:'HC2',name:'Thai Basilikum Huhn',price:12.9}], isRef:true},
+    {id:2, x:cx-20, y:my-18,      orders:[{code:'33', name:'Hühnerfilet · Kokos Curry',price:10.9}], isRef:false},
+    {id:3, x:mx+tw+18, y:my+th*0.6, orders:[], isRef:false},
+    {id:4, x:cx+10, y:my+th+18,   orders:[], isRef:false},
+  ];
+
+  renderGuests();
+  // Timer noch nicht gestartet — Confirm-Button soll sichtbar sein
+  if (timerIv) { clearInterval(timerIv); timerIv = null; }
+  timerSec = 0;
+  document.getElementById('tbl-timer').style.display = 'none';
+  setMode('idle');
+
+  document.getElementById('snd-btn').disabled = false;
+}
+
+// ── Shared helpers ────────────────────────────────────────────
+function doSend(dest) {
+  const lo = document.getElementById('send-lo');
+  document.getElementById('lo-txt').textContent = `Sende an ${dest}…`;
+  lo.classList.add('show');
+  setTimeout(() => {
+    lo.classList.remove('show');
+    const t = document.getElementById('send-toast');
+    document.getElementById('toast-txt').textContent = `✓ An ${dest} gesendet`;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }, 1600);
+}
+
+function selBg(btn) {
+  btn.closest('.bgs').querySelectorAll('.bgb').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+</script>
+</body>
+</html>

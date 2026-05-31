@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "title": "Asiatische Klassiker",
+    "lunchHours": "Montags – Freitags: 11:30 – 14:30 Uhr",
+    "lunchIncludes": "Peking Suppe oder Frühlingsrolle (außer an Feiertagen)"
+  },
+  "spiceLevels": [
+    { "index": 0, "label": "Nicht scharf",        "chiliCount": 0 },
+    { "index": 1, "label": "Leichte Schärfe",      "chiliCount": 1 },
+    { "index": 2, "label": "Asiatisch scharf",     "chiliCount": 2 },
+    { "index": 3, "label": "Wirklich sehr scharf", "chiliCount": 3 }
+  ],
+  "hotcooked": {
+    "note": "Auf heißer Pfanne serviert",
+    "items": {
+      "HC1": {
+        "name": "Rindfleisch mit Zwiebeln",
+        "description": "",
+        "price": 12.90,
+        "spiceLevel": 0
+      },
+      "HC2": {
+        "name": "Thai Basilikum Huhn",
+        "description": "Scharf angebraten mit Zitronengras und milder Chili",
+        "price": 12.90,
+        "spiceLevel": 1
+      },
+      "HC3": {
+        "name": "Verschiedene Fleischsorten",
+        "description": "Mit Gemüse nach Kanton Art",
+        "price": 12.90,
+        "spiceLevel": 1
+      },
+      "HC4": {
+        "name": "Hong Kong Ente",
+        "description": "Mit Gemüse in würziger Sauce",
+        "price": 13.90,
+        "spiceLevel": 1
+      }
+    }
+  },
+  "kombinieren": {
+    "note": "Rote Zahl für das Hauptgericht, blaue Zahl für die Sauce. Gemüse und Reis sind immer dabei. Kombinationscode = Hauptgericht-Nr. + Sauce-Nr. (z.B. '33' = Hühnerfilet + Kokos Curry)",
+    "mainDishes": {
+      "1": { "name": "Gemüse",             "price": 9.90,  "spiceLevel": 0 },
+      "2": { "name": "Tofu",               "price": 10.90, "spiceLevel": 0 },
+      "3": { "name": "Hühnerfilet",         "price": 10.90, "spiceLevel": 0 },
+      "4": { "name": "Paniertes Hühnchen", "price": 11.90, "spiceLevel": 0 },
+      "5": { "name": "Rindfleisch",        "price": 11.90, "spiceLevel": 0 },
+      "6": { "name": "Knuspriges Hühnchen","price": 11.90, "spiceLevel": 0 },
+      "7": { "name": "Knusprige Ente",     "price": 12.90, "spiceLevel": 0 }
+    },
+    "sauces": {
+      "1": { "name": "Chop Suey",    "spiceLevel": 0 },
+      "2": { "name": "Chili Sauce",  "spiceLevel": 1 },
+      "3": { "name": "Kokos Curry",  "spiceLevel": 1 },
+      "4": { "name": "Süßsauer",     "spiceLevel": 0 },
+      "5": { "name": "Kanton Art",   "spiceLevel": 1 },
+      "6": { "name": "Erdnuss",      "spiceLevel": 0 },
+      "7": { "name": "Kokos Sauce",  "spiceLevel": 0 }
+    }
+  },
+  "reisNudel": {
+    "note": "Reis-/Nudelgerichte mit Gemüse",
+    "items": {
+      "RN1": {
+        "name": "Gebratener Reis oder Nudel",
+        "description": "Mit Hühnerfleisch",
+        "price": 10.90,
+        "spiceLevel": 0
+      },
+      "RN2": {
+        "name": "Gebratener Curryreis oder -nudel",
+        "description": "Mit Hühnerfleisch",
+        "price": 10.90,
+        "spiceLevel": 1
+      },
+      "RN3": {
+        "name": "Hühnchen knusprig",
+        "description": "Mit gebratenen Nudel/Reis",
+        "price": 11.90,
+        "spiceLevel": 0
+      },
+      "RN4": {
+        "name": "Ente knusprig",
+        "description": "Mit gebratenen Nudel/Reis",
+        "price": 12.90,
+        "spiceLevel": 0
+      },
+      "RN5": {
+        "name": "Garnelen",
+        "description": "Mit gebratenen Nudel/Reis",
+        "price": 14.90,
+        "spiceLevel": 0
+      }
+    }
+  },
+  "chefSpecials": {
+    "C01": {
+      "name": "Knuspriges Hühnchen",
+      "description": "Mit Gemüse, Kokosmilch und Erdnuss Sauce",
+      "price": 14.90,
+      "spiceLevel": 0
+    },
+    "C02": {
+      "name": "Knuspriges Hühnchen",
+      "description": "Mit Gemüse und Kokos Curry",
+      "price": 14.90,
+      "spiceLevel": 1
+    },
+    "C03": {
+      "name": "Seelachs",
+      "description": "Mit Gemüse und Ingwer in Süßsauer Sauce",
+      "price": 14.90,
+      "spiceLevel": 0
+    },
+    "C04": {
+      "name": "Seelachs",
+      "description": "Mit Gemüse der Saison und Kokos Sauce",
+      "price": 14.90,
+      "spiceLevel": 0
+    },
+    "C05": {
+      "name": "Hotcooked Rind und Huhn",
+      "description": "Nach vietnamesischer Art",
+      "price": 15.90,
+      "spiceLevel": 1
+    },
+    "C06": {
+      "name": "Hotcooked verschiedene Fleischsorten",
+      "description": "Mit knuspriger Ente und Gemüse",
+      "price": 18.90,
+      "spiceLevel": 1
+    },
+    "C07": {
+      "name": "\"Saigon Ente\" knusprig",
+      "description": "Mit Gemüse der Saison, Ananas und Süßsauer Sauce",
+      "price": 17.90,
+      "spiceLevel": 0
+    },
+    "C08": {
+      "name": "\"Hue Ente\" knusprig",
+      "description": "Mit Gemüse der Saison und Orangen Sauce",
+      "price": 17.90,
+      "spiceLevel": 0
+    },
+    "C09": {
+      "name": "Hotcooked \"Hanoi Ente\" knusprig",
+      "description": "Mit Pak Choi und Knoblauch in würziger Sauce",
+      "price": 18.90,
+      "spiceLevel": 0
+    },
+    "C10": {
+      "name": "Hotcooked \"Tai King Ente\" knusprig",
+      "description": "Mit Gemüse der Saison nach Kanton Art",
+      "price": 18.90,
+      "spiceLevel": 1
+    },
+    "C11": {
+      "name": "Hotcooked \"Bangkok Ente\" knusprig",
+      "description": "Mit Gemüse der Saison und Kokos Curry",
+      "price": 18.90,
+      "spiceLevel": 0
+    },
+    "C12": {
+      "name": "Riesengarnelen aus dem Wok",
+      "description": "Mit Gemüse der Saison nach Kanton Art",
+      "price": 24.90,
+      "spiceLevel": 1
+    },
+    "C13": {
+      "name": "Hotcooked gegrillte Riesengarnelen",
+      "description": "Mit Gemüse der Saison und Knoblauch-Chili Sauce",
+      "price": 24.90,
+      "spiceLevel": 1
+    },
+    "C14": {
+      "name": "\"Pho Xao\" Gebratene Reisbandnudel",
+      "description": "Mit Rind oder Huhn und asiatischem Gemüse in würziger Sauce",
+      "price": 14.90,
+      "spiceLevel": 0
+    },
+    "C15": {
+      "name": "\"Pho Gion\" Knusprige Reisbandnudel",
+      "description": "Mit Hühnchen, Gemüse und Erdnuss Sauce",
+      "price": 14.90,
+      "spiceLevel": 0
+    },
+    "C16": {
+      "name": "\"Bun Bo\" Reisfadennudeln mit Rindfleisch",
+      "description": "Sowie Salat, Zitronengras, Röstzwiebeln und vietnamesische Rollen (Empfehlung für warme Tage)",
+      "price": 14.90,
+      "spiceLevel": 0
+    },
+    "C17": {
+      "name": "\"Udon Xao\" Gebratene dicke Reisnudel",
+      "description": "Mit Rind oder Huhn und asiatischem Gemüse in Schwarzer Bohnen Sauce",
+      "price": 14.90,
+      "spiceLevel": 0
+    },
+    "C18": {
+      "name": "\"Mien Xao\" Gebratene Glasnudel",
+      "description": "Mit Garnelen, Rindfleisch und asiatischem Gemüse",
+      "price": 17.90,
+      "spiceLevel": 0
+    },
+    "C19": {
+      "name": "Tofu mit Pak Choi",
+      "description": "Mit Knoblauch in würziger Sauce",
+      "price": 14.90,
+      "spiceLevel": 0
+    },
+    "C20": {
+      "name": "\"Pho\" vietnamesische Nudelsuppe",
+      "description": "Mit Rind oder Huhn",
+      "price": 12.90,
+      "spiceLevel": 0
+    }
+  }
+}
