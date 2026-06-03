@@ -15,10 +15,20 @@ Die Speisekarte ist in `menu.config.json` definiert.
 
 ## Benutzer & Nutzungsszenario
 
-- Zielgruppe: 1–3 Bedienungen pro Tag (kein technisches Vorwissen erforderlich)
+- Zielgruppe: 1–3 Bedienungen pro Tag
 - Gerät: Smartphone (mobile only)
 - Restaurantkapazität: ca. 60–80 Gäste gleichzeitig
 - Workflow: Bedienung geht zum Tisch → nimmt Bestellung auf → App berechnet Preis automatisch
+
+### Power User – zentrales UI/UX-Prinzip
+
+Die Bedienungen sind **täglich wiederkehrende Nutzer**, die die App vielfach pro Schicht einsetzen. Daraus folgen konkrete Designentscheidungen:
+
+- **Effizienz vor Erlernbarkeit** – eine höhere Lernkurve ist akzeptabel, wenn sie dauerhaft schnelleres Arbeiten ermöglicht
+- **Keine Händchenhaltung** – keine Onboarding-Texte, keine Tooltips, keine erklärenden Labels für offensichtliche Aktionen
+- **Kompaktes, dichtes Layout** – Platzverschwendung für „Anfänger-Komfort" (große Buttons, viel Weißraum, redundante Beschriftungen) ist abzulehnen
+- **Keine unnötigen Bestätigungsdialoge** für häufige Aktionen – Unterbrechungen kosten im Stress wertvolle Sekunden
+- **Gesten und Shortcuts** sind willkommen – Power User lernen und nutzen sie aktiv
 
 ---
 
