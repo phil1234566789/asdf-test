@@ -139,6 +139,13 @@ Jede Karte zeigt genau diese vier Informationen – nicht mehr:
 | **Timer** | Wartezeit in ganzen Minuten |
 | **Bestellstatus** | Aktueller Status der Bestellung (noch zu definieren) |
 
+### Nachspeisen-Indikator
+
+- Enthält ein Tisch mindestens eine **Menü-Bestellung**, erscheint auf der Übersichtskarte ein **Nachspeisen-Hinweis**
+- Zweck: B weiß auf einen Blick, dass sie bei diesem Tisch wegen der Nachspeise nachfragen muss
+- Der Hinweis muss auch im Stress gut erkennbar sein (kein dezentes Icon, das übersehen wird)
+- Konkrete Umsetzung (Icon, Badge, Farbe, Position auf der Karte) noch zu definieren
+
 ---
 
 ## Wartezeit-Anzeige

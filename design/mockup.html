@@ -108,7 +108,6 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 .gdot{position:absolute;width:42px;height:42px;border-radius:50%;background:var(--surface2);border:2.5px solid var(--surface3);color:var(--text2);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);cursor:pointer;z-index:20;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none;}
 .gdot.ref{border-color:var(--warn);}
 .gdot.active{background:var(--accent);border-color:var(--accent);color:#fff;width:48px;height:48px;font-size:15px;z-index:25;}
-.gdot.done::after{content:'';position:absolute;bottom:1px;right:1px;width:11px;height:11px;background:var(--success);border-radius:50%;border:2px solid #0a0a0c;}
 .order-tag{position:absolute;background:rgba(28,28,30,0.92);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;color:var(--accent);z-index:18;pointer-events:none;white-space:nowrap;backdrop-filter:blur(4px);}
 
 /* Status-Leiste (Idle) */
@@ -527,7 +526,7 @@ function openTable(num, shape, seats, onReady) {
 // ── Tisch-Extension ─────────────────────────────────────────
 const UH = 140, GAP = 4;       // Einheit: Tisch-Höhe (Hochformat)
 const TW = 104;                 // Tisch-Breite (Hochformat)
-const SEAT_X = 82;             // horizontaler Abstand Mitte → Sitzplatz
+const SEAT_X = 27;             // Kreis an Innenkante links/rechts (TW/2 - Radius - Margin)
 const SEAT_Y = 38;             // vertikaler Abstand Mitte → Sitzplatz
 
 let tableExtTop = false, tableExtBottom = false;
@@ -689,8 +688,7 @@ function renderGuests() {
     const div = document.createElement('div');
     div.className = 'gdot' +
       (g.isRef         ? ' ref'    : '') +
-      (g.id===activeGid? ' active' : '') +
-      (g.orders.length ? ' done'   : '');
+      (g.id===activeGid? ' active' : '');
     div.textContent = g.id;
     div.style.left = g.x + 'px';
     div.style.top  = g.y + 'px';
@@ -701,14 +699,20 @@ function renderGuests() {
     div.addEventListener('touchmove',  () => clearTimeout(lp));
     gl.appendChild(div);
 
-    g.orders.forEach((o, i) => {
-      const tag = document.createElement('div');
-      tag.className = 'order-tag';
-      tag.textContent = o.code;
-      tag.style.left = (g.x + 26) + 'px';
-      tag.style.top  = (g.y - 8 + i * 17) + 'px';
-      gl.appendChild(tag);
-    });
+    if (g.orders.length > 0) {
+      const area  = document.getElementById('tbl-area');
+      const cx    = area.offsetWidth / 2;
+      const isLeft = g.x < cx;
+      g.orders.forEach((o, i) => {
+        const tag = document.createElement('div');
+        tag.className = 'order-tag';
+        tag.textContent = o.code;
+        // Links vom Tisch für linke Kreise, rechts für rechte Kreise
+        tag.style.left = isLeft ? (g.x - 62) + 'px' : (g.x + 26) + 'px';
+        tag.style.top  = (g.y - 8 + i * 17) + 'px';
+        gl.appendChild(tag);
+      });
+    }
   });
 
   gl.onclick = e => { if (e.target === gl && tMode === 'selected') deselectGuest(); };

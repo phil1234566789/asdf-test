@@ -46,6 +46,13 @@
 - Wartezeit-Timer (Minuten)
 - Bestellstatus (noch zu definieren)
 
+### Nachspeisen-Indikator
+- Wer ein **Menü** bestellt, bekommt automatisch eine Nachspeise
+- In der Übersichtskarte erscheint ein **visueller Hinweis**, sobald ein Tisch mindestens eine Menü-Bestellung enthält
+- Zweck: B wird daran erinnert, beim Tisch nach der Nachspeise zu fragen
+- Der Indikator muss klar genug sein, um im Stress nicht übersehen zu werden
+- Details (Icon, Farbe, Platzierung auf der Karte) noch zu definieren
+
 ---
 
 ## Tischplan & Sitzplatzzuordnung
