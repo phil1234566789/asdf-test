@@ -93,9 +93,15 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 
 /* Tischvisualisierung */
 .tbl-area{flex:1;position:relative;overflow:hidden;background:#0a0a0c;}
-.tbl-shape{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--surface2);border:2.5px solid rgba(255,255,255,0.18);}
-.tbl-shape.rect{width:164px;height:104px;border-radius:var(--r);}
+.tbl-shape{position:absolute;background:var(--surface2);border:2.5px solid rgba(255,255,255,0.18);transform:translate(-50%,-50%);}
+.tbl-shape.rect{width:104px;height:140px;border-radius:var(--r);}
 .tbl-shape.round{width:148px;height:148px;border-radius:50%;}
+
+/* Tisch-Erweiterungs-Buttons */
+.ext-btn{position:absolute;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.04);border:2px dashed rgba(255,255,255,0.15);border-radius:var(--r-sm);color:rgba(255,255,255,0.25);font-size:22px;cursor:pointer;width:72px;height:32px;display:none;align-items:center;justify-content:center;font-family:inherit;-webkit-tap-highlight-color:transparent;z-index:30;}
+.ext-btn:active{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);}
+#ext-top{top:10px;}
+#ext-bottom{bottom:10px;}
 
 /* Gäste-Dots */
 #guest-layer{position:absolute;inset:0;pointer-events:all;z-index:10;}
@@ -308,7 +314,8 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 
   <!-- Tischvisualisierung mit Sitzplatz-Dots -->
   <div class="tbl-area" id="tbl-area">
-    <div class="tbl-shape rect" id="tbl-shape"></div>
+    <button class="ext-btn" id="ext-top"    onclick="addTableExtension('top')">+</button>
+    <button class="ext-btn" id="ext-bottom" onclick="addTableExtension('bottom')">+</button>
     <div id="guest-layer"></div>
   </div>
 
@@ -500,7 +507,6 @@ function openTable(num, shape, seats, onReady) {
 
   document.getElementById('tbl-label').textContent =
     tableNum.startsWith('D') ? `Draußen ${tableNum}` : `Tisch ${tableNum}`;
-  document.getElementById('tbl-shape').className = 'tbl-shape ' + tableShape;
   document.getElementById('numpad-section').style.display = 'none';
   document.getElementById('guest-layer').innerHTML = '';
 
@@ -518,34 +524,119 @@ function openTable(num, shape, seats, onReady) {
   }));
 }
 
-// ── Sitzplätze automatisch platzieren ──────────────────────
-function autoPlaceSeats() {
+// ── Tisch-Extension ─────────────────────────────────────────
+const UH = 140, GAP = 4;       // Einheit: Tisch-Höhe (Hochformat)
+const TW = 104;                 // Tisch-Breite (Hochformat)
+const SEAT_X = 82;             // horizontaler Abstand Mitte → Sitzplatz
+const SEAT_Y = 38;             // vertikaler Abstand Mitte → Sitzplatz
+
+let tableExtTop = false, tableExtBottom = false;
+
+function addTableExtension(side) {
+  if (side === 'top')    tableExtTop    = true;
+  if (side === 'bottom') tableExtBottom = true;
+  refreshTableLayout();
+  setMode(tMode);
+}
+
+function refreshTableLayout() {
   const area = document.getElementById('tbl-area');
+  const gl   = document.getElementById('guest-layer');
   const cx   = area.offsetWidth  / 2;
   const cy   = area.offsetHeight / 2;
 
+  area.querySelectorAll('.tbl-shape').forEach(s => s.remove());
+
+  const sections = (tableExtTop ? 1 : 0) + 1 + (tableExtBottom ? 1 : 0);
+  const totalH   = sections * UH + (sections - 1) * GAP;
+  const startCY  = cy - totalH / 2 + UH / 2;
+
+  // Tischform-Divs (hochkant) erstellen
+  for (let i = 0; i < sections; i++) {
+    const div = document.createElement('div');
+    div.className = 'tbl-shape rect';
+    div.style.cssText = `left:${cx}px;top:${startCY + i*(UH+GAP)}px;`;
+    area.insertBefore(div, gl);
+  }
+
+  // Sitzplatz-Positionen: links und rechts neben jedem Tischabschnitt
+  const positions = [];
+  for (let i = 0; i < sections; i++) {
+    const scy = startCY + i * (UH + GAP);
+    positions.push(
+      {x: cx - SEAT_X, y: scy - SEAT_Y},  // links oben
+      {x: cx + SEAT_X, y: scy - SEAT_Y},  // rechts oben
+      {x: cx + SEAT_X, y: scy + SEAT_Y},  // rechts unten
+      {x: cx - SEAT_X, y: scy + SEAT_Y},  // links unten
+    );
+  }
+
+  for (let i = guests.length; i < positions.length; i++) {
+    guests.push({id: i+1, x: 0, y: 0, orders: [], isRef: false});
+  }
+  guests.forEach((g, i) => {
+    if (i < positions.length) { g.x = positions[i].x; g.y = positions[i].y; }
+  });
+
+  const canExtend = tableShape === 'rect' && tableSeats === 4;
+  document.getElementById('ext-top').style.display    = (canExtend && !tableExtTop)    ? 'flex' : 'none';
+  document.getElementById('ext-bottom').style.display = (canExtend && !tableExtBottom) ? 'flex' : 'none';
+
+  renderGuests();
+}
+
+// ── Sitzplätze automatisch platzieren ──────────────────────
+function autoPlaceSeats() {
+  tableExtTop    = false;
+  tableExtBottom = false;
+
+  const area = document.getElementById('tbl-area');
+  const gl   = document.getElementById('guest-layer');
+  const cx   = area.offsetWidth  / 2;
+  const cy   = area.offsetHeight / 2;
+
+  area.querySelectorAll('.tbl-shape').forEach(s => s.remove());
+
   if (tableShape === 'round') {
+    const sh = document.createElement('div');
+    sh.className = 'tbl-shape round';
+    sh.style.cssText = `left:${cx}px;top:${cy}px;`;
+    area.insertBefore(sh, gl);
+    document.getElementById('ext-top').style.display    = 'none';
+    document.getElementById('ext-bottom').style.display = 'none';
     const r = 110;
     guests = Array.from({length: tableSeats}, (_, i) => {
       const angle = (2 * Math.PI * i / tableSeats) - Math.PI / 2;
       return {id: i+1, x: cx + r*Math.cos(angle), y: cy + r*Math.sin(angle), orders: [], isRef: i===0};
     });
-  } else {
-    // Rechteckig: 2 oben + 2 unten, bei 6 Plätzen zusätzlich 1 links + 1 rechts
-    const base = [
-      {id:1, x:cx-40, y:cy-100},
-      {id:2, x:cx+40, y:cy-100},
-      {id:3, x:cx+40, y:cy+100},
-      {id:4, x:cx-40, y:cy+100},
+    setMode('idle');
+    renderGuests();
+
+  } else if (tableSeats === 6) {
+    // Tisch 12 – langer Tisch hochkant, 3×links + 3×rechts
+    const sh = document.createElement('div');
+    sh.className = 'tbl-shape rect';
+    sh.style.cssText = `left:${cx}px;top:${cy}px;`;
+    area.insertBefore(sh, gl);
+    document.getElementById('ext-top').style.display    = 'none';
+    document.getElementById('ext-bottom').style.display = 'none';
+    guests = [
+      {id:1, x:cx-SEAT_X, y:cy-SEAT_Y*2, orders:[], isRef:true},
+      {id:2, x:cx+SEAT_X, y:cy-SEAT_Y*2, orders:[], isRef:false},
+      {id:3, x:cx+SEAT_X, y:cy,           orders:[], isRef:false},
+      {id:4, x:cx-SEAT_X, y:cy,           orders:[], isRef:false},
+      {id:5, x:cx-SEAT_X, y:cy+SEAT_Y*2, orders:[], isRef:false},
+      {id:6, x:cx+SEAT_X, y:cy+SEAT_Y*2, orders:[], isRef:false},
     ];
-    if (tableSeats >= 6) {
-      base.push({id:5, x:cx-100, y:cy});
-      base.push({id:6, x:cx+100, y:cy});
-    }
-    guests = base.slice(0, tableSeats).map((g, i) => ({...g, orders:[], isRef: i===0}));
+    setMode('idle');
+    renderGuests();
+
+  } else {
+    // Standard 4er-Tisch hochkant mit Erweiterungs-Buttons
+    guests = [];
+    refreshTableLayout();
+    setMode('idle');
   }
-  setMode('idle');
-  renderGuests();
 }
 
 // ── Mode ─────────────────────────────────────────────────────
@@ -704,10 +795,10 @@ function loadDemo() {
     const area = document.getElementById('tbl-area');
     const cx = area.offsetWidth / 2, cy = area.offsetHeight / 2;
     guests = [
-      {id:1, x:cx-40, y:cy-100, orders:[{code:'HC2', name:'Thai Basilikum Huhn',      price:12.9}], isRef:true},
-      {id:2, x:cx+40, y:cy-100, orders:[{code:'33',  name:'Hühnerfilet · Kokos Curry', price:10.9}], isRef:false},
-      {id:3, x:cx+40, y:cy+100, orders:[], isRef:false},
-      {id:4, x:cx-40, y:cy+100, orders:[], isRef:false},
+      {id:1, x:cx-SEAT_X, y:cy-SEAT_Y, orders:[{code:'HC2', name:'Thai Basilikum Huhn',       price:12.9}], isRef:true},
+      {id:2, x:cx+SEAT_X, y:cy-SEAT_Y, orders:[{code:'33',  name:'Hühnerfilet · Kokos Curry', price:10.9}], isRef:false},
+      {id:3, x:cx+SEAT_X, y:cy+SEAT_Y, orders:[], isRef:false},
+      {id:4, x:cx-SEAT_X, y:cy+SEAT_Y, orders:[], isRef:false},
     ];
     renderGuests();
     setMode('idle');
