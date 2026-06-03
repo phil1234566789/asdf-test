@@ -50,36 +50,38 @@
 
 ## Tischplan & Sitzplatzzuordnung
 
-### Freies Tisch-Zeichnen
-- Bedienung zeichnet Tischform per Finger direkt auf dem Bildschirm
-- Keine vorgegebenen Formen – unterstützt rechteckig, rund, L-Form, U-Form etc.
-- Muss in wenigen Sekunden erledigt sein
+### Tischform aus Config
+- Tischformen sind in `config/tables.config.json` vordefiniert – kein Zeichnen durch die Bedienung
+- Unterstützte Formen: rechteckig (Standard) und rund
+- Innen: Tische 1–50, davon 8, 9, 11, 12 rund – alle anderen rechteckig
+- Draußen: alle Tische rechteckig
+- Sitzplätze pro Tisch aus Config (`defaultSeats`); Standard: 4 Plätze
 
-### Gäste visuell platzieren
-- Nach dem Zeichnen: Tippen auf Stellen rund um den Tisch platziert einen Gast
-- Gäste erscheinen als nummerierte Kreise an der Tischkante – entspricht realer Sitzordnung
+### Sitzplätze anzeigen
+- Sitzplätze erscheinen als nummerierte Kreise rund um den Tischgrundriss – entspricht realer Sitzordnung
+- Anzahl der Sitzplätze entspricht `defaultSeats` aus der Config
+- B kann zusätzliche Sitzplätze hinzufügen – noch zu definieren
 
 ### Referenzgast
-- Einen Gast per langem Druck als Referenzpunkt markieren
-- Referenzgast wird farbig hervorgehoben; alle anderen Gäste werden relativ dazu zugeordnet
+- Einen Sitzplatz per langem Druck als Referenzpunkt markieren
+- Referenzgast wird farbig hervorgehoben; alle anderen werden relativ dazu zugeordnet
 
 ### Bestellung pro Sitzplatz
-- Gast antippen → Numpad öffnet sich → Code eingeben → Gericht erscheint als Label beim Gast
+- Sitzplatz antippen → Numpad öffnet sich → Code eingeben → Gericht erscheint als Label beim Sitzplatz
 - Zuordnung Gericht ↔ Sitzplatz ist beim Servieren und auf der Rechnung jederzeit sichtbar
 
 ### Alles in einer Ansicht
-- Kein separater Setup-Screen – Tisch zeichnen, Gäste platzieren und Bestellungen aufnehmen in einer einzigen Ansicht
+- Kein separater Setup-Screen – Tischansicht öffnet sich sofort, Bestellungen direkt aufnehmen
 
-### Tischnummer (optional)
-- Kleines, optionales Feld am Rand – kann jederzeit nachgetragen werden
-- Blockiert nicht den Start der Bestellaufnahme
+### Tischnummer
+- Wird aus der Übersicht übernommen und als Heading angezeigt – kein manuelles Eingeben nötig
 
 ---
 
 ## Tisch- & Abholoptionen
 
 ### Tisch Innen
-- Tischnummern 1–14 (kein Präfix)
+- Tischnummern 1–50 (kein Präfix)
 
 ### Tisch Draußen
 - D1–D10 (Präfix `D`)

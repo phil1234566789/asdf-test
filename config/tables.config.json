@@ -4,22 +4,34 @@
       "id": "indoor",
       "label": "Innen",
       "prefix": "",
-      "min": 1,
-      "max": 14
+      "tables": {
+        "count": 50,
+        "defaultShape": "rect",
+        "defaultSeats": 4,
+        "overrides": [
+          { "numbers": [8, 11], "shape": "round", "seats": 6 },
+          { "numbers": [9],     "shape": "round", "seats": 10 },
+          { "numbers": [12],    "shape": "rect",  "seats": 6 }
+        ]
+      }
     },
     {
       "id": "outdoor",
       "label": "Draußen",
       "prefix": "D",
-      "min": 1,
-      "max": 10
+      "tables": {
+        "count": 10,
+        "defaultShape": "rect",
+        "defaultSeats": 4
+      }
     },
     {
       "id": "takeaway",
       "label": "Mitnehmen",
       "prefix": "M",
-      "min": 1,
-      "max": 5
+      "tables": {
+        "count": 5
+      }
     }
   ]
 }

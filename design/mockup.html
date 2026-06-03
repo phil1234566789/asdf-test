@@ -34,19 +34,14 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 .cg{background:var(--success-light);color:var(--success);}
 .cy{background:var(--warn-light);color:var(--warn);}
 .cr{background:var(--danger-light);color:var(--danger);}
-.lh{padding:6px 20px 14px;flex-shrink:0;}
-.lh h1{font-size:32px;font-weight:700;color:var(--text);}
-.lh-s{font-size:13px;color:var(--text3);margin-top:3px;}
 .sc{flex:1;overflow-y:auto;padding:0 16px;-webkit-overflow-scrolling:touch;}
 .sc::-webkit-scrollbar{display:none;}
 .sl{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;}
 .bb{padding:10px 16px 28px;border-top:1px solid var(--border);flex-shrink:0;}
-.btn-p{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:15px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
 
 /* ── Home screen ── */
 .home-hdr{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;}
 .home-ttl{font-size:17px;font-weight:600;color:var(--text);}
-/* FAB Speed-Dial */
 .fab{position:absolute;bottom:24px;right:16px;z-index:50;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
 .fab-main{width:50px;height:50px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:26px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,107,53,.45);font-family:inherit;-webkit-tap-highlight-color:transparent;}
 .fab-opts{display:none;flex-direction:column;align-items:flex-end;gap:8px;}
@@ -54,56 +49,85 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 .fab-row{display:flex;align-items:center;gap:8px;}
 .fab-lbl{background:var(--surface2);color:var(--text);font-size:13px;font-weight:600;padding:5px 12px;border-radius:20px;white-space:nowrap;}
 .fab-btn{width:38px;height:38px;border-radius:50%;border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;}
+.user-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--text2);}
 
-/* ── Table sketch screen ── */
+/* ── Übersicht Grid ── */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
+.tcard{background:var(--surface);border-radius:var(--r);padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:2px solid transparent;-webkit-tap-highlight-color:transparent;min-height:88px;}
+.tcard:active{background:var(--surface2);}
+.tcard.mine{border-color:var(--accent);}
+.tc-num{font-size:22px;font-weight:700;color:var(--text);line-height:1.1;}
+.tc-bname{font-size:11px;color:var(--text3);}
+.tc-status{font-size:10px;color:var(--text3);margin-bottom:2px;}
+
+/* ── Bereichsfarben ── */
+:root{
+  --innen:#0A84FF;--innen-bg:rgba(10,132,255,0.10);
+  --draussen:#30D158;--draussen-bg:rgba(48,209,88,0.10);
+  --mitnahme:#BF5AF2;--mitnahme-bg:rgba(191,90,242,0.10);
+}
+.tcard.innen{background:var(--innen-bg);}
+.tcard.draussen{background:var(--draussen-bg);}
+.tcard.mitnahme{background:var(--mitnahme-bg);}
+.tcard.innen.mine{border-color:var(--innen);}
+.tcard.draussen.mine{border-color:var(--draussen);}
+.tcard.mitnahme.mine{border-color:var(--mitnahme);}
+.sl.innen{color:var(--innen);}
+.sl.draussen{color:var(--draussen);}
+.sl.mitnahme{color:var(--mitnahme);}
+
+/* ── Tischauswahl ── */
+.tpick-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:4px;}
+.tpick{aspect-ratio:1;border:2px solid var(--surface3);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.tpick.rect{border-radius:8px;}
+.tpick.round{border-radius:50%;}
+.tpick:active:not(:disabled){background:var(--surface2);}
+.tpick:disabled{opacity:0.2;cursor:not-allowed;}
+.tpick.innen{background:var(--innen-bg);border-color:var(--innen);color:var(--innen);}
+.tpick.draussen{background:var(--draussen-bg);border-color:var(--draussen);color:var(--draussen);}
+
+/* ── Bestellaufnahme ── */
 .table-hdr{height:50px;display:flex;align-items:center;gap:8px;padding:0 12px;flex-shrink:0;border-bottom:1px solid var(--border);}
-.tn-badge{background:var(--surface);border:none;border-radius:8px;padding:5px 10px;color:var(--text3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;min-width:52px;text-align:center;}
-.tn-badge.set{color:var(--text);}
-.snd-btn{margin-left:auto;background:var(--accent);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
-.snd-btn:disabled{background:var(--surface2);color:var(--text3);}
+.tbl-label{font-size:15px;font-weight:600;color:var(--text);flex:1;}
+.snd-btn{background:var(--accent);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
 
-/* Sketch area */
-.sketch-wrap{flex:1;position:relative;overflow:hidden;background:#0a0a0c;transition:flex .25s ease;}
-#sketch-cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;}
-#guest-layer{position:absolute;inset:0;pointer-events:none;z-index:10;}
-#guest-layer.interactive{pointer-events:all;}
+/* Tischvisualisierung */
+.tbl-area{flex:1;position:relative;overflow:hidden;background:#0a0a0c;}
+.tbl-shape{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--surface2);border:2.5px solid rgba(255,255,255,0.18);}
+.tbl-shape.rect{width:164px;height:104px;border-radius:var(--r);}
+.tbl-shape.round{width:148px;height:148px;border-radius:50%;}
 
-/* Guest dots */
+/* Gäste-Dots */
+#guest-layer{position:absolute;inset:0;pointer-events:all;z-index:10;}
 .gdot{position:absolute;width:42px;height:42px;border-radius:50%;background:var(--surface2);border:2.5px solid var(--surface3);color:var(--text2);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);cursor:pointer;z-index:20;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none;}
 .gdot.ref{border-color:var(--warn);}
 .gdot.active{background:var(--accent);border-color:var(--accent);color:#fff;width:48px;height:48px;font-size:15px;z-index:25;}
 .gdot.done::after{content:'';position:absolute;bottom:1px;right:1px;width:11px;height:11px;background:var(--success);border-radius:50%;border:2px solid #0a0a0c;}
 .order-tag{position:absolute;background:rgba(28,28,30,0.92);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;color:var(--accent);z-index:18;pointer-events:none;white-space:nowrap;backdrop-filter:blur(4px);}
 
-/* Overlays */
-.overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:30;pointer-events:none;}
-.overlay.on{display:flex;pointer-events:all;}
-.ov-hint{font-size:16px;color:var(--text3);text-align:center;padding:0 32px;line-height:1.5;}
-.ov-icon{font-size:40px;}
-.ov-btn{background:var(--accent);color:#fff;border:none;border-radius:24px;padding:10px 24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;display:none;}
-.ov-btn.show{display:block;}
-.ov-sub{font-size:13px;color:var(--text3);}
-
-/* Mode status bar */
-.mode-bar{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;border-top:1px solid var(--border);}
+/* Status-Leiste (Idle) */
+.mode-bar{height:36px;display:flex;align-items:center;padding:0 16px;flex-shrink:0;border-top:1px solid var(--border);}
 .mode-txt{font-size:13px;color:var(--text3);}
-.mode-action{font-size:13px;color:var(--accent);font-weight:600;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px;}
 
-/* Code display */
+/* Numpad-Overlay */
+#numpad-section{position:absolute;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);z-index:30;display:none;flex-direction:column;}
+.np-bar{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.np-who{font-size:13px;color:var(--text3);}
+.np-close{background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;padding:4px;}
+
+/* Code-Display */
 .cd{margin:0 16px 6px;background:var(--surface);border-radius:var(--r);padding:10px 14px;min-height:56px;flex-shrink:0;}
 .cd-row{display:flex;align-items:center;gap:10px;}
 .cd-code{font-size:24px;font-weight:700;color:var(--accent);min-width:52px;}
 .cd-info{flex:1;font-size:13px;color:var(--text2);line-height:1.4;}
 .cd-err{color:var(--danger);}
 .cd-hint{color:var(--text3);}
-.cd-who{font-size:11px;color:var(--text3);margin-top:1px;}
 
-/* Keypad */
+/* Numpad */
 .kp{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:4px 14px 12px;flex-shrink:0;}
 .k{background:var(--surface);border:none;border-radius:var(--r-sm);height:50px;font-size:20px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:background .08s;}
 .k:active{background:var(--surface3);}
 .k.kcat{font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-light);}
-.k.kcat.dim{color:var(--text3);background:var(--surface);opacity:.4;}
 .k.kdel{font-size:22px;color:var(--text2);background:var(--surface2);}
 .k.kok{background:var(--success);color:#fff;}
 .k.kok:disabled{background:var(--surface2);color:var(--text3);}
@@ -150,16 +174,6 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 .bab{background:var(--surface);border:none;border-radius:var(--r);padding:14px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;}
 .bab .icon{font-size:22px;}
 .bab.primary{background:var(--accent);color:#fff;}
-
-/* ── Übersicht Grid ── */
-.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
-.tcard{background:var(--surface);border-radius:var(--r);padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:2px solid transparent;-webkit-tap-highlight-color:transparent;min-height:88px;}
-.tcard:active{background:var(--surface2);}
-.tcard.mine{border-color:var(--accent);}
-.tc-num{font-size:22px;font-weight:700;color:var(--text);line-height:1.1;}
-.tc-bname{font-size:11px;color:var(--text3);}
-.tc-status{font-size:10px;color:var(--text3);margin-bottom:2px;}
-.user-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--text2);}
 </style>
 </head>
 <body>
@@ -176,67 +190,67 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
     <span class="user-chip">👤 Anna</span>
   </div>
   <div class="sc" style="padding-bottom:80px;">
-    <div class="sl">Innen <span style="font-weight:400;color:var(--text2);">9</span></div>
+    <div class="sl innen">Innen <span style="font-weight:400;color:var(--text2);">9</span></div>
     <div class="tgrid">
-      <div class="tcard mine" onclick="goTable('demo')">
+      <div class="tcard innen mine" onclick="loadDemo()">
         <div class="tc-num">1</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
         <span class="chip cg" style="font-size:11px;">4 min</span>
       </div>
-      <div class="tcard mine" onclick="goTable('demo')">
+      <div class="tcard innen mine" onclick="loadDemo()">
         <div class="tc-num">3</div><div class="tc-bname">Anna</div><div class="tc-status">gesendet</div>
         <span class="chip cg" style="font-size:11px;">9 min</span>
       </div>
-      <div class="tcard" onclick="goTable('demo')">
+      <div class="tcard innen" onclick="loadDemo()">
         <div class="tc-num">5</div><div class="tc-bname">Lisa</div><div class="tc-status">gesendet</div>
         <span class="chip cg" style="font-size:11px;">11 min</span>
       </div>
-      <div class="tcard mine" onclick="goTable('demo')">
+      <div class="tcard innen mine" onclick="loadDemo()">
         <div class="tc-num">6</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
         <span class="chip cy" style="font-size:11px;">17 min</span>
       </div>
-      <div class="tcard" onclick="goTable('demo')">
+      <div class="tcard innen" onclick="loadDemo()">
         <div class="tc-num">7</div><div class="tc-bname">Lisa</div><div class="tc-status">gesendet</div>
         <span class="chip cy" style="font-size:11px;">24 min</span>
       </div>
-      <div class="tcard" onclick="go('s-bill')">
+      <div class="tcard innen" onclick="go('s-bill')">
         <div class="tc-num">9</div><div class="tc-bname">Lisa</div><div class="tc-status">Rechnung</div>
         <span class="chip cr" style="font-size:11px;">33 min</span>
       </div>
-      <div class="tcard mine" onclick="goTable('demo')">
+      <div class="tcard innen mine" onclick="loadDemo()">
         <div class="tc-num">10</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
         <span class="chip cg" style="font-size:11px;">3 min</span>
       </div>
-      <div class="tcard" onclick="go('s-bill')">
+      <div class="tcard innen" onclick="go('s-bill')">
         <div class="tc-num">12</div><div class="tc-bname">Lisa</div><div class="tc-status">Rechnung</div>
         <span class="chip cr" style="font-size:11px;">38 min</span>
       </div>
-      <div class="tcard" onclick="goTable('demo')">
+      <div class="tcard innen" onclick="loadDemo()">
         <div class="tc-num">14</div><div class="tc-bname">Lisa</div><div class="tc-status">gesendet</div>
         <span class="chip cy" style="font-size:11px;">21 min</span>
       </div>
     </div>
-    <div class="sl" style="margin-top:14px;">Draußen <span style="font-weight:400;color:var(--text2);">3</span></div>
+    <div class="sl draussen" style="margin-top:14px;">Draußen <span style="font-weight:400;color:var(--text2);">3</span></div>
     <div class="tgrid">
-      <div class="tcard mine" onclick="goTable('demo')">
+      <div class="tcard draussen mine" onclick="loadDemo()">
         <div class="tc-num">D2</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
         <span class="chip cg" style="font-size:11px;">7 min</span>
       </div>
-      <div class="tcard" onclick="goTable('demo')">
+      <div class="tcard draussen" onclick="loadDemo()">
         <div class="tc-num">D5</div><div class="tc-bname">Lisa</div><div class="tc-status">gesendet</div>
         <span class="chip cy" style="font-size:11px;">19 min</span>
       </div>
-      <div class="tcard" onclick="go('s-bill')">
+      <div class="tcard draussen" onclick="go('s-bill')">
         <div class="tc-num">D8</div><div class="tc-bname">Lisa</div><div class="tc-status">Rechnung</div>
         <span class="chip cr" style="font-size:11px;">41 min</span>
       </div>
     </div>
-    <div class="sl" style="margin-top:14px;">Mitnahme <span style="font-weight:400;color:var(--text2);">2</span></div>
+    <div class="sl mitnahme" style="margin-top:14px;">Mitnahme <span style="font-weight:400;color:var(--text2);">2</span></div>
     <div class="tgrid">
-      <div class="tcard mine" onclick="goTable('demo')">
+      <div class="tcard mitnahme mine" onclick="loadDemo()">
         <div class="tc-num">M1</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
         <span class="chip cg" style="font-size:11px;">8 min</span>
       </div>
-      <div class="tcard mine" onclick="goTable('demo')">
+      <div class="tcard mitnahme mine" onclick="loadDemo()">
         <div class="tc-num">M2</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
         <span class="chip cr" style="font-size:11px;">35 min</span>
       </div>
@@ -248,15 +262,11 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
     <div class="fab-opts" id="fab-opts">
       <div class="fab-row">
         <span class="fab-lbl">Mitnehmen</span>
-        <button class="fab-btn" style="background:var(--surface3);" onclick="goTable('new');toggleFab()">M</button>
+        <button class="fab-btn" style="background:var(--mitnahme);" onclick="go('s-pick');toggleFab()">M</button>
       </div>
       <div class="fab-row">
-        <span class="fab-lbl">Draußen</span>
-        <button class="fab-btn" style="background:var(--surface3);" onclick="goTable('new');toggleFab()">D</button>
-      </div>
-      <div class="fab-row">
-        <span class="fab-lbl">Innen</span>
-        <button class="fab-btn" style="background:var(--accent);" onclick="goTable('new');toggleFab()">T</button>
+        <span class="fab-lbl">Tisch</span>
+        <button class="fab-btn" style="background:var(--accent);" onclick="go('s-pick');toggleFab()">T</button>
       </div>
     </div>
     <button class="fab-main" id="fab-main" onclick="toggleFab()">+</button>
@@ -265,73 +275,64 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 
 
 <!-- ════════════════════════════════
-     SCREEN 2 — Tischskizze (alles in einem)
+     SCREEN — Tischauswahl
+════════════════════════════════ -->
+<div class="screen" id="s-pick">
+  <div class="sb"><span class="sb-t">19:34</span><div class="sb-i"><span>▲</span><span>🔋</span></div></div>
+  <div class="nh">
+    <button class="back" onclick="go('s-home')">‹</button>
+    <span class="nh-ttl">Tisch wählen</span>
+  </div>
+  <div class="sc" style="padding-bottom:20px;">
+    <div class="sl innen">Innen</div>
+    <div class="tpick-grid" id="pick-indoor-grid"></div>
+    <div class="sl draussen" style="margin-top:14px;">Draußen</div>
+    <div class="tpick-grid" id="pick-outdoor-grid"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     SCREEN 2 — Bestellaufnahme
 ════════════════════════════════ -->
 <div class="screen" id="s-table">
-  <div class="sb"><span class="sb-t" id="tbl-clock">19:35</span><div class="sb-i"><span>▲</span><span>🔋</span></div></div>
+  <div class="sb"><span class="sb-t">19:35</span><div class="sb-i"><span>▲</span><span>🔋</span></div></div>
 
-  <!-- Mini-Header: Back | Tischnummer | Timer | Senden -->
+  <!-- Header: Zurück | Tischbezeichnung | Timer | Senden -->
   <div class="table-hdr">
-    <button class="back" onclick="go('s-home')">‹</button>
-    <button class="tn-badge" id="tn-badge" onclick="enterTnMode()" title="Tischnummer eingeben">T?</button>
-    <span class="chip cg" id="tbl-timer" style="margin-left:4px;display:none;">00:00</span>
-    <button class="snd-btn" id="snd-btn" onclick="go('s-send')">Senden →</button>
+    <button class="back" onclick="go('s-pick')">‹</button>
+    <span class="tbl-label" id="tbl-label">Tisch 3</span>
+    <span class="chip cg" id="tbl-timer" style="display:none;">0 min</span>
+    <button class="snd-btn" onclick="go('s-send')">Senden →</button>
   </div>
 
-  <!-- Canvas area: the whole experience -->
-  <div class="sketch-wrap" id="sketch-wrap">
-    <canvas id="sketch-cv"></canvas>
-
-    <!-- Guest dots + order tags live here (injected by JS) -->
+  <!-- Tischvisualisierung mit Sitzplatz-Dots -->
+  <div class="tbl-area" id="tbl-area">
+    <div class="tbl-shape rect" id="tbl-shape"></div>
     <div id="guest-layer"></div>
-
-    <!-- OVERLAY A: Draw mode -->
-    <div class="overlay on" id="ov-draw">
-      <span class="ov-icon">✏️</span>
-      <div class="ov-hint">Zeichne den Tisch<br><span style="font-size:13px;color:var(--text3);">Finger halten und ziehen</span></div>
-      <button class="ov-btn" id="draw-done-btn" onclick="finishDraw()">Tisch fertig →</button>
-      <button onclick="goTable('demo')" style="background:var(--surface2);color:var(--text2);border:none;border-radius:20px;padding:9px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;">Demo laden</button>
-    </div>
-
-    <!-- OVERLAY B: Place mode -->
-    <div class="overlay" id="ov-place">
-      <div class="ov-hint">Tippe um Gäste zu platzieren</div>
-      <button class="ov-btn" id="place-done-btn" onclick="finishPlace()">Gäste fertig →</button>
-      <div class="ov-sub" id="place-count"></div>
-    </div>
-
-    <!-- OVERLAY C: Idle hint (fades) -->
-    <div id="ov-idle" style="position:absolute;bottom:12px;left:0;right:0;text-align:center;z-index:15;pointer-events:none;opacity:0;transition:opacity .3s;">
-      <span style="background:rgba(0,0,0,.6);color:var(--text3);font-size:13px;padding:6px 14px;border-radius:20px;backdrop-filter:blur(6px);">Gast antippen zum Bestellen · Lang drücken = Referenz</span>
-    </div>
   </div>
 
-  <!-- Mode status strip -->
-  <div class="mode-bar" id="mode-bar">
-    <span class="mode-txt" id="mode-txt">Tisch zeichnen…</span>
-    <button class="mode-action" id="mode-action" onclick="modeAction()" style="display:none"></button>
+  <!-- Status-Leiste (Idle) -->
+  <div class="mode-bar">
+    <span class="mode-txt" id="mode-txt">Sitzplatz antippen</span>
   </div>
 
-  <!-- "Bestellung aufgenommen" — nur im idle Modus sichtbar, startet Timer -->
-  <div id="order-confirm-bar" style="display:none;padding:8px 14px;flex-shrink:0;border-top:1px solid var(--border);">
-    <button onclick="confirmOrder()" style="width:100%;background:var(--success);color:#fff;border:none;border-radius:var(--r);padding:13px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">✓ Bestellung aufgenommen</button>
-  </div>
-
-  <!-- Code display + Keypad (hidden until guest selected or TN mode) -->
+  <!-- Numpad als Overlay (erscheint wenn Sitzplatz ausgewählt) -->
   <div id="numpad-section" style="display:none;flex-direction:column;">
+    <div class="np-bar">
+      <span class="np-who" id="np-who"></span>
+      <button class="np-close" onclick="deselectGuest()">✕ Schließen</button>
+    </div>
     <div class="cd">
       <div class="cd-row">
         <span class="cd-code" id="cd-code">—</span>
-        <div>
-          <div class="cd-info" id="cd-info"><span class="cd-hint">Code eingeben…</span></div>
-          <div class="cd-who" id="cd-who"></div>
-        </div>
+        <div class="cd-info" id="cd-info"><span class="cd-hint">Code eingeben…</span></div>
       </div>
     </div>
     <div class="kp">
-      <button class="k kcat" id="k-hc" onclick="kIn('HC')">HC</button>
-      <button class="k kcat" id="k-rn" onclick="kIn('RN')">RN</button>
-      <button class="k kcat" id="k-c"  onclick="kIn('C')">C</button>
+      <button class="k kcat" onclick="kIn('HC')">HC</button>
+      <button class="k kcat" onclick="kIn('RN')">RN</button>
+      <button class="k kcat" onclick="kIn('C')">C</button>
       <button class="k" onclick="kIn('7')">7</button>
       <button class="k" onclick="kIn('8')">8</button>
       <button class="k" onclick="kIn('9')">9</button>
@@ -357,8 +358,8 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
   <div class="nh"><button class="back" onclick="go('s-table')">‹ Tisch</button><span class="nh-ttl">Senden · Tisch 3</span></div>
   <div class="sc">
     <div class="sl" style="margin-top:0">🍳 Küche <span style="font-weight:400;color:var(--text3)">(4 Speisen)</span></div>
+    <div class="si"><div class="si-dot" style="background:var(--accent)">1</div><div class="si-info"><div class="si-name">Thai Basilikum Huhn</div><div class="si-sub">Hotcooked · HC2</div></div><div class="si-price">12,90 €</div></div>
     <div class="si"><div class="si-dot" style="background:var(--accent)">2</div><div class="si-info"><div class="si-name">Hühnerfilet · Kokos Curry</div><div class="si-sub">Kombinieren · 33</div></div><div class="si-price">10,90 €</div></div>
-    <div class="si"><div class="si-dot" style="background:var(--accent)">2</div><div class="si-info"><div class="si-name">Thai Basilikum Huhn</div><div class="si-sub">Hotcooked · HC2</div></div><div class="si-price">12,90 €</div></div>
     <div class="si"><div class="si-dot" style="background:var(--success)">3</div><div class="si-info"><div class="si-name">Knuspriges Hühnchen</div><div class="si-sub">Kombinieren · 61</div></div><div class="si-price">11,90 €</div></div>
     <div class="si"><div class="si-dot" style="background:#8b5cf6">4</div><div class="si-info"><div class="si-name">Rindfleisch mit Zwiebeln</div><div class="si-sub">Hotcooked · HC1</div></div><div class="si-price">12,90 €</div></div>
     <div class="sl">🍹 Bar</div>
@@ -383,16 +384,15 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
   <div class="sb"><span class="sb-t">20:12</span><div class="sb-i"><span>▲</span><span>🔋</span></div></div>
   <div class="nh"><button class="back" onclick="go('s-home')">‹</button><span class="nh-ttl">Rechnung · Tisch 12</span></div>
   <div class="bgs">
-    <button class="bgb sel" onclick="selBg(this)">Gast 2+3</button>
-    <button class="bgb" onclick="selBg(this)">Gast 4+5</button>
-    <button class="bgb" onclick="selBg(this)">Gast 6</button>
+    <button class="bgb sel" onclick="selBg(this)">Platz 1+2</button>
+    <button class="bgb" onclick="selBg(this)">Platz 3+4</button>
     <button class="bgb" onclick="selBg(this)">Alle</button>
   </div>
   <div class="bc">
-    <div class="sl" style="margin-top:0">Gast 2</div>
+    <div class="sl" style="margin-top:0">Platz 1</div>
     <div class="bi"><div class="bi-l"><div class="nm">Hühnerfilet · Kokos Curry</div><div class="cd2">Kombinieren 33</div></div><div class="bi-p">10,90 €</div></div>
     <div class="bi"><div class="bi-l"><div class="nm">Thai Basilikum Huhn</div><div class="cd2">Hotcooked HC2</div></div><div class="bi-p">12,90 €</div></div>
-    <div class="sl">Gast 3</div>
+    <div class="sl">Platz 2</div>
     <div class="bi"><div class="bi-l"><div class="nm">Knuspriges Hühnchen</div><div class="cd2">Kombinieren 61</div></div><div class="bi-p">11,90 €</div></div>
     <div style="height:8px"></div>
   </div>
@@ -407,11 +407,11 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 
 <!-- Demo nav -->
 <div class="demo-nav" style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:5px;background:rgba(10,10,10,.9);padding:6px;border-radius:22px;backdrop-filter:blur(12px);">
-  <button onclick="go('s-home')"       style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">🏠 Home</button>
-  <button onclick="goTable('new')"     style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">✏️ Neu</button>
-  <button onclick="goTable('demo')"    style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">📋 Demo</button>
-  <button onclick="go('s-send')"       style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">📤 Senden</button>
-  <button onclick="go('s-bill')"       style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">🧾 Rechnung</button>
+  <button onclick="go('s-home')"  style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">🏠 Home</button>
+  <button onclick="go('s-pick')"  style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">🍽️ Tische</button>
+  <button onclick="loadDemo()"    style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">📋 Demo</button>
+  <button onclick="go('s-send')"  style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">📤 Senden</button>
+  <button onclick="go('s-bill')"  style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;font-family:inherit;">🧾 Rechnung</button>
 </div>
 
 <script>
@@ -439,22 +439,24 @@ function resolve(raw) {
   return {err:`"${c}" nicht erkannt`};
 }
 
-// ── State ──────────────────────────────────────────────────
-let tMode = 'draw';   // draw | place | idle | selected | tn
-let guests = [];
-let activeGid = null;
-let inputCode = '';
-let tnInput = '';
-let tableNum = '';
-let timerSec = 0;
-let timerIv = null;
-let cvInited = false;
-let isDrawing = false;
-let drawnPaths = [];
-let curPath = [];
+// ── Tisch-Config (spiegelt tables.config.json) ─────────────
+const TABLE_OVERRIDES = {
+  8:  {shape:'round', seats:6},
+  9:  {shape:'round', seats:10},
+  11: {shape:'round', seats:6},
+  12: {shape:'rect',  seats:6},
+};
+const OCCUPIED = new Set(['1','3','5','6','7','9','10','12','14','D2','D5','D8']);
 
-// Canvas refs
-let cv, ctx, guestLayer, sketchWrap;
+// ── State ──────────────────────────────────────────────────
+let tMode      = 'idle';
+let guests     = [];
+let activeGid  = null;
+let inputCode  = '';
+let tableNum   = '';
+let tableShape = 'rect';
+let timerSec   = 0;
+let timerIv    = null;
 
 // ── Navigation ──────────────────────────────────────────────
 function go(id) {
@@ -462,122 +464,112 @@ function go(id) {
   document.getElementById(id).classList.add('active');
 }
 
-function goTable(type) {
+// ── Tischauswahl aufbauen ───────────────────────────────────
+function buildPicker() {
+  const indoorGrid = document.getElementById('pick-indoor-grid');
+  for (let n = 1; n <= 50; n++) {
+    const ov    = TABLE_OVERRIDES[n] || {};
+    const shape = ov.shape || 'rect';
+    const btn   = document.createElement('button');
+    btn.className = `tpick innen ${shape}`;
+    btn.textContent = n;
+    btn.disabled = OCCUPIED.has(String(n));
+    if (!btn.disabled) btn.onclick = () => openTable(String(n), shape, ov.seats || 4);
+    indoorGrid.appendChild(btn);
+  }
+  const outdoorGrid = document.getElementById('pick-outdoor-grid');
+  for (let n = 1; n <= 10; n++) {
+    const id  = 'D' + n;
+    const btn = document.createElement('button');
+    btn.className = 'tpick draussen rect';
+    btn.textContent = id;
+    btn.disabled = OCCUPIED.has(id);
+    if (!btn.disabled) btn.onclick = () => openTable(id, 'rect', 4);
+    outdoorGrid.appendChild(btn);
+  }
+}
+
+// ── Tisch öffnen ────────────────────────────────────────────
+let tableSeats = 4;
+
+function openTable(num, shape, seats, onReady) {
+  tableNum   = String(num);
+  tableShape = shape || 'rect';
+  tableSeats = seats || 4;
   go('s-table');
-  // Wait for screen to be visible before sizing canvas
+
+  document.getElementById('tbl-label').textContent =
+    tableNum.startsWith('D') ? `Draußen ${tableNum}` : `Tisch ${tableNum}`;
+  document.getElementById('tbl-shape').className = 'tbl-shape ' + tableShape;
+  document.getElementById('numpad-section').style.display = 'none';
+  document.getElementById('guest-layer').innerHTML = '';
+
+  guests    = [];
+  activeGid = null;
+  inputCode = '';
+  if (timerIv) { clearInterval(timerIv); timerIv = null; }
+  timerSec = 0;
+
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    initCanvas();
-    if (type === 'demo') loadDemo();
-    else resetTable();
+    autoPlaceSeats();
+    startTimer(0);
+    document.getElementById('tbl-timer').style.display = 'inline-flex';
+    if (onReady) onReady();
   }));
 }
 
-// ── Canvas init ──────────────────────────────────────────────
-function initCanvas() {
-  cv = document.getElementById('sketch-cv');
-  ctx = cv.getContext('2d');
-  guestLayer = document.getElementById('guest-layer');
-  sketchWrap = document.getElementById('sketch-wrap');
+// ── Sitzplätze automatisch platzieren ──────────────────────
+function autoPlaceSeats() {
+  const area = document.getElementById('tbl-area');
+  const cx   = area.offsetWidth  / 2;
+  const cy   = area.offsetHeight / 2;
 
-  const W = sketchWrap.offsetWidth;
-  const H = sketchWrap.offsetHeight;
-  cv.width = W;
-  cv.height = H;
-
-  if (!cvInited) {
-    cvInited = true;
-    // Touch
-    cv.addEventListener('touchstart', onStart, {passive:false});
-    cv.addEventListener('touchmove',  onMove,  {passive:false});
-    cv.addEventListener('touchend',   onEnd,   {passive:false});
-    // Mouse (desktop) — use document for mouseup so release outside canvas is caught
-    cv.addEventListener('mousedown', e => { e.preventDefault(); onStart({touches:[{clientX:e.clientX,clientY:e.clientY}], preventDefault:()=>{}}); });
-    document.addEventListener('mousemove', e => { if (e.buttons === 1) onMove({touches:[{clientX:e.clientX,clientY:e.clientY}], preventDefault:()=>{}}); });
-    document.addEventListener('mouseup', onEnd);
+  if (tableShape === 'round') {
+    const r = 110;
+    guests = Array.from({length: tableSeats}, (_, i) => {
+      const angle = (2 * Math.PI * i / tableSeats) - Math.PI / 2;
+      return {id: i+1, x: cx + r*Math.cos(angle), y: cy + r*Math.sin(angle), orders: [], isRef: i===0};
+    });
+  } else {
+    // Rechteckig: 2 oben + 2 unten, bei 6 Plätzen zusätzlich 1 links + 1 rechts
+    const base = [
+      {id:1, x:cx-40, y:cy-100},
+      {id:2, x:cx+40, y:cy-100},
+      {id:3, x:cx+40, y:cy+100},
+      {id:4, x:cx-40, y:cy+100},
+    ];
+    if (tableSeats >= 6) {
+      base.push({id:5, x:cx-100, y:cy});
+      base.push({id:6, x:cx+100, y:cy});
+    }
+    guests = base.slice(0, tableSeats).map((g, i) => ({...g, orders:[], isRef: i===0}));
   }
-}
-
-function getXY(e) {
-  const r = cv.getBoundingClientRect();
-  const t = e.touches ? e.touches[0] : e;
-  return {x: t.clientX - r.left, y: t.clientY - r.top};
-}
-
-// ── Drawing ──────────────────────────────────────────────────
-function onStart(e) {
-  e.preventDefault();
-  const p = getXY(e);
-  if (tMode === 'draw') {
-    isDrawing = true;
-    curPath = [p];
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-  } else if (tMode === 'place') {
-    placeGuest(p.x, p.y);
-  }
-}
-
-function onMove(e) {
-  e.preventDefault();
-  if (!isDrawing || tMode !== 'draw') return;
-  const p = getXY(e);
-  curPath.push(p);
-  if (curPath.length >= 3) {
-    const prev = curPath[curPath.length - 2];
-    const mid = {x:(prev.x+p.x)/2, y:(prev.y+p.y)/2};
-    ctx.quadraticCurveTo(prev.x, prev.y, mid.x, mid.y);
-    ctx.stroke();
-  }
-}
-
-function onEnd() {
-  if (!isDrawing) return;
-  isDrawing = false;
-  if (curPath.length > 3) {
-    drawnPaths.push([...curPath]);
-    curPath = [];
-    document.getElementById('draw-done-btn').classList.add('show');
-  }
-}
-
-function finishDraw() {
-  // Close + fill each drawn path to look like a table
-  drawnPaths.forEach(path => {
-    ctx.beginPath();
-    ctx.moveTo(path[0].x, path[0].y);
-    path.forEach(p => ctx.lineTo(p.x, p.y));
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(38,38,42,0.95)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.75)';
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-  });
-  setMode('place');
-}
-
-// ── Guest placement ──────────────────────────────────────────
-function placeGuest(x, y) {
-  const id = guests.length + 1;
-  guests.push({id, x, y, orders:[], isRef: id===1});
-  renderGuests();
-  const el = document.getElementById('place-count');
-  el.textContent = `${guests.length} Gast${guests.length>1?'…e':''} platziert`;
-  document.getElementById('place-done-btn').classList.add('show');
-}
-
-function finishPlace() {
   setMode('idle');
-  startTimer(0);
+  renderGuests();
 }
 
-// ── Guest selection & ordering ────────────────────────────────
+// ── Mode ─────────────────────────────────────────────────────
+function setMode(m) {
+  tMode = m;
+  const numpad  = document.getElementById('numpad-section');
+  const modeTxt = document.getElementById('mode-txt');
+
+  if (m === 'idle') {
+    numpad.style.display = 'none';
+    const total = guests.reduce((a, g) => a + g.orders.length, 0);
+    modeTxt.textContent = `${guests.length} Plätze · ${total} Gericht${total !== 1 ? 'e' : ''}`;
+  } else if (m === 'selected') {
+    numpad.style.display = 'flex';
+    const g   = guests.find(x => x.id === activeGid);
+    const cnt = g ? g.orders.length : 0;
+    modeTxt.textContent = `Platz ${activeGid} ausgewählt`;
+    document.getElementById('np-who').textContent =
+      `Platz ${activeGid}${g && g.isRef ? ' 🟡' : ''} · ${cnt} Gericht${cnt !== 1 ? 'e' : ''}`;
+  }
+}
+
+// ── Gast-Interaktion ─────────────────────────────────────────
 function selectGuest(id) {
-  if (tMode === 'place') return;
   activeGid = id;
   inputCode = '';
   setMode('selected');
@@ -587,6 +579,7 @@ function selectGuest(id) {
 
 function deselectGuest() {
   activeGid = null;
+  inputCode = '';
   setMode('idle');
   renderGuests();
 }
@@ -596,164 +589,48 @@ function setRef(id) {
   renderGuests();
 }
 
-// ── Render guests ─────────────────────────────────────────────
+// ── Gäste rendern ────────────────────────────────────────────
 function renderGuests() {
-  guestLayer.innerHTML = '';
+  const gl = document.getElementById('guest-layer');
+  gl.innerHTML = '';
+
   guests.forEach(g => {
     const div = document.createElement('div');
     div.className = 'gdot' +
-      (g.isRef ? ' ref' : '') +
-      (g.id === activeGid ? ' active' : '') +
-      (g.orders.length > 0 ? ' done' : '');
+      (g.isRef         ? ' ref'    : '') +
+      (g.id===activeGid? ' active' : '') +
+      (g.orders.length ? ' done'   : '');
     div.textContent = g.id;
     div.style.left = g.x + 'px';
     div.style.top  = g.y + 'px';
-
-    // Tap: select
     div.addEventListener('click', e => { e.stopPropagation(); selectGuest(g.id); });
-    // Long press: set as reference
     let lp;
     div.addEventListener('touchstart', () => { lp = setTimeout(() => { setRef(g.id); vibrate(); }, 500); }, {passive:true});
     div.addEventListener('touchend',   () => clearTimeout(lp));
     div.addEventListener('touchmove',  () => clearTimeout(lp));
-    guestLayer.appendChild(div);
+    gl.appendChild(div);
 
-    // Order tags next to guest
-    if (g.orders.length > 0) {
-      g.orders.forEach((o, i) => {
-        const tag = document.createElement('div');
-        tag.className = 'order-tag';
-        tag.textContent = o.code;
-        // Offset to avoid overlapping the dot
-        tag.style.left = (g.x + 26) + 'px';
-        tag.style.top  = (g.y - 8 + i * 17) + 'px';
-        guestLayer.appendChild(tag);
-      });
-    }
+    g.orders.forEach((o, i) => {
+      const tag = document.createElement('div');
+      tag.className = 'order-tag';
+      tag.textContent = o.code;
+      tag.style.left = (g.x + 26) + 'px';
+      tag.style.top  = (g.y - 8 + i * 17) + 'px';
+      gl.appendChild(tag);
+    });
   });
 
-  // Tap on empty area in idle → deselect
-  guestLayer.onclick = e => {
-    if (e.target === guestLayer && tMode === 'selected') deselectGuest();
-  };
+  gl.onclick = e => { if (e.target === gl && tMode === 'selected') deselectGuest(); };
 }
 
-function vibrate() {
-  if (navigator.vibrate) navigator.vibrate(30);
-}
+function vibrate() { if (navigator.vibrate) navigator.vibrate(30); }
 
-// ── Mode management ───────────────────────────────────────────
-function setMode(m) {
-  tMode = m;
-
-  const ovDraw   = document.getElementById('ov-draw');
-  const ovPlace  = document.getElementById('ov-place');
-  const ovIdle   = document.getElementById('ov-idle');
-  const numpad   = document.getElementById('numpad-section');
-  const modeBar  = document.getElementById('mode-bar');
-  const modeTxt  = document.getElementById('mode-txt');
-  const modeAct  = document.getElementById('mode-action');
-  const sndBtn   = document.getElementById('snd-btn');
-  const gl       = document.getElementById('guest-layer');
-  const confBar  = document.getElementById('order-confirm-bar');
-
-  // Reset all
-  ovDraw.classList.remove('on');
-  ovPlace.classList.remove('on');
-  ovIdle.style.opacity = '0';
-  numpad.style.display = 'none';
-  modeAct.style.display = 'none';
-  confBar.style.display = 'none';
-  gl.classList.remove('interactive');
-  cv.style.cursor = 'default';
-  // HC-Button nach TN-Mode zurücksetzen
-  const hcBtnReset = document.getElementById('k-hc');
-  hcBtnReset.textContent = 'HC';
-  hcBtnReset.classList.remove('dim');
-
-  if (m === 'draw') {
-    ovDraw.classList.add('on');
-    cv.style.cursor = 'crosshair';
-    modeTxt.textContent = 'Tisch zeichnen…';
-    sndBtn.disabled = false;
-  } else if (m === 'place') {
-    ovPlace.classList.add('on');
-    cv.style.cursor = 'crosshair';
-    modeTxt.textContent = 'Gäste platzieren…';
-    gl.classList.add('interactive');
-    sndBtn.disabled = false;
-  } else if (m === 'idle') {
-    gl.classList.add('interactive');
-    modeTxt.textContent = guests.length > 0
-      ? `${guests.length} Gäste · ${guests.reduce((a,g)=>a+g.orders.length,0)} Gerichte`
-      : 'Keine Gäste';
-    ovIdle.style.opacity = '1';
-    setTimeout(() => { if (tMode==='idle') ovIdle.style.opacity='0'; }, 2500);
-    modeAct.textContent = 'Neu zeichnen';
-    modeAct.style.display = 'block';
-    // Timer läuft noch nicht — Button zeigen
-    if (!timerIv) confBar.style.display = 'block';
-    sndBtn.disabled = false;
-  } else if (m === 'selected') {
-    gl.classList.add('interactive');
-    const g = guests.find(x => x.id === activeGid);
-    modeTxt.textContent = `Gast ${activeGid}${g && g.isRef ? ' 🟡' : ''}`;
-    modeAct.textContent = 'Schließen ✕';
-    modeAct.style.display = 'block';
-    numpad.style.display = 'flex';
-    // Update who label
-    document.getElementById('cd-who').textContent =
-      g ? `${g.orders.length} Gericht${g.orders.length!==1?'e':''} · Gast ${activeGid}` : '';
-    // Toggle category keys (active in order mode)
-    ['k-hc','k-rn','k-c'].forEach(id => document.getElementById(id).classList.remove('dim'));
-    sndBtn.disabled = false;
-  } else if (m === 'tn') {
-    gl.classList.add('interactive');
-    tnInput = tableNum;
-    inputCode = tnInput;
-    numpad.style.display = 'flex';
-    modeTxt.textContent = 'Tischnummer eingeben';
-    modeAct.textContent = 'Abbrechen';
-    modeAct.style.display = 'block';
-    // In TN mode: HC-Button wird zu "D" (Draußen), RN/C bleiben deaktiviert
-    const hcBtn = document.getElementById('k-hc');
-    hcBtn.textContent = 'D';
-    hcBtn.classList.remove('dim');
-    ['k-rn','k-c'].forEach(id => document.getElementById(id).classList.add('dim'));
-    updateCodeDisplay();
-  }
-}
-
-function modeAction() {
-  if (tMode === 'selected') deselectGuest();
-  else if (tMode === 'tn') { tMode = 'idle'; setMode('idle'); }
-  else if (tMode === 'idle') resetTable();
-}
-
-// ── TN mode ───────────────────────────────────────────────────
-function enterTnMode() {
-  if (tMode === 'draw' || tMode === 'place') return;
-  setMode('tn');
-  inputCode = tableNum || '';
-  updateCodeDisplay();
-}
-
-// ── Keypad ────────────────────────────────────────────────────
+// ── Numpad ───────────────────────────────────────────────────
 function kIn(key) {
-  if (tMode === 'tn') {
-    if (key === 'RN' || key === 'C') return;
-    if (key === 'HC') {
-      if (!inputCode) inputCode = 'D'; // HC-Button fungiert als D-Präfix
-      return;
-    }
-    const maxLen = inputCode.startsWith('D') ? 3 : 2; // D10 = 3 Zeichen
-    if (inputCode.length >= maxLen) return;
-    inputCode += key;
-  } else if (tMode === 'selected') {
-    if (key === 'HC' || key === 'RN') { inputCode = key; }
-    else if (key === 'C') { inputCode = 'C'; }
-    else { inputCode += key; }
-  }
+  if (tMode !== 'selected') return;
+  if (key === 'HC' || key === 'RN') { inputCode = key; }
+  else if (key === 'C') { inputCode = 'C'; }
+  else { inputCode += key; }
   updateCodeDisplay();
 }
 
@@ -763,32 +640,23 @@ function kDel() {
 }
 
 function kOk() {
-  if (tMode === 'tn') {
-    const isD = inputCode.startsWith('D');
-    const n = parseInt(isD ? inputCode.slice(1) : inputCode);
-    const validTn = (!isD && n >= 1 && n <= 14) || (isD && n >= 1 && n <= 10);
-    if (validTn) {
-      tableNum = inputCode;
-      const badge = document.getElementById('tn-badge');
-      badge.textContent = tableNum.startsWith('D') ? tableNum : 'T' + tableNum;
-      badge.classList.add('set');
-    }
-    inputCode = '';
-    setMode('idle');
-    return;
-  }
   if (tMode !== 'selected') return;
   const r = resolve(inputCode);
   if (!r.name) return;
   const g = guests.find(x => x.id === activeGid);
-  if (g) {
-    g.orders.push({code: inputCode, name: r.name, price: r.price});
-    renderGuests();
-    // Brief success flash
-    const el = document.getElementById('cd-code');
-    el.style.color = 'var(--success)';
-    setTimeout(() => { el.style.color = 'var(--accent)'; inputCode = ''; updateCodeDisplay(); }, 320);
-  }
+  if (!g) return;
+  g.orders.push({code: inputCode, name: r.name, price: r.price});
+  renderGuests();
+  const el = document.getElementById('cd-code');
+  el.style.color = 'var(--success)';
+  setTimeout(() => {
+    el.style.color = 'var(--accent)';
+    inputCode = '';
+    updateCodeDisplay();
+    const cnt = g.orders.length;
+    document.getElementById('np-who').textContent =
+      `Platz ${activeGid}${g.isRef ? ' 🟡' : ''} · ${cnt} Gericht${cnt !== 1 ? 'e' : ''}`;
+  }, 320);
 }
 
 function updateCodeDisplay() {
@@ -796,28 +664,6 @@ function updateCodeDisplay() {
   const infoEl = document.getElementById('cd-info');
   const okBtn  = document.getElementById('k-ok');
   if (!codeEl) return;
-
-  if (tMode === 'tn') {
-    const isD = inputCode.startsWith('D');
-    const num = parseInt(isD ? inputCode.slice(1) : inputCode);
-    const validIndoor  = !isD && num >= 1 && num <= 14;
-    const validOutdoor = isD && num >= 1 && num <= 10;
-    const valid = validIndoor || validOutdoor;
-    codeEl.textContent = inputCode || '—';
-    if (!inputCode) {
-      infoEl.innerHTML = '<span class="cd-hint">Innen 1–14 · Draußen D1–D10</span>';
-      okBtn.disabled = true;
-    } else if (!valid) {
-      infoEl.innerHTML = '<span class="cd-err">Innen: 1–14 · Draußen: D1–D10</span>';
-      okBtn.disabled = true;
-    } else {
-      const loc = validOutdoor ? 'Draußen' : 'Innen';
-      infoEl.innerHTML = `<strong style="color:var(--success)">${inputCode} · ${loc} ✓</strong>`;
-      okBtn.disabled = false;
-    }
-    return;
-  }
-
   codeEl.textContent = inputCode || '—';
   if (!inputCode) {
     infoEl.innerHTML = '<span class="cd-hint">Code eingeben…</span>';
@@ -837,15 +683,6 @@ function updateCodeDisplay() {
   }
 }
 
-// ── Bestellung aufgenommen ────────────────────────────────────
-function confirmOrder() {
-  const bar = document.getElementById('order-confirm-bar');
-  bar.style.display = 'none';
-  startTimer(0);
-  const chip = document.getElementById('tbl-timer');
-  chip.style.display = 'inline-flex';
-}
-
 // ── Timer ─────────────────────────────────────────────────────
 function startTimer(startSec) {
   if (timerIv) clearInterval(timerIv);
@@ -861,82 +698,23 @@ function startTimer(startSec) {
   }, 1000);
 }
 
-// ── Reset ─────────────────────────────────────────────────────
-function resetTable() {
-  guests = [];
-  activeGid = null;
-  inputCode = '';
-  tableNum = '';
-  drawnPaths = [];
-  curPath = [];
-  isDrawing = false;
-  if (ctx) ctx.clearRect(0, 0, cv.width, cv.height);
-  if (guestLayer) guestLayer.innerHTML = '';
-  document.getElementById('draw-done-btn').classList.remove('show');
-  document.getElementById('place-done-btn').classList.remove('show');
-  const badge = document.getElementById('tn-badge');
-  badge.textContent = 'T?';
-  badge.classList.remove('set');
-  setMode('draw');
-  if (timerIv) clearInterval(timerIv);
-  timerSec = 0;
-  const el = document.getElementById('tbl-timer');
-  if (el) { el.textContent = '00:00'; el.className = 'chip cg'; }
-}
-
-// ── Demo pre-loaded state ──────────────────────────────────────
+// ── Demo ──────────────────────────────────────────────────────
 function loadDemo() {
-  const W = cv.width, H = cv.height;
-  guests = [];
-  activeGid = null;
-  inputCode = '';
-  tableNum = '3';
-  drawnPaths = [];
-  ctx.clearRect(0, 0, W, H);
-
-  // Draw a hand-drawn-style rectangle (table)
-  const mx=55, my=70, tw=W-mx*2, th=Math.min(H*0.44, 200);
-  ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,0.78)';
-  ctx.fillStyle   = 'rgba(38,38,44,0.95)';
-  ctx.lineWidth = 2.8;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.beginPath();
-  ctx.moveTo(mx+3,    my+5);
-  ctx.lineTo(mx+tw-2, my+3);
-  ctx.lineTo(mx+tw+4, my+th-4);
-  ctx.lineTo(mx-2,    my+th+3);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-  ctx.restore();
-
-  // Badge
-  const badge = document.getElementById('tn-badge');
-  badge.textContent = 'T3';
-  badge.classList.add('set');
-
-  // Place guests around the table
-  const cx = W/2, cy = my + th/2;
-  guests = [
-    {id:1, x:mx-16, y:my+th*0.35, orders:[{code:'HC2',name:'Thai Basilikum Huhn',price:12.9}], isRef:true},
-    {id:2, x:cx-20, y:my-18,      orders:[{code:'33', name:'Hühnerfilet · Kokos Curry',price:10.9}], isRef:false},
-    {id:3, x:mx+tw+18, y:my+th*0.6, orders:[], isRef:false},
-    {id:4, x:cx+10, y:my+th+18,   orders:[], isRef:false},
-  ];
-
-  renderGuests();
-  // Timer noch nicht gestartet — Confirm-Button soll sichtbar sein
-  if (timerIv) { clearInterval(timerIv); timerIv = null; }
-  timerSec = 0;
-  document.getElementById('tbl-timer').style.display = 'none';
-  setMode('idle');
-
-  document.getElementById('snd-btn').disabled = false;
+  openTable('3', 'rect', 4, () => {
+    const area = document.getElementById('tbl-area');
+    const cx = area.offsetWidth / 2, cy = area.offsetHeight / 2;
+    guests = [
+      {id:1, x:cx-40, y:cy-100, orders:[{code:'HC2', name:'Thai Basilikum Huhn',      price:12.9}], isRef:true},
+      {id:2, x:cx+40, y:cy-100, orders:[{code:'33',  name:'Hühnerfilet · Kokos Curry', price:10.9}], isRef:false},
+      {id:3, x:cx+40, y:cy+100, orders:[], isRef:false},
+      {id:4, x:cx-40, y:cy+100, orders:[], isRef:false},
+    ];
+    renderGuests();
+    setMode('idle');
+  });
 }
 
-// ── Shared helpers ────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────
 function doSend(dest) {
   const lo = document.getElementById('send-lo');
   document.getElementById('lo-txt').textContent = `Sende an ${dest}…`;
@@ -954,7 +732,7 @@ function toggleFab() {
   const opts = document.getElementById('fab-opts');
   const btn  = document.getElementById('fab-main');
   const open = opts.classList.toggle('open');
-  btn.textContent = open ? '✕' : '+';
+  btn.textContent  = open ? '✕' : '+';
   btn.style.fontSize = open ? '18px' : '26px';
 }
 
@@ -962,6 +740,9 @@ function selBg(btn) {
   btn.closest('.bgs').querySelectorAll('.bgb').forEach(b => b.classList.remove('sel'));
   btn.classList.add('sel');
 }
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', buildPicker);
 </script>
 </body>
 </html>

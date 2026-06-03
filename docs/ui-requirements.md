@@ -70,30 +70,31 @@ Die Bedienungen sind **täglich wiederkehrende Nutzer**, die die App vielfach pr
 
 ### Kernprinzip: Die UI darf nicht gegen Papier + Stift verlieren
 
-Auf Papier zeichnet die Bedienung in Sekunden eine freie Tischskizze, platziert Gäste darum und schreibt Bestellungen direkt daneben. Die App muss diesen Workflow mindestens genauso schnell und intuitiv abbilden.
+Die App zeigt den Tisch als vordefinierten Grundriss an – die Bedienung muss nichts zeichnen. Der Grundriss entspricht der realen Tischform und ist sofort nutzbar.
 
-### Alles in einer einzigen Tischskizzen-Ansicht
+### Alles in einer einzigen Tischansicht
 
-- Es gibt **keinen separaten Setup-Screen** – Zeichnen, Gäste platzieren und Bestellungen aufnehmen passiert alles in **einer Ansicht**, analog zum Papier
-- Workflow: Tisch zeichnen → Gäste antippen zum Platzieren → Gast antippen → Numpad erscheint → Code eingeben → nächster Gast
+- Es gibt **keinen separaten Setup-Screen** – Tischansicht öffnen, Gäste antippen und Bestellungen aufnehmen passiert alles in **einer Ansicht**
+- Workflow: Tisch auswählen → Tischansicht öffnet sich sofort → Sitzplatz antippen → Numpad erscheint → Code eingeben → nächster Sitzplatz
 
-### Freies Tisch-Zeichnen (kein Preset)
+### Tischform aus Config (kein freies Zeichnen)
 
-- Die Bedienung **zeichnet den Tisch per Finger** direkt auf dem Bildschirm – freie Form, kein vorgegebenes Rechteck oder Oval
-- Dadurch werden alle realen Tischformen unterstützt: rechteckig, rund, **L-Form** (wenn zwei Tische zusammengestellt werden), U-Form etc.
-- Das Zeichnen muss in wenigen Sekunden möglich sein – Ziel: schneller als Papier
+- Tischformen sind in `config/tables.config.json` vordefiniert – kein Zeichnen durch die Bedienung
+- Unterstützte Formen: **rechteckig** (Standard) und **rund**
+- Innen: Tische 1–50, davon 8, 9, 11, 12 rund – alle anderen rechteckig
+- Draußen: alle Tische rechteckig, kein Präfix-Präfix nötig
+- Sitzplätze pro Tisch ebenfalls aus Config (`defaultSeats`); Standard: 4 Plätze
 
-### Tischnummer: sekundär
+### Tischnummer: primär
 
-- Die Tischnummer ist **nicht der erste Schritt** – die Bedienung ist vor Ort, sie weiß welcher Tisch es ist
-- Die Nummer wird als **kleines, optionales Feld** irgendwo am Rand eingeblendet und kann jederzeit nachgetragen werden
-- Sie blockiert **nicht** den Start der Bestellaufnahme
+- Die Tischnummer wird beim Öffnen der Bestellansicht als Heading angezeigt
+- Sie kommt aus der Auswahl in der Übersicht – die Bedienung muss sie nicht nochmals eingeben
 
-### Gäste visuell am Tisch platzieren
+### Gäste / Sitzplätze
 
-- Nach dem Zeichnen tippt die Bedienung auf Stellen **rund um den gezeichneten Tisch**, um Gäste zu platzieren
-- Die Gast-Positionen erscheinen als nummerierte Kreise direkt an der Tischkante – visuell wie auf dem Papier-Zettel
-- Die Anordnung entspricht der realen Sitzordnung
+- Die Sitzplätze erscheinen als nummerierte Kreise rund um den Tischgrundriss – entspricht der realen Sitzordnung
+- Die Anzahl der angezeigten Sitzplätze entspricht `defaultSeats` aus der Config
+- B kann zusätzliche Sitzplätze hinzufügen (z. B. wenn mehr Gäste kommen als Standardplätze vorhanden) – noch zu definieren
 
 ### Referenzgast markieren
 
@@ -103,7 +104,7 @@ Auf Papier zeichnet die Bedienung in Sekunden eine freie Tischskizze, platziert 
 
 ### Bestellung pro Sitzplatz
 
-- Gast antippen → Numpad öffnet sich → Code eingeben → Gericht erscheint als Label beim Gast in der Skizze
+- Sitzplatz antippen → Numpad öffnet sich → Code eingeben → Gericht erscheint als Label beim Sitzplatz
 - Jedes Gericht ist einem konkreten Sitzplatz zugeordnet
 - Beim Servieren und bei der Rechnung ist die Zuordnung sofort sichtbar
 
@@ -111,7 +112,7 @@ Auf Papier zeichnet die Bedienung in Sekunden eine freie Tischskizze, platziert 
 
 ## Tisch- & Abholoptionen
 
-- **Tischnummern Innen:** 1–14 (kein Präfix)
+- **Tischnummern Innen:** 1–50 (kein Präfix)
 - **Tischnummern Draußen:** D1–D10 (Präfix `D`)
 - **Mitnehmen:** M1–M5 (Präfix `M`, max. 5 gleichzeitig, keine Tischnummer)
 - **Lieferung:** nicht vorhanden
