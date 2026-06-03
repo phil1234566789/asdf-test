@@ -44,17 +44,16 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 .btn-p{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:15px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
 
 /* ── Home screen ── */
-.ag{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;}
-.agb{background:var(--surface);border:none;border-radius:var(--r);padding:16px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;}
-.agb:active{background:var(--surface2);}
-.agb-icon{font-size:28px;}
-.agb-label{font-size:14px;font-weight:600;color:var(--text);}
-.agb-sub{font-size:12px;color:var(--text3);}
-.tc{background:var(--surface);border-radius:var(--r);padding:13px 14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.tc:active{background:var(--surface2);}
-.tc-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0;}
-.tc-name{font-size:16px;font-weight:600;color:var(--text);}
-.tc-sub{font-size:13px;color:var(--text3);margin-top:2px;}
+.home-hdr{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;}
+.home-ttl{font-size:17px;font-weight:600;color:var(--text);}
+/* FAB Speed-Dial */
+.fab{position:absolute;bottom:24px;right:16px;z-index:50;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+.fab-main{width:50px;height:50px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:26px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,107,53,.45);font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.fab-opts{display:none;flex-direction:column;align-items:flex-end;gap:8px;}
+.fab-opts.open{display:flex;}
+.fab-row{display:flex;align-items:center;gap:8px;}
+.fab-lbl{background:var(--surface2);color:var(--text);font-size:13px;font-weight:600;padding:5px 12px;border-radius:20px;white-space:nowrap;}
+.fab-btn{width:38px;height:38px;border-radius:50%;border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;}
 
 /* ── Table sketch screen ── */
 .table-hdr{height:50px;display:flex;align-items:center;gap:8px;padding:0 12px;flex-shrink:0;border-bottom:1px solid var(--border);}
@@ -151,6 +150,16 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 .bab{background:var(--surface);border:none;border-radius:var(--r);padding:14px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;}
 .bab .icon{font-size:22px;}
 .bab.primary{background:var(--accent);color:#fff;}
+
+/* ── Übersicht Grid ── */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
+.tcard{background:var(--surface);border-radius:var(--r);padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:2px solid transparent;-webkit-tap-highlight-color:transparent;min-height:88px;}
+.tcard:active{background:var(--surface2);}
+.tcard.mine{border-color:var(--accent);}
+.tc-num{font-size:22px;font-weight:700;color:var(--text);line-height:1.1;}
+.tc-bname{font-size:11px;color:var(--text3);}
+.tc-status{font-size:10px;color:var(--text3);margin-bottom:2px;}
+.user-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--text2);}
 </style>
 </head>
 <body>
@@ -162,43 +171,95 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
 ════════════════════════════════ -->
 <div class="screen active" id="s-home">
   <div class="sb"><span class="sb-t">19:34</span><div class="sb-i"><span>▲</span><span>🔋</span></div></div>
-  <div class="lh"><h1>Übersicht</h1><div class="lh-s">3 aktive Tische · 1 Mitnahme</div></div>
-  <div class="sc">
-    <div class="ag">
-      <button class="agb" onclick="goTable('new')">
-        <span class="agb-icon">✏️</span>
-        <span class="agb-label">Neuer Tisch</span>
-        <span class="agb-sub">Tisch zeichnen</span>
-      </button>
-      <button class="agb" onclick="goTable('new')">
-        <span class="agb-icon">🥡</span>
-        <span class="agb-label">Mitnehmen</span>
-        <span class="agb-sub">#1 – 10</span>
-      </button>
+  <div class="home-hdr">
+    <span class="home-ttl">Übersicht</span>
+    <span class="user-chip">👤 Anna</span>
+  </div>
+  <div class="sc" style="padding-bottom:80px;">
+    <div class="sl">Innen <span style="font-weight:400;color:var(--text2);">9</span></div>
+    <div class="tgrid">
+      <div class="tcard mine" onclick="goTable('demo')">
+        <div class="tc-num">1</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
+        <span class="chip cg" style="font-size:11px;">4 min</span>
+      </div>
+      <div class="tcard mine" onclick="goTable('demo')">
+        <div class="tc-num">3</div><div class="tc-bname">Anna</div><div class="tc-status">gesendet</div>
+        <span class="chip cg" style="font-size:11px;">9 min</span>
+      </div>
+      <div class="tcard" onclick="goTable('demo')">
+        <div class="tc-num">5</div><div class="tc-bname">Lisa</div><div class="tc-status">gesendet</div>
+        <span class="chip cg" style="font-size:11px;">11 min</span>
+      </div>
+      <div class="tcard mine" onclick="goTable('demo')">
+        <div class="tc-num">6</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
+        <span class="chip cy" style="font-size:11px;">17 min</span>
+      </div>
+      <div class="tcard" onclick="goTable('demo')">
+        <div class="tc-num">7</div><div class="tc-bname">Lisa</div><div class="tc-status">gesendet</div>
+        <span class="chip cy" style="font-size:11px;">24 min</span>
+      </div>
+      <div class="tcard" onclick="go('s-bill')">
+        <div class="tc-num">9</div><div class="tc-bname">Lisa</div><div class="tc-status">Rechnung</div>
+        <span class="chip cr" style="font-size:11px;">33 min</span>
+      </div>
+      <div class="tcard mine" onclick="goTable('demo')">
+        <div class="tc-num">10</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
+        <span class="chip cg" style="font-size:11px;">3 min</span>
+      </div>
+      <div class="tcard" onclick="go('s-bill')">
+        <div class="tc-num">12</div><div class="tc-bname">Lisa</div><div class="tc-status">Rechnung</div>
+        <span class="chip cr" style="font-size:11px;">38 min</span>
+      </div>
+      <div class="tcard" onclick="goTable('demo')">
+        <div class="tc-num">14</div><div class="tc-bname">Lisa</div><div class="tc-status">gesendet</div>
+        <span class="chip cy" style="font-size:11px;">21 min</span>
+      </div>
     </div>
-    <div class="sl">Aktive Tische</div>
-    <div class="tc" onclick="goTable('demo')">
-      <div class="tc-icon" style="background:rgba(255,107,53,.15);color:var(--accent);">3</div>
-      <div style="flex:1"><div class="tc-name">Tisch 3</div><div class="tc-sub">4 Gäste · 2 Gerichte</div></div>
-      <span class="chip cg">09:04</span>
+    <div class="sl" style="margin-top:14px;">Draußen <span style="font-weight:400;color:var(--text2);">3</span></div>
+    <div class="tgrid">
+      <div class="tcard mine" onclick="goTable('demo')">
+        <div class="tc-num">D2</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
+        <span class="chip cg" style="font-size:11px;">7 min</span>
+      </div>
+      <div class="tcard" onclick="goTable('demo')">
+        <div class="tc-num">D5</div><div class="tc-bname">Lisa</div><div class="tc-status">gesendet</div>
+        <span class="chip cy" style="font-size:11px;">19 min</span>
+      </div>
+      <div class="tcard" onclick="go('s-bill')">
+        <div class="tc-num">D8</div><div class="tc-bname">Lisa</div><div class="tc-status">Rechnung</div>
+        <span class="chip cr" style="font-size:11px;">41 min</span>
+      </div>
     </div>
-    <div class="tc" onclick="goTable('demo')">
-      <div class="tc-icon" style="background:rgba(255,214,10,.15);color:var(--warn);">7</div>
-      <div style="flex:1"><div class="tc-name">Tisch 7</div><div class="tc-sub">2 Gäste · gesendet</div></div>
-      <span class="chip cy">24:11</span>
+    <div class="sl" style="margin-top:14px;">Mitnahme <span style="font-weight:400;color:var(--text2);">2</span></div>
+    <div class="tgrid">
+      <div class="tcard mine" onclick="goTable('demo')">
+        <div class="tc-num">M1</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
+        <span class="chip cg" style="font-size:11px;">8 min</span>
+      </div>
+      <div class="tcard mine" onclick="goTable('demo')">
+        <div class="tc-num">M2</div><div class="tc-bname">Anna</div><div class="tc-status">ausstehend</div>
+        <span class="chip cr" style="font-size:11px;">35 min</span>
+      </div>
     </div>
-    <div class="tc" onclick="go('s-bill')">
-      <div class="tc-icon" style="background:rgba(255,69,58,.15);color:var(--danger);">12</div>
-      <div style="flex:1"><div class="tc-name">Tisch 12</div><div class="tc-sub">6 Gäste · Rechnung</div></div>
-      <span class="chip cr">38:47</span>
+  </div>
+
+  <!-- Speed-Dial FAB -->
+  <div class="fab" id="fab">
+    <div class="fab-opts" id="fab-opts">
+      <div class="fab-row">
+        <span class="fab-lbl">Mitnehmen</span>
+        <button class="fab-btn" style="background:var(--surface3);" onclick="goTable('new');toggleFab()">M</button>
+      </div>
+      <div class="fab-row">
+        <span class="fab-lbl">Draußen</span>
+        <button class="fab-btn" style="background:var(--surface3);" onclick="goTable('new');toggleFab()">D</button>
+      </div>
+      <div class="fab-row">
+        <span class="fab-lbl">Innen</span>
+        <button class="fab-btn" style="background:var(--accent);" onclick="goTable('new');toggleFab()">T</button>
+      </div>
     </div>
-    <div class="sl">Mitnahme</div>
-    <div class="tc" onclick="goTable('demo')">
-      <div class="tc-icon" style="background:rgba(255,69,58,.15);font-size:22px;">🥡</div>
-      <div style="flex:1"><div class="tc-name">Mitnahme #2</div><div class="tc-sub">1 Person · ausstehend</div></div>
-      <span class="chip cr">35:02</span>
-    </div>
-    <div style="height:20px"></div>
+    <button class="fab-main" id="fab-main" onclick="toggleFab()">+</button>
   </div>
 </div>
 
@@ -605,6 +666,10 @@ function setMode(m) {
   confBar.style.display = 'none';
   gl.classList.remove('interactive');
   cv.style.cursor = 'default';
+  // HC-Button nach TN-Mode zurücksetzen
+  const hcBtnReset = document.getElementById('k-hc');
+  hcBtnReset.textContent = 'HC';
+  hcBtnReset.classList.remove('dim');
 
   if (m === 'draw') {
     ovDraw.classList.add('on');
@@ -650,8 +715,11 @@ function setMode(m) {
     modeTxt.textContent = 'Tischnummer eingeben';
     modeAct.textContent = 'Abbrechen';
     modeAct.style.display = 'block';
-    // Dim category keys in TN mode
-    ['k-hc','k-rn','k-c'].forEach(id => document.getElementById(id).classList.add('dim'));
+    // In TN mode: HC-Button wird zu "D" (Draußen), RN/C bleiben deaktiviert
+    const hcBtn = document.getElementById('k-hc');
+    hcBtn.textContent = 'D';
+    hcBtn.classList.remove('dim');
+    ['k-rn','k-c'].forEach(id => document.getElementById(id).classList.add('dim'));
     updateCodeDisplay();
   }
 }
@@ -673,8 +741,13 @@ function enterTnMode() {
 // ── Keypad ────────────────────────────────────────────────────
 function kIn(key) {
   if (tMode === 'tn') {
-    if (key === 'HC' || key === 'RN' || key === 'C') return; // disabled in TN mode
-    if (inputCode.length >= 2) return;
+    if (key === 'RN' || key === 'C') return;
+    if (key === 'HC') {
+      if (!inputCode) inputCode = 'D'; // HC-Button fungiert als D-Präfix
+      return;
+    }
+    const maxLen = inputCode.startsWith('D') ? 3 : 2; // D10 = 3 Zeichen
+    if (inputCode.length >= maxLen) return;
     inputCode += key;
   } else if (tMode === 'selected') {
     if (key === 'HC' || key === 'RN') { inputCode = key; }
@@ -691,11 +764,13 @@ function kDel() {
 
 function kOk() {
   if (tMode === 'tn') {
-    const n = parseInt(inputCode);
-    if (n >= 1 && n <= 50) {
+    const isD = inputCode.startsWith('D');
+    const n = parseInt(isD ? inputCode.slice(1) : inputCode);
+    const validTn = (!isD && n >= 1 && n <= 14) || (isD && n >= 1 && n <= 10);
+    if (validTn) {
       tableNum = inputCode;
       const badge = document.getElementById('tn-badge');
-      badge.textContent = 'T' + tableNum;
+      badge.textContent = tableNum.startsWith('D') ? tableNum : 'T' + tableNum;
       badge.classList.add('set');
     }
     inputCode = '';
@@ -723,16 +798,21 @@ function updateCodeDisplay() {
   if (!codeEl) return;
 
   if (tMode === 'tn') {
-    codeEl.textContent = inputCode ? 'T' + inputCode : 'T?';
-    const n = parseInt(inputCode);
+    const isD = inputCode.startsWith('D');
+    const num = parseInt(isD ? inputCode.slice(1) : inputCode);
+    const validIndoor  = !isD && num >= 1 && num <= 14;
+    const validOutdoor = isD && num >= 1 && num <= 10;
+    const valid = validIndoor || validOutdoor;
+    codeEl.textContent = inputCode || '—';
     if (!inputCode) {
-      infoEl.innerHTML = '<span class="cd-hint">Tischnummer 1–50</span>';
+      infoEl.innerHTML = '<span class="cd-hint">Innen 1–14 · Draußen D1–D10</span>';
       okBtn.disabled = true;
-    } else if (n < 1 || n > 50) {
-      infoEl.innerHTML = '<span class="cd-err">Nur 1–50 möglich</span>';
+    } else if (!valid) {
+      infoEl.innerHTML = '<span class="cd-err">Innen: 1–14 · Draußen: D1–D10</span>';
       okBtn.disabled = true;
     } else {
-      infoEl.innerHTML = `<strong style="color:var(--success)">Tisch ${n} ✓</strong>`;
+      const loc = validOutdoor ? 'Draußen' : 'Innen';
+      infoEl.innerHTML = `<strong style="color:var(--success)">${inputCode} · ${loc} ✓</strong>`;
       okBtn.disabled = false;
     }
     return;
@@ -772,12 +852,10 @@ function startTimer(startSec) {
   timerSec = startSec || 0;
   timerIv = setInterval(() => {
     timerSec++;
-    const m = String(Math.floor(timerSec/60)).padStart(2,'0');
-    const s = String(timerSec%60).padStart(2,'0');
+    const mins = Math.floor(timerSec / 60);
     const el = document.getElementById('tbl-timer');
-    if (el) el.textContent = m+':'+s;
-    // Color escalation: <10min green, <25min yellow, else red
     if (el) {
+      el.textContent = mins + ' min';
       el.className = 'chip ' + (timerSec < 600 ? 'cg' : timerSec < 1500 ? 'cy' : 'cr');
     }
   }, 1000);
@@ -870,6 +948,14 @@ function doSend(dest) {
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }, 1600);
+}
+
+function toggleFab() {
+  const opts = document.getElementById('fab-opts');
+  const btn  = document.getElementById('fab-main');
+  const open = opts.classList.toggle('open');
+  btn.textContent = open ? '✕' : '+';
+  btn.style.fontSize = open ? '18px' : '26px';
 }
 
 function selBg(btn) {

@@ -1,0 +1,25 @@
+{
+  "zones": [
+    {
+      "id": "indoor",
+      "label": "Innen",
+      "prefix": "",
+      "min": 1,
+      "max": 14
+    },
+    {
+      "id": "outdoor",
+      "label": "Draußen",
+      "prefix": "D",
+      "min": 1,
+      "max": 10
+    },
+    {
+      "id": "takeaway",
+      "label": "Mitnehmen",
+      "prefix": "M",
+      "min": 1,
+      "max": 5
+    }
+  ]
+}

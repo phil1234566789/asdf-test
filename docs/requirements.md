@@ -3,6 +3,7 @@
 ## Ziele & Stakeholder
 
 ### B (Bedienung)
+- 1–3 Bedienungen pro Tag
 - Bestellungen schnell und fehlerfrei aufnehmen
 - Rechnungen einfach stellen, auch bei getrennter Zahlung
 - App muss mindestens so schnell sein wie Papier + Stift – sonst wird sie nicht genutzt

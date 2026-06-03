@@ -27,6 +27,27 @@
 
 ---
 
+## Gemeinsame Übersicht & B-Zuweisung
+
+### Geteilte Echtzeit-Übersicht
+- Alle eingeloggten Bedienungen sehen dieselbe Übersicht (alle offenen Tische und Mitnahmen, egal von wem angelegt)
+
+### Zuständige B pro Tisch
+- Jede Session ist der B zugewiesen, die sie angelegt hat
+- Jede Übersichtskarte zeigt den Namen der zuständigen B
+
+### Eigene Tische hervorheben
+- Tische der aktuell eingeloggten B sind visuell hervorgehoben (z.B. Akzent-Rand)
+- Die eingeloggte B ist jederzeit in der Übersicht sichtbar
+
+### Übersichtskarte (Inhalt)
+- Tischkennung (Nummer / Kürzel)
+- B-Name
+- Wartezeit-Timer (Minuten)
+- Bestellstatus (noch zu definieren)
+
+---
+
 ## Tischplan & Sitzplatzzuordnung
 
 ### Freies Tisch-Zeichnen
@@ -57,11 +78,18 @@
 
 ## Tisch- & Abholoptionen
 
-### Tisch
-- Tischnummern 1–50
+### Tisch Innen
+- Tischnummern 1–14 (kein Präfix)
+
+### Tisch Draußen
+- D1–D10 (Präfix `D`)
 
 ### Mitnehmen
-- 1–10 Bestellungen ohne Tischnummer
+- M1–M5 (Präfix `M`, max. 5 gleichzeitig)
+
+### Config-getrieben
+- Zonen, Präfixe und Limits sind in `config/tables.config.json` definiert
+- Die App liest diese Datei als einzige Quelle – keine hardgecodeten Bereichsgrenzen
 
 ---
 
@@ -105,6 +133,7 @@
 
 ### Wartezeit-Timer
 - Jede Bestellung zeigt einen laufenden Timer ab Zeitpunkt der Aufnahme
+- Anzeige in ganzen Minuten (z.B. „9 min") – keine Sekundenanzeige
 - Timer läuft weiter, auch wenn die App kurz geschlossen oder das Display gesperrt wird
 
 ### Visuelle Eskalation

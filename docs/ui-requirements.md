@@ -15,7 +15,7 @@ Die Speisekarte ist in `menu.config.json` definiert.
 
 ## Benutzer & Nutzungsszenario
 
-- Zielgruppe: 1–2 Bedienungen (kein technisches Vorwissen erforderlich)
+- Zielgruppe: 1–3 Bedienungen pro Tag (kein technisches Vorwissen erforderlich)
 - Gerät: Smartphone (mobile only)
 - Restaurantkapazität: ca. 60–80 Gäste gleichzeitig
 - Workflow: Bedienung geht zum Tisch → nimmt Bestellung auf → App berechnet Preis automatisch
@@ -101,15 +101,39 @@ Auf Papier zeichnet die Bedienung in Sekunden eine freie Tischskizze, platziert 
 
 ## Tisch- & Abholoptionen
 
-- **Tischnummer:** 1–50 auswählbar
-- **Mitnehmen:** 1–10 Bestellungen möglich (keine Tischnummer nötig)
+- **Tischnummern Innen:** 1–14 (kein Präfix)
+- **Tischnummern Draußen:** D1–D10 (Präfix `D`)
+- **Mitnehmen:** M1–M5 (Präfix `M`, max. 5 gleichzeitig, keine Tischnummer)
 - **Lieferung:** nicht vorhanden
+
+Diese Zonen und Grenzen sind in `config/tables.config.json` definiert und können je Restaurant angepasst werden. Die App liest alle Zonen, Präfixe und Limits ausschließlich aus dieser Datei.
+
+---
+
+## Gemeinsame Übersicht & B-Zuweisung
+
+- Alle eingeloggten Bedienungen sehen **dieselbe Übersicht** aller offenen Tische und Mitnahme-Bestellungen – unabhängig davon, wer sie angelegt hat
+- Jede Session ist einer **zuständigen B** zugewiesen (die B, die den Tisch angelegt hat)
+- **Eigene Tische** (Tische der aktuell eingeloggten B) werden visuell hervorgehoben (z.B. farbiger Akzent-Rand)
+- Die aktuell eingeloggte B ist jederzeit in der Übersicht sichtbar (z.B. als kleines Label im Header)
+
+### Inhalt einer Übersichtskarte
+
+Jede Karte zeigt genau diese vier Informationen – nicht mehr:
+
+| Element | Beschreibung |
+|---|---|
+| **Tischkennung** | Nummer bzw. Kürzel (z.B. `3`, `D5`, `M2`) |
+| **B-Name** | Name der zuständigen Bedienung |
+| **Timer** | Wartezeit in ganzen Minuten |
+| **Bestellstatus** | Aktueller Status der Bestellung (noch zu definieren) |
 
 ---
 
 ## Wartezeit-Anzeige
 
 - Jede Bestellung zeigt einen **laufenden Timer** an, der ab dem Zeitpunkt der Aufnahme zählt
+- Anzeige in **ganzen Minuten** – Sekunden werden nicht angezeigt (z.B. „9 min", „24 min")
 - Die Übersicht aller offenen Tische/Bestellungen zeigt die Wartezeit auf einen Blick, damit B priorisieren kann
 - Visuelle Eskalation empfohlen: z.B. grün → gelb → rot je nach Wartezeit (konkrete Schwellenwerte folgen)
 - Timer läuft weiter, auch wenn B die App kurz schließt oder das Display sperrt
