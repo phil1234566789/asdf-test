@@ -6,4 +6,21 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/overview/overview.component').then(m => m.OverviewComponent),
   },
+  {
+    path: 'pick',
+    loadComponent: () =>
+      import('./pages/table-picker/table-picker.component').then(m => m.TablePickerComponent),
+    data: { mode: 'tables' },
+  },
+  {
+    path: 'pick/takeaway',
+    loadComponent: () =>
+      import('./pages/table-picker/table-picker.component').then(m => m.TablePickerComponent),
+    data: { mode: 'takeaway' },
+  },
+  {
+    path: 'table/:key',
+    loadComponent: () =>
+      import('./pages/table/table.component').then(m => m.TableComponent),
+  },
 ];

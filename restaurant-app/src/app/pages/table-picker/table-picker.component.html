@@ -1,0 +1,41 @@
+<div class="picker">
+  <header class="header">
+    <button class="back-btn" (click)="back()">‹</button>
+    <span class="title">{{ title }}</span>
+  </header>
+
+  <main class="content">
+    @if (mode === 'tables') {
+      <div class="pick-grid">
+        @for (t of indoorTables(); track t.key) {
+          <button class="pick-btn innen"
+                  [class.rect]="t.shape === 'rect'"
+                  [class.round]="t.shape === 'round'"
+                  [class.occupied]="isOccupied(t.key)"
+                  (click)="selectTable(t)">
+            {{ t.number }}
+          </button>
+        }
+        @for (t of outdoorTables(); track t.key) {
+          <button class="pick-btn rect draussen"
+                  [class.occupied]="isOccupied(t.key)"
+                  (click)="selectTable(t)">
+            {{ t.key }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (mode === 'takeaway') {
+      <div class="pick-grid">
+        @for (t of takeawayTables(); track t.key) {
+          <button class="pick-btn rect mitnahme"
+                  [class.occupied]="isOccupied(t.key)"
+                  (click)="selectTable(t)">
+            {{ t.key }}
+          </button>
+        }
+      </div>
+    }
+  </main>
+</div>

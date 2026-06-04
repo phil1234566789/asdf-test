@@ -44,15 +44,11 @@
       <div class="fab-options">
         <div class="fab-row">
           <span class="fab-label">Mitnehmen</span>
-          <button class="fab-btn fab-btn--mitnahme" (click)="closeFab()">M</button>
+          <button class="fab-btn fab-btn--mitnahme" (click)="navigateTo('/pick/takeaway')">M</button>
         </div>
         <div class="fab-row">
-          <span class="fab-label">Draußen</span>
-          <button class="fab-btn fab-btn--draussen" (click)="closeFab()">D</button>
-        </div>
-        <div class="fab-row">
-          <span class="fab-label">Innen</span>
-          <button class="fab-btn fab-btn--innen" (click)="closeFab()">I</button>
+          <span class="fab-label">Tisch</span>
+          <button class="fab-btn fab-btn--tisch" (click)="navigateTo('/pick')">T</button>
         </div>
       </div>
     }

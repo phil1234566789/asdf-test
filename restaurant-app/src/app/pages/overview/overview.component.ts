@@ -1,4 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { MockSessionService } from '../../services/mock-session.service';
 import { ThemeService } from '../../services/theme.service';
 import { TableCardComponent } from '../../components/table-card/table-card.component';
@@ -10,6 +11,7 @@ import { TableCardComponent } from '../../components/table-card/table-card.compo
   imports: [TableCardComponent],
 })
 export class OverviewComponent implements OnInit {
+  private readonly router = inject(Router);
   private readonly sessionService = inject(MockSessionService);
   readonly themeService = inject(ThemeService);
   private readonly destroyRef = inject(DestroyRef);
@@ -45,5 +47,10 @@ export class OverviewComponent implements OnInit {
 
   closeFab(): void {
     this.fabOpen.set(false);
+  }
+
+  navigateTo(path: string): void {
+    this.fabOpen.set(false);
+    this.router.navigateByUrl(path);
   }
 }

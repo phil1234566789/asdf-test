@@ -139,7 +139,6 @@
   align-items: center;
   justify-content: center;
 
-  &--innen    { background: var(--innen); }
-  &--draussen { background: var(--draussen); }
+  &--tisch    { background: var(--accent); }
   &--mitnahme { background: var(--mitnahme); }
 }

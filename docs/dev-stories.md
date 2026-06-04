@@ -249,10 +249,10 @@ Zeigt genau vier Informationen (laut Requirements):
 
 ---
 
-## Story 4 – Tischauswahl-Seite
+## ✅ Story 4 – Tischauswahl-Seite
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** Fertig
 
 ### Ziel
 
