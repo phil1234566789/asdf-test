@@ -48,10 +48,8 @@
 
 ### Nachspeisen-Indikator
 - Wer ein **Menü** bestellt, bekommt automatisch eine Nachspeise
-- In der Übersichtskarte erscheint ein **visueller Hinweis**, sobald ein Tisch mindestens eine Menü-Bestellung enthält
+- In der Übersichtskarte erscheint ein **gelbes „N"-Badge** oben rechts auf der Karte, sobald ein Tisch mindestens eine Menü-Bestellung enthält
 - Zweck: B wird daran erinnert, beim Tisch nach der Nachspeise zu fragen
-- Der Indikator muss klar genug sein, um im Stress nicht übersehen zu werden
-- Details (Icon, Farbe, Platzierung auf der Karte) noch zu definieren
 
 ---
 
@@ -142,7 +140,7 @@
 
 ### Wartezeit-Timer
 - Jede Bestellung zeigt einen laufenden Timer ab Zeitpunkt der Aufnahme
-- Anzeige in ganzen Minuten (z.B. „9 min") – keine Sekundenanzeige
+- Anzeige in ganzen Minuten als reine Zahl (z.B. „9") – keine Sekundenanzeige, kein „min"-Suffix
 - Timer läuft weiter, auch wenn die App kurz geschlossen oder das Display gesperrt wird
 
 ### Visuelle Eskalation
@@ -154,8 +152,8 @@
 ## Erscheinungsbild
 
 ### Hell-/Dunkelmodus
-- **Dark Mode:** Standard – spart Akku
-- **Light Mode:** Für Einsatz bei Sonneneinstrahlung
+- **Light Mode:** Standard – bessere Lesbarkeit im Alltag
+- **Dark Mode:** Optionaler Modus zum Akkusparen
 - Umschaltung jederzeit schnell erreichbar
 
 ---
