@@ -1,0 +1,17 @@
+<div class="card"
+     [class.innen]="session().zoneId === 'indoor'"
+     [class.draussen]="session().zoneId === 'outdoor'"
+     [class.mitnahme]="session().zoneId === 'takeaway'"
+     [class.mine]="isOwn()">
+  @if (session().isMenu) {
+    <span class="menu-badge">N</span>
+  }
+  <div class="card-num">{{ session().tableKey }}</div>
+  <div class="card-bname">{{ session().createdByName }}</div>
+  <span class="card-timer"
+        [class.timer--green]="minutes() < 15"
+        [class.timer--yellow]="minutes() >= 15 && minutes() < 30"
+        [class.timer--red]="minutes() >= 30">
+    {{ minutes() }}
+  </span>
+</div>

@@ -1,0 +1,63 @@
+<div class="overview">
+  <header class="header">
+    <span class="app-title">Restaurant</span>
+    <div class="header-actions">
+      <span class="user-chip">{{ currentUserName }}</span>
+      <button class="theme-btn" (click)="themeService.toggle()">
+        @if (themeService.theme() === 'dark') { ☀ } @else { ☾ }
+      </button>
+    </div>
+  </header>
+
+  <main class="content">
+    @if (indoorSessions().length > 0) {
+      <div class="table-grid">
+        @for (s of indoorSessions(); track s.id) {
+          <app-table-card [session]="s" [isOwn]="s.createdBy === currentUserId" [now]="now()" />
+        }
+      </div>
+    }
+
+    @if (outdoorSessions().length > 0) {
+      <div class="table-grid section-gap">
+        @for (s of outdoorSessions(); track s.id) {
+          <app-table-card [session]="s" [isOwn]="s.createdBy === currentUserId" [now]="now()" />
+        }
+      </div>
+    }
+
+    @if (takeawaySessions().length > 0) {
+      <div class="table-grid section-gap">
+        @for (s of takeawaySessions(); track s.id) {
+          <app-table-card [session]="s" [isOwn]="s.createdBy === currentUserId" [now]="now()" />
+        }
+      </div>
+    }
+  </main>
+
+  @if (fabOpen()) {
+    <div class="fab-backdrop" (click)="closeFab()"></div>
+  }
+
+  <div class="fab">
+    @if (fabOpen()) {
+      <div class="fab-options">
+        <div class="fab-row">
+          <span class="fab-label">Mitnehmen</span>
+          <button class="fab-btn fab-btn--mitnahme" (click)="closeFab()">M</button>
+        </div>
+        <div class="fab-row">
+          <span class="fab-label">Draußen</span>
+          <button class="fab-btn fab-btn--draussen" (click)="closeFab()">D</button>
+        </div>
+        <div class="fab-row">
+          <span class="fab-label">Innen</span>
+          <button class="fab-btn fab-btn--innen" (click)="closeFab()">I</button>
+        </div>
+      </div>
+    }
+    <button class="fab-main" (click)="toggleFab()">
+      {{ fabOpen() ? '✕' : '+' }}
+    </button>
+  </div>
+</div>
