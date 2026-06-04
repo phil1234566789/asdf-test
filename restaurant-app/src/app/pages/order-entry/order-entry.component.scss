@@ -47,24 +47,48 @@
   &.chip--red    { background: var(--danger-light);  color: var(--danger); }
 }
 
-.send-btn {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
+.view-toggle {
+  display: flex;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
   flex-shrink: 0;
 }
 
-.tbl-area {
+.view-toggle__btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &.active {
+    background: var(--bg);
+    color: var(--accent);
+  }
+}
+
+// ── Content area (non-takeaway, wraps tbl-area + list-view) ─────────────────
+
+.content-area {
   flex: 1;
   position: relative;
   overflow: hidden;
+}
+
+.tbl-area {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
   background: var(--tbl-area-bg);
+
+  &.is-hidden { display: none; }
 }
 
 .tbl-shape {
@@ -152,6 +176,139 @@
   &.ref { border-color: var(--warn); }
 }
 
+.order-tag {
+  position: absolute;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  z-index: 18;
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translateY(-50%);
+
+  &--radial { transform: translate(-50%, -50%); }
+}
+
+// ── Price bar (table view, numpad closed, orders present) ────────────────────
+
+.price-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.price-bar__summary {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.price-bar__submit {
+  flex-shrink: 0;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+// ── List view (overlays content-area) ───────────────────────────────────────
+
+.order-list-view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.order-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 16px 0;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.ol-seat {
+  padding: 12px 0 4px;
+  border-bottom: 1px solid var(--border);
+
+  &:last-of-type { border-bottom: none; }
+}
+
+.ol-seat__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.ol-seat__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.ol-seat__total {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ol-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+.ol-code {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text3);
+  min-width: 36px;
+  flex-shrink: 0;
+}
+
+.ol-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.ol-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.ol-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  border-top: 2px solid var(--border);
+  margin-top: 4px;
+}
+
+// ── Takeaway list ────────────────────────────────────────────────────────────
 
 .takeaway-list {
   flex: 1;
@@ -209,15 +366,69 @@
   margin-top: 2px;
 }
 
-.order-tag {
-  position: absolute;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
-  z-index: 18;
-  pointer-events: none;
-  white-space: nowrap;
-  transform: translateY(-50%);
+// ── Submit footer & button ───────────────────────────────────────────────────
 
-  &--radial { transform: translate(-50%, -50%); }
+.submit-footer {
+  flex-shrink: 0;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ── Loading overlay & success toast ─────────────────────────────────────────
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.success-toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--success);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 201;
+  white-space: nowrap;
 }

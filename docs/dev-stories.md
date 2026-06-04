@@ -495,10 +495,10 @@ Mitnehmen-Bestellungen haben keine Tischauswahl und keine Sitzplatz-Visualisieru
 
 ---
 
-## Story 8 – Bestellübersicht & Abschließen
+## ✅ Story 8 – Bestellübersicht & Abschließen
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** fertig
 
 ### Ziel
 

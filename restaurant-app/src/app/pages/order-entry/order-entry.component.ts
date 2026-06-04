@@ -1,8 +1,8 @@
 import {
   AfterViewInit, Component, DestroyRef, ElementRef,
-  OnInit, ViewChild, computed, inject, signal,
+  ViewChild, computed, inject, signal,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { TablesConfigService } from '../../services/tables-config.service';
 import { MockSessionService } from '../../services/mock-session.service';
@@ -33,11 +33,10 @@ type ShapeView = { x: number; y: number; shape: 'rect' | 'round' };
   styleUrl: './order-entry.component.scss',
   imports: [NumpadComponent],
 })
-export class OrderEntryComponent implements OnInit, AfterViewInit {
+export class OrderEntryComponent implements AfterViewInit {
   @ViewChild('tblArea') private tblAreaRef?: ElementRef<HTMLDivElement>;
 
   private readonly location = inject(Location);
-  private readonly router = inject(Router);
   private readonly tablesConfig = inject(TablesConfigService);
   private readonly sessionService = inject(MockSessionService);
   private readonly destroyRef = inject(DestroyRef);
@@ -52,29 +51,14 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
   readonly tableShapes = signal<ShapeView[]>([]);
   readonly activeSeatId = signal<number | null>(null);
   readonly inputCode = signal('');
-  readonly now = signal(Date.now());
+  readonly viewMode = signal<'table' | 'list'>('table');
+  readonly isLoading = signal(false);
+  readonly showSuccessToast = signal(false);
 
   // Tracked for tag-visibility safety check
   private tblAreaH = 0;
 
   private longPressTimer?: ReturnType<typeof setTimeout>;
-
-  readonly session = computed(() =>
-    this.sessionService.sessions().find(s => s.tableKey === this.key)
-  );
-
-  readonly minutes = computed(() => {
-    const s = this.session();
-    if (!s) return 0;
-    return Math.floor((this.now() - s.createdAt.getTime()) / 60_000);
-  });
-
-  readonly timerClass = computed(() => {
-    const m = this.minutes();
-    if (m < 15) return 'chip--green';
-    if (m < 30) return 'chip--yellow';
-    return 'chip--red';
-  });
 
   readonly tableLabel = computed(() => {
     if (this.key.startsWith('D')) return `Draußen ${this.key}`;
@@ -94,10 +78,25 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
     this.seats().find(s => s.id === this.activeSeatId()) ?? null
   );
 
-  ngOnInit(): void {
-    const id = setInterval(() => this.now.set(Date.now()), 60_000);
-    this.destroyRef.onDestroy(() => clearInterval(id));
-  }
+  readonly allOrders = computed(() =>
+    this.seats().flatMap(s => s.orders)
+  );
+
+  readonly totalPrice = computed(() =>
+    this.allOrders().reduce((sum, o) => sum + o.price, 0)
+  );
+
+  readonly totalCount = computed(() =>
+    this.allOrders().length
+  );
+
+  readonly seatsWithOrders = computed(() =>
+    this.seats().filter(s => s.orders.length > 0)
+  );
+
+  readonly showPriceBar = computed(() =>
+    this.activeSeatId() === null && this.totalCount() > 0
+  );
 
   ngAfterViewInit(): void {
     if (this.isTakeaway) {
@@ -332,8 +331,27 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
     clearTimeout(this.longPressTimer);
   }
 
-  navigateToSend(): void {
-    this.router.navigate(['/send', this.key]);
+  seatTotal(seat: Seat): number {
+    return seat.orders.reduce((sum, o) => sum + o.price, 0);
+  }
+
+  setViewMode(mode: 'table' | 'list'): void {
+    if (mode === 'list') this.deselectSeat();
+    this.viewMode.set(mode);
+    if (mode === 'table') {
+      requestAnimationFrame(() => this.recalcLayout());
+    }
+  }
+
+  submitOrder(): void {
+    if (this.isLoading()) return;
+    this.isLoading.set(true);
+    setTimeout(() => {
+      this.sessionService.updateStatus(this.key, 'in_progress');
+      this.isLoading.set(false);
+      this.showSuccessToast.set(true);
+      setTimeout(() => this.showSuccessToast.set(false), 3000);
+    }, 1000);
   }
 
   back(): void {

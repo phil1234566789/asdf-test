@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { OrderSession } from '../models/order-session.model';
+import { OrderSession, OrderStatus } from '../models/order-session.model';
 
 const m = (minutes: number) => new Date(Date.now() - minutes * 60_000);
 
@@ -32,4 +32,10 @@ export class MockSessionService {
   ]);
 
   readonly sessions = this._sessions.asReadonly();
+
+  updateStatus(tableKey: string, status: OrderStatus): void {
+    this._sessions.update(sessions =>
+      sessions.map(s => s.tableKey === tableKey ? { ...s, status } : s)
+    );
+  }
 }
