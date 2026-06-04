@@ -309,10 +309,10 @@ Der FAB bekommt nur zwei Optionen (wie im Mockup):
 
 ---
 
-## Story 5 – Tischvisualisierung
+## ✅ Story 5 – Tischvisualisierung
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** Fertig
 
 ### Ziel
 
@@ -404,10 +404,10 @@ Session aus `MockSessionService` (für Timer). Bestellungen nur in-memory.
 
 ---
 
-## Story 6 – Numpad & Codeeingabe
+## ✅ Story 6 – Numpad & Codeeingabe
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** Fertig
 
 ### Ziel
 
