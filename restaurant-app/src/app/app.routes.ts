@@ -21,6 +21,6 @@ export const routes: Routes = [
   {
     path: 'table/:key',
     loadComponent: () =>
-      import('./pages/table/table.component').then(m => m.TableComponent),
+      import('./pages/order-entry/order-entry.component').then(m => m.OrderEntryComponent),
   },
 ];

@@ -236,7 +236,7 @@ Zeigt genau vier Informationen (laut Requirements):
 
 ```
 /          → OverviewComponent
-/table/:key → TableComponent (Stub – kommt in Story 4+)
+/table/:key → OrderEntryComponent (Stub – kommt in Story 4+)
 ```
 
 ### Ergebnis
@@ -273,7 +273,7 @@ Der FAB bekommt nur zwei Optionen (wie im Mockup):
 ```
 /pick           → TablePickerComponent (Innen + Draußen)
 /pick/takeaway  → TablePickerComponent (nur Mitnehmen)
-/table/:key     → TableComponent (Stub – kommt Story 5)
+/table/:key     → OrderEntryComponent (Stub – kommt Story 5)
 ```
 
 ### `TablePickerComponent` (`src/app/pages/table-picker/`)
@@ -306,6 +306,192 @@ Der FAB bekommt nur zwei Optionen (wie im Mockup):
 - Alle Tische werden aus Config geladen, korrekte Form (rund/eckig)
 - Belegte Tische sind sofort erkennbar
 - Navigation zu `/table/:key` funktioniert (Stub reicht)
+
+---
+
+## Story 5 – Tischvisualisierung
+
+**Datum:** 2026-06-04
+**Status:** Offen
+
+### Ziel
+
+Tischform und Sitzplätze korrekt darstellen. Sitzplatz antippen → Auswahl (Numpad kommt Story 6). Referenzgast per Long Press markieren.
+
+### Orientierung
+
+Mockup `design/mockup.html` → Screen „Bestellaufnahme", Funktionen `openTable()`, `autoPlaceSeats()`, `renderGuests()`.
+
+---
+
+### Neue Models (`src/app/models/seat.model.ts`)
+
+```typescript
+export type SeatOrder = {
+  code: string;
+  name: string;
+  price: number;
+};
+
+export type Seat = {
+  id: number;
+  orders: SeatOrder[];
+  isRef: boolean;
+};
+```
+
+---
+
+### `OrderEntryComponent` – Ersetzt Stub
+
+#### Header
+- `‹` Zurück → `location.back()`
+- Tischbezeichnung: `"Tisch 3"` / `"Draußen D5"` (abgeleitet aus Key)
+- Timer-Chip (grün/gelb/rot) – läuft ab `session.createdAt`
+- `"Senden →"` Button → Stub, navigiert zu `/send/:key` (Story 7)
+
+#### Tisch-Visualisierung (`div.tbl-area`)
+
+Relativer Container, Tischform + Sitzplatz-Dots absolut positioniert. Maße aus Mockup:
+
+| Konstante | Wert | Bedeutung |
+|---|---|---|
+| `TABLE_W` | 104px | Breite Rechteck-Tisch |
+| `TABLE_H` | 140px | Höhe Rechteck-Tisch |
+| `TABLE_R` | 148px | Durchmesser Rund-Tisch |
+| `SEAT_X` | 27px | Horizontaler Abstand Dot ↔ Tischmitte |
+| `SEAT_Y` | 38px | Vertikaler Abstand Dot ↔ Tischmitte-Reihe |
+| `SEAT_R` | 110px | Radius Sitzkreis bei runden Tischen |
+
+Positionen in `afterViewInit` berechnet (`cx = width/2`, `cy = height/2`):
+
+- **4er-Tisch:** Plätze an `(±SEAT_X, ±SEAT_Y)` – Erweiterungs-Buttons (+) oben/unten
+- **6er-Tisch (Tisch 12):** 3 Plätze links + 3 rechts bei `cy−SEAT_Y×2`, `cy`, `cy+SEAT_Y×2`
+- **Runder Tisch (8, 9, 11):** `angle = 2π×i/seats − π/2`, Radius 110px
+
+**Tisch-Extension (nur 4er):**
+- `+` oben/unten → weiterer Tischabschnitt (104×140px) + 4 neue Plätze
+- Max. 1× oben, 1× unten
+
+#### Sitzplatz-Dots
+
+- 42×42px Kreis, nummeriert
+- States: normal / aktiv (Akzentfarbe, 48×48px) / Referenz (gelber Rand)
+- Tap → `selectSeat(id)` – Numpad-Stub (Status-Leiste zeigt „Platz X ausgewählt")
+- Long Press (500ms) → `setRef(id)` + `navigator.vibrate(30)`
+
+#### Status-Leiste
+
+- Idle: `"N Plätze · M Gerichte"`
+- Aktiv: `"Platz X ausgewählt"`
+
+#### State
+
+```typescript
+readonly seats = signal<Seat[]>([]);
+readonly activeSeatId = signal<number | null>(null);
+```
+
+Session aus `MockSessionService` (für Timer). Bestellungen nur in-memory.
+
+### Ergebnis
+
+- Tischform + Sitzplatzanzahl aus Config, kein Hardcoding
+- Korrekte Positionen für 4er, 6er, runde Tische
+- Tisch-Extension funktioniert
+- Referenzgast markierbar
+- Numpad noch nicht vorhanden (Stub-Statusleiste reicht)
+
+---
+
+## Story 6 – Numpad & Codeeingabe
+
+**Datum:** 2026-06-04
+**Status:** Offen
+
+### Ziel
+
+Numpad-Overlay in die Tischansicht integrieren. Sitzplatz antippen → Numpad öffnet sich, Code eingeben, Gericht wird live aufgelöst und dem Sitzplatz zugeordnet.
+
+### `NumpadComponent` (`src/app/components/numpad/`)
+
+Eigenständige Komponente, erscheint als Overlay von unten.
+
+**Inputs:** `seat: Seat`, `inputCode: string`
+**Outputs:** `codeChange: string`, `confirm: SeatOrder`, `close: void`
+
+#### Code-Display
+- Code groß in Akzentfarbe
+- Darunter Live-Auflösung via `MenuConfigService.resolveCode()`:
+  - Gültiger Code → Name + Preis (grün)
+  - Präfix (`HC`, `RN`, `C`) → Hinweis auf folgende Codes
+  - Einzelziffer → Hinweis „+ Sauce wählen (1–7)"
+  - Unbekannt → Fehlermeldung (rot)
+
+#### Numpad-Layout
+```
+[ HC ]  [ RN ]  [ C  ]
+[  7 ]  [  8 ]  [  9 ]
+[  4 ]  [  5 ]  [  6 ]
+[  1 ]  [  2 ]  [  3 ]
+[  ⌫ ]  [  0 ]  [  ✓ ]
+```
+- `✓` disabled bis Code gültig
+- Nach `✓`: kurz grün → Reset, Numpad bleibt offen
+
+### Integration in `OrderEntryComponent`
+
+- Sitzplatz antippen → Numpad erscheint
+- Tippen auf Tischbereich (außerhalb Dots) → Numpad schließt
+- Bestätigtes Gericht → `SeatOrder` in `seat.orders` pushen, Tag neben Dot rendern
+
+#### Bestell-Tags
+
+Kleines Label neben dem Dot (nach Bestätigung):
+- Linke Dots: `dot.x − 62px`
+- Rechte Dots: `dot.x + 26px`
+- Text: eingegebener Code (`"33"`, `"HC2"`)
+
+### Ergebnis
+
+- Vollständige Codeeingabe für alle Kategorien (Kombinieren, HC, RN, C)
+- Fehlerhafte Codes klar erkennbar
+- Gerichte erscheinen als Tags an den Sitzplätzen
+
+---
+
+## Story 7 – Mitnehmen-Flow
+
+**Datum:** 2026-06-04
+**Status:** Offen
+
+### Ziel
+
+Mitnehmen-Bestellungen haben keine Tischauswahl und keine Sitzplatz-Visualisierung. Der FAB weist automatisch den nächsten freien M-Slot zu und öffnet direkt die Bestellaufnahme.
+
+### FAB-Änderung (OverviewComponent)
+
+- „Mitnehmen"-Button → prüft welche M-Slots (M1–M5) bereits belegt sind
+- Weist automatisch den niedrigsten freien Slot zu (M1, dann M2 usw.)
+- Navigiert direkt zu `/table/M1` (kein Picker-Umweg)
+- Alle 5 Slots belegt → Toast: „Alle Mitnehmen-Plätze belegt"
+
+### `OrderEntryComponent` – Mitnehmen-Variante
+
+`OrderEntryComponent` erkennt Mitnehmen-Keys (`key.startsWith('M')`) und rendert eine andere Ansicht:
+
+**Kein Tischbereich** – stattdessen:
+- Einfache scrollbare Bestellliste (Gerichte untereinander, mit Code + Name + Preis)
+- Numpad dauerhaft sichtbar (kein Sitzplatz-Antippen nötig)
+- Alle Gerichte landen in einer einzigen Gruppe (kein Seat-Konzept)
+
+**Header** identisch: `"Mitnehmen M1"`, Timer, „Senden →"
+
+### Ergebnis
+
+- FAB weist M-Slot automatisch zu
+- Keine überflüssige Tischauswahl für Mitnehmen
+- Numpad dauerhaft offen, Gerichte in einfacher Liste
 
 ---
 
