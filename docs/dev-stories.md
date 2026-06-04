@@ -495,8 +495,168 @@ Mitnehmen-Bestellungen haben keine Tischauswahl und keine Sitzplatz-Visualisieru
 
 ---
 
+## Story 8 – Bestellübersicht & Abschließen
+
+**Datum:** 2026-06-04
+**Status:** Offen
+
+### Ziel
+
+B kann zwischen der Tischvisualisierung und einer strukturierten Bestellübersicht hin- und herwechseln. Die Liste zeigt alle Gerichte pro Sitzplatz mit Preisen und Gesamtsumme. Von dort aus wird die Bestellung mit einem Tap abgeschlossen (HTTP POST an Backend, gemockt mit 1 Sek. Verzögerung).
+
+---
+
+### Änderungen am Header (`OrderEntryComponent`)
+
+- **„Senden →" Button entfernen** – wird durch den neuen Flow ersetzt
+- **Toggle-Buttons** im Header: `Tisch` | `Liste`
+  - Icons oder kurze Labels, visuell als aktiver/inaktiver State
+  - Steuern welche View im Inhaltsbereich gezeigt wird
+
+---
+
+### View A – Tischvisualisierung (bestehend)
+
+Keine inhaltlichen Änderungen. Neu:
+
+- Wenn Numpad **geschlossen** ist: schmale Gesamtpreis-Leiste am unteren Rand sichtbar
+  ```
+  ┌─────────────────────────────┐
+  │  4 Gerichte      24,80 €   │
+  └─────────────────────────────┘
+  ```
+- Wenn Numpad **offen** ist: Leiste ausgeblendet (Platz sparen)
+
+---
+
+### View B – Bestellliste
+
+Gleiche Struktur wie Mitnehmen-Ansicht, aber pro Sitzplatz gegliedert:
+
+```
+Platz 1 ★                    12,80 €
+  HC2  Thai Basilikum Huhn   12,80 €
+
+Platz 2                       9,90 €
+  33   Hühnerfilet + Kokos    9,90 €
+
+Platz 3                      22,70 €
+  11   Gemüse + Chop Suey     9,90 €
+  HC1  Rindfleisch            12,80 €
+─────────────────────────────────────
+Gesamt                       45,40 €
+
+      [ Bestellung abschließen ]
+```
+
+- Referenzplatz (★) wird hervorgehoben
+- Plätze ohne Bestellung werden nicht angezeigt
+- Scrollen wenn Gäste viele Bestellungen haben
+- **„Bestellung abschließen"** Button am Ende der Liste, immer sichtbar (sticky oder nach der Liste)
+
+---
+
+### „Bestellung abschließen" – Flow
+
+1. B tippt auf Button
+2. **Ladeindikator** erscheint (Overlay mit Spinner)
+3. Mock: 1 Sekunde Verzögerung (simuliert HTTP POST)
+4. **Erfolg-Toast**: „✓ Bestellung gespeichert" für 3 Sekunden
+5. Session-Status wechselt auf `in_progress` im `MockSessionService`
+6. Button deaktiviert solange Ladevorgang läuft
+
+---
+
+### Neue Models / Typen
+
+Keine neuen Models nötig – die bestehenden `Seat`, `SeatOrder`, `OrderSession` reichen.
+
+---
+
+### Ergebnis
+
+- B kann jederzeit zwischen Tisch-Grafik und Liste wechseln
+- Gesamtpreis immer sichtbar (in beiden Views)
+- Bestellung abschließen mit Lade- und Erfolgsindikator
+- „Senden →" ist weg
+
+---
+
+## Story 9 – Senden-Screen (zurückgestellt)
+
+**Datum:** 2026-06-04
+**Status:** Offen
+
+### Ziel
+
+Wenn B auf „Senden →" tippt, öffnet sich eine Übersicht aller noch nicht gesendeten Gerichte. B kann sie manuell an Küche oder Bar schicken. Nach dem Senden wird der Session-Status aktualisiert.
+
+### Orientierung
+
+Mockup `design/mockup.html` → Screen „Senden".
+
+### Route
+
+`/send/:key` (Stub bereits vorhanden → `SendComponent` ersetzen)
+
+### `SendComponent` (`src/app/pages/send/`)
+
+#### Header
+- `‹ Tisch X` Zurück-Button → navigiert zurück zur Tischansicht
+- Titel: `"Senden · Tisch X"`
+
+#### Inhalt (scrollbar)
+
+Zwei Sektionen:
+
+**🍳 Küche** – alle Speisen (alle Gerichte aus `menu.config.json` die keine Getränke sind)
+- Jedes Gericht als Zeile: nummerierter Dot (Farbe = Sitzplatz-Zuordnung), Name, Code, Preis
+- Status-Trennung: **Ausstehend** (noch nicht gesendet) vs. **Bereits gesendet** (ausgegraut, nicht wiederholbar)
+
+**🍹 Bar** – Getränke
+- Solange keine Getränke in `menu.config.json` definiert sind: leerer Zustand „Keine Getränke erfasst"
+
+#### Bottom-Bar
+
+Zwei Buttons nebeneinander:
+- **An Küche** – sendet alle ausstehenden Küchen-Gerichte
+- **An Bar** – sendet alle ausstehenden Bar-Getränke
+- Jeweils mit Anzahl der Positionen als Sub-Label (z.B. „4 Gerichte")
+- Deaktiviert wenn keine ausstehenden Positionen für das jeweilige Ziel
+
+#### Lade- & Erfolgs-Zustand
+
+- Beim Senden: Ladeoverlay mit Spinner
+- Erfolg: Toast „✓ An Küche gesendet" für 3 Sekunden
+
+### State-Änderungen nach dem Senden
+
+- Gesendete Positionen bekommen `status: 'sent'` (neues Feld in `SeatOrder`)
+- `OrderSession.status` wechselt zu `in_progress` (im MockSessionService)
+- Bereits gesendete Positionen bleiben sichtbar aber ausgegraut
+
+### Neue Felder
+
+`SeatOrder` bekommt `sent: boolean` (default `false`):
+```typescript
+export type SeatOrder = {
+  code: string;
+  name: string;
+  price: number;
+  sent: boolean;
+};
+```
+
+### Ergebnis
+
+- B sieht alle ungesendeten Gerichte auf einen Blick
+- Senden aktualisiert den Status im Mock
+- Bereits gesendete Positionen können nicht versehentlich erneut gesendet werden
+- Session-Status wechselt auf `in_progress` → Übersichtskarte zeigt `▶`
+
+---
+
 ## Offene Fragen / Backlog
 
 - **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter. Sobald Menü-Gerichte in `menu.config.json` erscheinen, muss das automatisch aus den bestellten Items abgeleitet werden.
-- **GitHub Pages Repo-Name:** Für `base-href` beim Build benötigt.
 - **Supabase-Projekt:** Wird angelegt, sobald Auth/Backend gebraucht wird.
