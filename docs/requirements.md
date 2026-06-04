@@ -20,8 +20,8 @@
 ### Hell-/Dunkelmodus
 
 - Die App unterstützt einen **Dark Mode** und einen **Light Mode**
-- **Dark Mode:** Standard-Modus – reduziert den Akkuverbrauch des Smartphones
-- **Light Mode:** Für den Einsatz bei starker Sonneneinstrahlung, damit der Bildschirm besser ablesbar bleibt
+- **Light Mode:** Standard-Modus – bessere Lesbarkeit im Alltag
+- **Dark Mode:** Optionaler Modus zum Akkusparen
 - Umschaltung muss schnell und jederzeit erreichbar sein (die Bedienung wechselt situationsbedingt)
 
 ---
