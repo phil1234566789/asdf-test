@@ -36,17 +36,36 @@
 
 ## Technologie & Architektur
 
+### Repository-Struktur
+
+- **Monorepo** – Frontend und Backend-Konfiguration leben im selben Repository
+- Struktur:
+  ```
+  /
+  ├── restaurant-app/     ← Angular Frontend (ng new)
+  ├── supabase/           ← Supabase CLI (wird automatisch angelegt)
+  │   ├── config.toml     ← Projekt-Konfiguration
+  │   ├── migrations/     ← SQL-Dateien für Schema-Änderungen
+  │   └── functions/      ← Edge Functions (falls nötig)
+  ├── config/             ← Speisekarte & Tisch-Configs (JSON)
+  └── docs/
+  ```
+
 ### Backend & Authentifizierung
 
 - Backend und Authentifizierung werden vollständig über **Supabase** abgewickelt
+- Supabase stellt Datenbank (PostgreSQL), Auth und Realtime bereit – kein eigener Server
+- Das Angular-Frontend spricht Supabase direkt über die `@supabase/supabase-js` Client-Bibliothek an
+- Backend-Code im Repo = SQL-Migrationen und ggf. Edge Functions (TypeScript/Deno) – kein klassischer API-Server
 
 ### Frontend
 
 - **Angular** (mobile-only Web-App)
+- Liegt im Unterordner `restaurant-app/`
 
 ### Deployment
 
 - Frontend wird über **GitHub Pages** deployed
 - Anforderung: zero Wartungsaufwand im laufenden Betrieb – keine Infrastruktur, kein Server-Management
-- **Hinweis:** Angular-Routing erfordert eine `404.html` (identisch zur `index.html`) als einmaligen Workaround für direkte URL-Aufrufe
+- Angular-Routing nutzt `HashLocationStrategy` – keine serverseitige Konfiguration nötig
 

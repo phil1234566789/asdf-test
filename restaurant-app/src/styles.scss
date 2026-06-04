@@ -1,0 +1,68 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  // Surfaces
+  --bg: #f2f2f7;
+  --surface: #ffffff;
+  --surface2: #e5e5ea;
+  --surface3: #d1d1d6;
+
+  // Accent
+  --accent: #ff6b35;
+  --accent-light: rgba(255, 107, 53, 0.15);
+
+  // Semantic
+  --success: #34c759;
+  --success-light: rgba(52, 199, 89, 0.15);
+  --warn: #ff9500;
+  --warn-light: rgba(255, 149, 0, 0.15);
+  --danger: #ff3b30;
+  --danger-light: rgba(255, 59, 48, 0.15);
+
+  // Text
+  --text: #000000;
+  --text2: rgba(60, 60, 67, 0.8);
+  --text3: rgba(60, 60, 67, 0.4);
+
+  // Misc
+  --border: rgba(0, 0, 0, 0.1);
+  --r: 12px;
+  --r-sm: 8px;
+
+  // Zonen
+  --innen: #0a84ff;
+  --innen-bg: rgba(10, 132, 255, 0.1);
+  --draussen: #30d158;
+  --draussen-bg: rgba(48, 209, 88, 0.1);
+  --mitnahme: #bf5af2;
+  --mitnahme-bg: rgba(191, 90, 242, 0.1);
+}
+
+body.dark {
+  --bg: #0f0f0f;
+  --surface: #1c1c1e;
+  --surface2: #2c2c2e;
+  --surface3: #3a3a3c;
+
+  --text: #ffffff;
+  --text2: rgba(235, 235, 245, 0.8);
+  --text3: rgba(235, 235, 245, 0.4);
+
+  --border: rgba(255, 255, 255, 0.08);
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
