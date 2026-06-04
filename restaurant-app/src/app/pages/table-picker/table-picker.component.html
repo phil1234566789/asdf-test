@@ -12,6 +12,7 @@
                   [class.rect]="t.shape === 'rect'"
                   [class.round]="t.shape === 'round'"
                   [class.occupied]="isOccupied(t.key)"
+                  [disabled]="isOccupied(t.key)"
                   (click)="selectTable(t)">
             {{ t.number }}
           </button>
@@ -19,6 +20,7 @@
         @for (t of outdoorTables; track t.key) {
           <button class="pick-btn rect draussen"
                   [class.occupied]="isOccupied(t.key)"
+                  [disabled]="isOccupied(t.key)"
                   (click)="selectTable(t)">
             {{ t.key }}
           </button>
@@ -31,6 +33,7 @@
         @for (t of takeawayTables; track t.key) {
           <button class="pick-btn rect mitnahme"
                   [class.occupied]="isOccupied(t.key)"
+                  [disabled]="isOccupied(t.key)"
                   (click)="selectTable(t)">
             {{ t.key }}
           </button>
