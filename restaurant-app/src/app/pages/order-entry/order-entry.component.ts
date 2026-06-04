@@ -67,15 +67,11 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
   });
 
   readonly showExtTop = computed(() =>
-    this.resolvedTable?.shape === 'rect' &&
-    this.resolvedTable?.seats === 4 &&
-    !this.extTop()
+    this.resolvedTable?.shape === 'rect' && !this.extTop()
   );
 
   readonly showExtBottom = computed(() =>
-    this.resolvedTable?.shape === 'rect' &&
-    this.resolvedTable?.seats === 4 &&
-    !this.extBottom()
+    this.resolvedTable?.shape === 'rect' && !this.extBottom()
   );
 
   readonly statusText = computed(() => {
@@ -124,15 +120,43 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
     }
 
     if (seatCount === 6) {
-      this.tableShapes.set([{ x: cx, y: cy, shape: 'rect' }]);
-      this.seats.set([
+      const extTopY = cy - TABLE_H - TABLE_GAP;
+      const extBotY = cy + TABLE_H + TABLE_GAP;
+
+      const shapes: ShapeView[] = [{ x: cx, y: cy, shape: 'rect' }];
+      if (this.extTop())    shapes.unshift({ x: cx, y: extTopY, shape: 'rect' });
+      if (this.extBottom()) shapes.push({ x: cx, y: extBotY, shape: 'rect' });
+      this.tableShapes.set(shapes);
+
+      const newSeats: SeatView[] = [
         { id: 1, x: cx - SEAT_X, y: cy - SEAT_Y * 2, isRef: true,  orders: [] },
         { id: 2, x: cx + SEAT_X, y: cy - SEAT_Y * 2, isRef: false, orders: [] },
         { id: 3, x: cx + SEAT_X, y: cy,               isRef: false, orders: [] },
         { id: 4, x: cx - SEAT_X, y: cy,               isRef: false, orders: [] },
         { id: 5, x: cx - SEAT_X, y: cy + SEAT_Y * 2, isRef: false, orders: [] },
         { id: 6, x: cx + SEAT_X, y: cy + SEAT_Y * 2, isRef: false, orders: [] },
-      ]);
+      ];
+      let nextId = 7;
+      if (this.extTop()) {
+        newSeats.push(
+          { id: nextId++, x: cx - SEAT_X, y: extTopY - SEAT_Y, isRef: false, orders: [] },
+          { id: nextId++, x: cx + SEAT_X, y: extTopY - SEAT_Y, isRef: false, orders: [] },
+        );
+      }
+      if (this.extBottom()) {
+        newSeats.push(
+          { id: nextId++, x: cx - SEAT_X, y: extBotY + SEAT_Y, isRef: false, orders: [] },
+          { id: nextId++, x: cx + SEAT_X, y: extBotY + SEAT_Y, isRef: false, orders: [] },
+        );
+      }
+
+      const existing = this.seats();
+      this.seats.set(
+        newSeats.map(s => {
+          const prev = existing.find(e => e.id === s.id);
+          return prev ? { ...s, orders: prev.orders, isRef: prev.isRef } : s;
+        })
+      );
       return;
     }
 
