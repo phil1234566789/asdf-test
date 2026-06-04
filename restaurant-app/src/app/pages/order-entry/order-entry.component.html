@@ -40,18 +40,18 @@
       </div>
 
       @for (order of seat.orders; track $index) {
-        <div class="order-tag"
-             [style.left.px]="seat.isLeft ? seat.x - 62 : seat.x + 26"
-             [style.top.px]="seat.y - 8 + $index * 17">
-          {{ order.code }}
-        </div>
+        @if (isTagInBounds(tagX(seat, $index), tagY(seat, $index))) {
+          <div class="order-tag"
+               [class.order-tag--radial]="seat.isRound"
+               [style.left.px]="tagX(seat, $index)"
+               [style.top.px]="tagY(seat, $index)">
+            {{ order.code }}
+          </div>
+        }
       }
     }
   </div>
 
-  <div class="mode-bar">
-    <span class="mode-txt">{{ statusText() }}</span>
-  </div>
 
   @if (activeSeat(); as seat) {
     <app-numpad

@@ -13,9 +13,18 @@ const SEAT_X = 27;
 const SEAT_Y = 38;
 const TABLE_H = 140;
 const TABLE_GAP = 4;
-const SEAT_CIRCLE_R = 110;
+const SEAT_CIRCLE_R = 88; // Sitze direkt an der Tischkante (Tisch-Radius 74px + Dot-Radius 14px)
+// Extra cy shift per order on the top seat of a round table
+const ROUND_TOP_SEAT_ORDER_SHIFT = 9;
 
-type SeatView = Seat & { x: number; y: number; isLeft: boolean };
+type SeatView = Seat & {
+  x: number;
+  y: number;
+  isLeft: boolean;
+  isRound: boolean;
+  tagDirX: number; // normalized direction for radial tag placement
+  tagDirY: number;
+};
 type ShapeView = { x: number; y: number; shape: 'rect' | 'round' };
 
 @Component({
@@ -44,6 +53,9 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
   readonly inputCode = signal('');
   readonly now = signal(Date.now());
 
+  // Tracked for tag-visibility safety check
+  private tblAreaH = 0;
+
   private longPressTimer?: ReturnType<typeof setTimeout>;
 
   readonly session = computed(() =>
@@ -70,24 +82,16 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
   });
 
   readonly showExtTop = computed(() =>
-    this.resolvedTable?.shape === 'rect' && !this.extTop()
+    this.resolvedTable?.shape === 'rect' && !this.extTop() && this.activeSeatId() === null
   );
 
   readonly showExtBottom = computed(() =>
-    this.resolvedTable?.shape === 'rect' && !this.extBottom()
+    this.resolvedTable?.shape === 'rect' && !this.extBottom() && this.activeSeatId() === null
   );
 
   readonly activeSeat = computed(() =>
     this.seats().find(s => s.id === this.activeSeatId()) ?? null
   );
-
-  readonly statusText = computed(() => {
-    const id = this.activeSeatId();
-    if (id !== null) return `Platz ${id} ausgewählt`;
-    const total = this.seats().reduce((sum, s) => sum + s.orders.length, 0);
-    const n = this.seats().length;
-    return `${n} Plätze · ${total} Gericht${total !== 1 ? 'e' : ''}`;
-  });
 
   ngOnInit(): void {
     const id = setInterval(() => this.now.set(Date.now()), 60_000);
@@ -103,24 +107,46 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
 
   private recalcLayout(): void {
     const el = this.tblAreaRef.nativeElement;
-    const cx = el.offsetWidth / 2;
-    const cy = el.offsetHeight / 2;
-    if (!cx || !cy || !this.resolvedTable) return;
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    if (!w || !h || !this.resolvedTable) return;
 
+    this.tblAreaH = h;
+    const cx = w / 2;
+    const rawCy = h / 2;
     const { shape, seats: seatCount } = this.resolvedTable;
 
     if (shape === 'round') {
+      // Shift table down proportionally to orders on the topmost seat (seat 1)
+      const topOrders = this.seats().find(s => s.id === 1)?.orders.length ?? 0;
+      const minCy = SEAT_CIRCLE_R + 20; // keep top seat at least 20px from top edge
+      const orderShift = topOrders * ROUND_TOP_SEAT_ORDER_SHIFT;
+      const cy = Math.min(Math.max(rawCy, minCy) + orderShift, h - SEAT_CIRCLE_R - 20);
+
       this.tableShapes.set([{ x: cx, y: cy, shape: 'round' }]);
+
+      const existing = this.seats();
       this.seats.set(
         Array.from({ length: seatCount }, (_, i) => {
           const angle = (2 * Math.PI * i / seatCount) - Math.PI / 2;
           const x = cx + SEAT_CIRCLE_R * Math.cos(angle);
           const y = cy + SEAT_CIRCLE_R * Math.sin(angle);
-          return { id: i + 1, x, y, isLeft: x <= cx, isRef: i === 0, orders: [] };
+          const prev = existing.find(e => e.id === i + 1);
+          return {
+            id: i + 1, x, y,
+            isLeft: x <= cx,
+            isRound: true,
+            tagDirX: Math.cos(angle),
+            tagDirY: Math.sin(angle),
+            isRef: prev?.isRef ?? (i === 0),
+            orders: prev?.orders ?? [],
+          };
         })
       );
       return;
     }
+
+    const cy = rawCy;
 
     if (seatCount === 6) {
       const extTopY = cy - TABLE_H - TABLE_GAP;
@@ -131,25 +157,26 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
       if (this.extBottom()) shapes.push({ x: cx, y: extBotY, shape: 'rect' });
       this.tableShapes.set(shapes);
 
+      const R: Pick<SeatView, 'isRound' | 'tagDirX' | 'tagDirY'> = { isRound: false, tagDirX: 0, tagDirY: 0 };
       const newSeats: SeatView[] = [
-        { id: 1, x: cx - SEAT_X, y: cy - SEAT_Y * 2, isLeft: true,  isRef: true,  orders: [] },
-        { id: 2, x: cx + SEAT_X, y: cy - SEAT_Y * 2, isLeft: false, isRef: false, orders: [] },
-        { id: 3, x: cx + SEAT_X, y: cy,               isLeft: false, isRef: false, orders: [] },
-        { id: 4, x: cx - SEAT_X, y: cy,               isLeft: true,  isRef: false, orders: [] },
-        { id: 5, x: cx - SEAT_X, y: cy + SEAT_Y * 2, isLeft: true,  isRef: false, orders: [] },
-        { id: 6, x: cx + SEAT_X, y: cy + SEAT_Y * 2, isLeft: false, isRef: false, orders: [] },
+        { id: 1, x: cx - SEAT_X, y: cy - SEAT_Y * 2, isLeft: true,  isRef: true,  orders: [], ...R, tagDirX: -1 },
+        { id: 2, x: cx + SEAT_X, y: cy - SEAT_Y * 2, isLeft: false, isRef: false, orders: [], ...R, tagDirX:  1 },
+        { id: 3, x: cx + SEAT_X, y: cy,               isLeft: false, isRef: false, orders: [], ...R, tagDirX:  1 },
+        { id: 4, x: cx - SEAT_X, y: cy,               isLeft: true,  isRef: false, orders: [], ...R, tagDirX: -1 },
+        { id: 5, x: cx - SEAT_X, y: cy + SEAT_Y * 2, isLeft: true,  isRef: false, orders: [], ...R, tagDirX: -1 },
+        { id: 6, x: cx + SEAT_X, y: cy + SEAT_Y * 2, isLeft: false, isRef: false, orders: [], ...R, tagDirX:  1 },
       ];
       let nextId = 7;
       if (this.extTop()) {
         newSeats.push(
-          { id: nextId++, x: cx - SEAT_X, y: extTopY - SEAT_Y, isLeft: true,  isRef: false, orders: [] },
-          { id: nextId++, x: cx + SEAT_X, y: extTopY - SEAT_Y, isLeft: false, isRef: false, orders: [] },
+          { id: nextId++, x: cx - SEAT_X, y: extTopY - SEAT_Y, isLeft: true,  isRef: false, orders: [], ...R, tagDirX: -1 },
+          { id: nextId++, x: cx + SEAT_X, y: extTopY - SEAT_Y, isLeft: false, isRef: false, orders: [], ...R, tagDirX:  1 },
         );
       }
       if (this.extBottom()) {
         newSeats.push(
-          { id: nextId++, x: cx - SEAT_X, y: extBotY + SEAT_Y, isLeft: true,  isRef: false, orders: [] },
-          { id: nextId++, x: cx + SEAT_X, y: extBotY + SEAT_Y, isLeft: false, isRef: false, orders: [] },
+          { id: nextId++, x: cx - SEAT_X, y: extBotY + SEAT_Y, isLeft: true,  isRef: false, orders: [], ...R, tagDirX: -1 },
+          { id: nextId++, x: cx + SEAT_X, y: extBotY + SEAT_Y, isLeft: false, isRef: false, orders: [], ...R, tagDirX:  1 },
         );
       }
 
@@ -187,11 +214,28 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
       positions.map((pos, i) => {
         const prev = existing[i];
         const isLeft = pos.x < cx;
+        const tagDirX = isLeft ? -1 : 1;
         return prev
-          ? { ...prev, x: pos.x, y: pos.y, isLeft }
-          : { id: i + 1, x: pos.x, y: pos.y, isLeft, isRef: i === 0 && !existing.length, orders: [] };
+          ? { ...prev, x: pos.x, y: pos.y, isLeft, isRound: false, tagDirX, tagDirY: 0 }
+          : { id: i + 1, x: pos.x, y: pos.y, isLeft, isRound: false, tagDirX, tagDirY: 0, isRef: i === 0 && !existing.length, orders: [] };
       })
     );
+  }
+
+  /** Safety check: don't render tags whose center falls outside the tbl-area */
+  isTagInBounds(x: number, y: number): boolean {
+    return x >= 0 && x <= this.tblAreaRef?.nativeElement.offsetWidth
+        && y >= 0 && y <= this.tblAreaH;
+  }
+
+  tagX(seat: SeatView, index: number): number {
+    if (seat.isRound) return seat.x + seat.tagDirX * (24 + index * 18);
+    return seat.isLeft ? seat.x - 46 : seat.x + 26;
+  }
+
+  tagY(seat: SeatView, index: number): number {
+    if (seat.isRound) return seat.y + seat.tagDirY * (24 + index * 18);
+    return seat.y - 8 + index * 18;
   }
 
   addExtension(side: 'top' | 'bottom'): void {
@@ -203,11 +247,15 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
   selectSeat(id: number): void {
     this.activeSeatId.set(id);
     this.inputCode.set('');
+    // Numpad becomes visible → tbl-area shrinks → recalc after render
+    requestAnimationFrame(() => this.recalcLayout());
   }
 
   deselectSeat(): void {
     this.activeSeatId.set(null);
     this.inputCode.set('');
+    // Numpad disappears → tbl-area grows → recalc after render
+    requestAnimationFrame(() => this.recalcLayout());
   }
 
   onKeyInput(key: string): void {
@@ -228,7 +276,11 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
     this.seats.update(seats =>
       seats.map(s => s.id === id ? { ...s, orders: [...s.orders, order] } : s)
     );
-    setTimeout(() => this.inputCode.set(''), 320);
+    // Delay clear for 320ms flash, then recalc (e.g. round table shift)
+    setTimeout(() => {
+      this.inputCode.set('');
+      requestAnimationFrame(() => this.recalcLayout());
+    }, 320);
   }
 
   onNumpadClosed(): void {
