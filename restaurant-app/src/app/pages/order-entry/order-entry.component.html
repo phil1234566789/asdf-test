@@ -38,10 +38,27 @@
            (pointercancel)="cancelLongPress()">
         {{ seat.id }}
       </div>
+
+      @for (order of seat.orders; track $index) {
+        <div class="order-tag"
+             [style.left.px]="seat.isLeft ? seat.x - 62 : seat.x + 26"
+             [style.top.px]="seat.y - 8 + $index * 17">
+          {{ order.code }}
+        </div>
+      }
     }
   </div>
 
   <div class="mode-bar">
     <span class="mode-txt">{{ statusText() }}</span>
   </div>
+
+  @if (activeSeat(); as seat) {
+    <app-numpad
+      [seat]="seat"
+      [inputCode]="inputCode()"
+      (keyInput)="onKeyInput($event)"
+      (confirmed)="onConfirmed($event)"
+      (closed)="onNumpadClosed()" />
+  }
 </div>

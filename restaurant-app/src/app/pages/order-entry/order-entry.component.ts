@@ -7,6 +7,7 @@ import { Location } from '@angular/common';
 import { TablesConfigService } from '../../services/tables-config.service';
 import { MockSessionService } from '../../services/mock-session.service';
 import { Seat, SeatOrder } from '../../models/seat.model';
+import { NumpadComponent } from '../../components/numpad/numpad.component';
 
 const SEAT_X = 27;
 const SEAT_Y = 38;
@@ -14,13 +15,14 @@ const TABLE_H = 140;
 const TABLE_GAP = 4;
 const SEAT_CIRCLE_R = 110;
 
-type SeatView = Seat & { x: number; y: number };
+type SeatView = Seat & { x: number; y: number; isLeft: boolean };
 type ShapeView = { x: number; y: number; shape: 'rect' | 'round' };
 
 @Component({
   selector: 'app-order-entry',
   templateUrl: './order-entry.component.html',
   styleUrl: './order-entry.component.scss',
+  imports: [NumpadComponent],
 })
 export class OrderEntryComponent implements OnInit, AfterViewInit {
   @ViewChild('tblArea') private tblAreaRef!: ElementRef<HTMLDivElement>;
@@ -39,6 +41,7 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
   readonly seats = signal<SeatView[]>([]);
   readonly tableShapes = signal<ShapeView[]>([]);
   readonly activeSeatId = signal<number | null>(null);
+  readonly inputCode = signal('');
   readonly now = signal(Date.now());
 
   private longPressTimer?: ReturnType<typeof setTimeout>;
@@ -74,6 +77,10 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
     this.resolvedTable?.shape === 'rect' && !this.extBottom()
   );
 
+  readonly activeSeat = computed(() =>
+    this.seats().find(s => s.id === this.activeSeatId()) ?? null
+  );
+
   readonly statusText = computed(() => {
     const id = this.activeSeatId();
     if (id !== null) return `Platz ${id} ausgewählt`;
@@ -107,13 +114,9 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
       this.seats.set(
         Array.from({ length: seatCount }, (_, i) => {
           const angle = (2 * Math.PI * i / seatCount) - Math.PI / 2;
-          return {
-            id: i + 1,
-            x: cx + SEAT_CIRCLE_R * Math.cos(angle),
-            y: cy + SEAT_CIRCLE_R * Math.sin(angle),
-            isRef: i === 0,
-            orders: [],
-          };
+          const x = cx + SEAT_CIRCLE_R * Math.cos(angle);
+          const y = cy + SEAT_CIRCLE_R * Math.sin(angle);
+          return { id: i + 1, x, y, isLeft: x <= cx, isRef: i === 0, orders: [] };
         })
       );
       return;
@@ -129,34 +132,32 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
       this.tableShapes.set(shapes);
 
       const newSeats: SeatView[] = [
-        { id: 1, x: cx - SEAT_X, y: cy - SEAT_Y * 2, isRef: true,  orders: [] },
-        { id: 2, x: cx + SEAT_X, y: cy - SEAT_Y * 2, isRef: false, orders: [] },
-        { id: 3, x: cx + SEAT_X, y: cy,               isRef: false, orders: [] },
-        { id: 4, x: cx - SEAT_X, y: cy,               isRef: false, orders: [] },
-        { id: 5, x: cx - SEAT_X, y: cy + SEAT_Y * 2, isRef: false, orders: [] },
-        { id: 6, x: cx + SEAT_X, y: cy + SEAT_Y * 2, isRef: false, orders: [] },
+        { id: 1, x: cx - SEAT_X, y: cy - SEAT_Y * 2, isLeft: true,  isRef: true,  orders: [] },
+        { id: 2, x: cx + SEAT_X, y: cy - SEAT_Y * 2, isLeft: false, isRef: false, orders: [] },
+        { id: 3, x: cx + SEAT_X, y: cy,               isLeft: false, isRef: false, orders: [] },
+        { id: 4, x: cx - SEAT_X, y: cy,               isLeft: true,  isRef: false, orders: [] },
+        { id: 5, x: cx - SEAT_X, y: cy + SEAT_Y * 2, isLeft: true,  isRef: false, orders: [] },
+        { id: 6, x: cx + SEAT_X, y: cy + SEAT_Y * 2, isLeft: false, isRef: false, orders: [] },
       ];
       let nextId = 7;
       if (this.extTop()) {
         newSeats.push(
-          { id: nextId++, x: cx - SEAT_X, y: extTopY - SEAT_Y, isRef: false, orders: [] },
-          { id: nextId++, x: cx + SEAT_X, y: extTopY - SEAT_Y, isRef: false, orders: [] },
+          { id: nextId++, x: cx - SEAT_X, y: extTopY - SEAT_Y, isLeft: true,  isRef: false, orders: [] },
+          { id: nextId++, x: cx + SEAT_X, y: extTopY - SEAT_Y, isLeft: false, isRef: false, orders: [] },
         );
       }
       if (this.extBottom()) {
         newSeats.push(
-          { id: nextId++, x: cx - SEAT_X, y: extBotY + SEAT_Y, isRef: false, orders: [] },
-          { id: nextId++, x: cx + SEAT_X, y: extBotY + SEAT_Y, isRef: false, orders: [] },
+          { id: nextId++, x: cx - SEAT_X, y: extBotY + SEAT_Y, isLeft: true,  isRef: false, orders: [] },
+          { id: nextId++, x: cx + SEAT_X, y: extBotY + SEAT_Y, isLeft: false, isRef: false, orders: [] },
         );
       }
 
       const existing = this.seats();
-      this.seats.set(
-        newSeats.map(s => {
-          const prev = existing.find(e => e.id === s.id);
-          return prev ? { ...s, orders: prev.orders, isRef: prev.isRef } : s;
-        })
-      );
+      this.seats.set(newSeats.map(s => {
+        const prev = existing.find(e => e.id === s.id);
+        return prev ? { ...s, orders: prev.orders, isRef: prev.isRef } : s;
+      }));
       return;
     }
 
@@ -185,9 +186,10 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
     this.seats.set(
       positions.map((pos, i) => {
         const prev = existing[i];
+        const isLeft = pos.x < cx;
         return prev
-          ? { ...prev, x: pos.x, y: pos.y }
-          : { id: i + 1, x: pos.x, y: pos.y, isRef: i === 0 && !existing.length, orders: [] };
+          ? { ...prev, x: pos.x, y: pos.y, isLeft }
+          : { id: i + 1, x: pos.x, y: pos.y, isLeft, isRef: i === 0 && !existing.length, orders: [] };
       })
     );
   }
@@ -200,10 +202,37 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
 
   selectSeat(id: number): void {
     this.activeSeatId.set(id);
+    this.inputCode.set('');
   }
 
   deselectSeat(): void {
     this.activeSeatId.set(null);
+    this.inputCode.set('');
+  }
+
+  onKeyInput(key: string): void {
+    if (key === '⌫') {
+      this.inputCode.update(c => c.slice(0, -1));
+    } else if (key === 'HC' || key === 'RN') {
+      this.inputCode.set(key);
+    } else if (key === 'C') {
+      this.inputCode.set('C');
+    } else {
+      this.inputCode.update(c => c + key);
+    }
+  }
+
+  onConfirmed(order: SeatOrder): void {
+    const id = this.activeSeatId();
+    if (id === null) return;
+    this.seats.update(seats =>
+      seats.map(s => s.id === id ? { ...s, orders: [...s.orders, order] } : s)
+    );
+    setTimeout(() => this.inputCode.set(''), 320);
+  }
+
+  onNumpadClosed(): void {
+    this.deselectSeat();
   }
 
   startLongPress(event: PointerEvent, id: number): void {

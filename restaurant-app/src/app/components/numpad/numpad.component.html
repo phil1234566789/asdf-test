@@ -1,0 +1,47 @@
+<div class="np-bar">
+  <span class="np-who">
+    Platz {{ seat().id }}{{ seat().isRef ? ' ★' : '' }}
+    · {{ seat().orders.length }} Gericht{{ seat().orders.length !== 1 ? 'e' : '' }}
+  </span>
+  <button class="np-close" (click)="closed.emit()">✕ Schließen</button>
+</div>
+
+<div class="code-display">
+  <div class="cd-row">
+    <span class="cd-code" [class.cd-code--valid]="isValid()">
+      {{ inputCode() || '—' }}
+    </span>
+    <div class="cd-info">
+      @switch (resolution().type) {
+        @case ('valid') {
+          <span class="cd-valid">{{ validName() }} <strong>{{ priceDisplay() }}</strong></span>
+        }
+        @case ('hint') {
+          <span class="cd-hint">{{ hintMessage() }}</span>
+        }
+        @case ('error') {
+          <span class="cd-error">{{ errorMessage() }}</span>
+        }
+        @default {
+          <span class="cd-hint">Code eingeben…</span>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+<div class="kp">
+  @for (row of keys; track $index) {
+    @for (key of row; track key) {
+      @if (key === '✓') {
+        <button class="k k-ok" [disabled]="!isValid()" (click)="confirm()">✓</button>
+      } @else if (key === '⌫') {
+        <button class="k k-del" (click)="press('⌫')">⌫</button>
+      } @else if (key === 'HC' || key === 'RN' || key === 'C') {
+        <button class="k k-cat" (click)="press(key)">{{ key }}</button>
+      } @else {
+        <button class="k" (click)="press(key)">{{ key }}</button>
+      }
+    }
+  }
+</div>

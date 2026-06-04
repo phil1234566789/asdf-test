@@ -1,0 +1,122 @@
+:host {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.np-bar {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.np-who {
+  font-size: 13px;
+  color: var(--text3);
+}
+
+.np-close {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px;
+}
+
+.code-display {
+  margin: 0 14px 6px;
+  background: var(--surface);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  min-height: 56px;
+  flex-shrink: 0;
+}
+
+.cd-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cd-code {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 52px;
+  flex-shrink: 0;
+
+  &--valid { color: var(--success); }
+}
+
+.cd-info {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cd-hint  { color: var(--text3); }
+.cd-error { color: var(--danger); }
+.cd-valid { color: var(--text2); }
+
+.kp {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  padding: 4px 14px 12px;
+  flex-shrink: 0;
+}
+
+.k {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-sm);
+  height: 50px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition: background 0.08s;
+
+  &:active { background: var(--surface3); }
+}
+
+.k-cat {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.k-del {
+  font-size: 22px;
+  color: var(--text2);
+  background: var(--surface2);
+}
+
+.k-ok {
+  background: var(--success);
+  color: #fff;
+
+  &:disabled {
+    background: var(--surface2);
+    color: var(--text3);
+    cursor: default;
+  }
+}
