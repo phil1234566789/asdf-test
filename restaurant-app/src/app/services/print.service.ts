@@ -15,7 +15,7 @@ export class PrintService {
     return this.mockPrint();
   }
 
-  printBar(orders: PrintOrder[]): Promise<void> {
+  printTheke(orders: PrintOrder[]): Promise<void> {
     return this.mockPrint();
   }
 

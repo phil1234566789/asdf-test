@@ -55,7 +55,7 @@
 | Wert | Bedeutung | Anzeige auf Karte |
 |---|---|---|
 | `new` | Bestellung aufgenommen, noch nicht gesendet | *(kein Symbol)* |
-| `in_progress` | An Küche/Bar gesendet und ausgedruckt | `▶` (orange) |
+| `in_progress` | An Küche/Theke gesendet und ausgedruckt | `▶` (orange) |
 | `payment_pending` | Essen serviert, Bezahlung ausstehend | `€` (gelb) |
 | `completed` | Bezahlt, Session geschlossen | *(nicht in Übersicht)* |
 
@@ -158,14 +158,14 @@
 
 ### Getrennte Sendeziele
 - **Küche** – für alle Speisen
-- **Bar** – für alle Getränke
+- **Theke** – für alle Getränke
 
 ### Gesendet/Ausstehend-Status
 - App zeigt pro Position klar an, ob sie bereits gesendet wurde oder noch aussteht
 - Bereits gesendete Positionen können nicht versehentlich erneut gesendet werden
 
 ### Sendebestätigung
-- Nach erfolgreichem Senden an Küche oder Bar erscheint eine explizite Bestätigung
+- Nach erfolgreichem Senden an Küche oder Theke erscheint eine explizite Bestätigung
 
 ---
 

@@ -2,7 +2,7 @@ export type GuestOrder = {
   code: string;
   name: string;
   price: number;
-  destination: 'kitchen' | 'bar';
+  destination: 'kitchen' | 'theke';
   printed: boolean;
 };
 

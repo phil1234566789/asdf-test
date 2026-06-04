@@ -1,7 +1,7 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { PrintOrder, PrintService } from '../../services/print.service';
 
-export type PrintTarget = 'kitchen' | 'bar' | 'both';
+export type PrintTarget = 'kitchen' | 'theke' | 'both';
 
 @Component({
   selector: 'app-print-sheet',
@@ -12,7 +12,7 @@ export class PrintSheetComponent {
   private readonly printService = inject(PrintService);
 
   kitchenOrders = input.required<PrintOrder[]>();
-  barOrders     = input.required<PrintOrder[]>();
+  thekenOrders  = input.required<PrintOrder[]>();
 
   done   = output<PrintTarget>();
   closed = output<void>();
@@ -23,8 +23,8 @@ export class PrintSheetComponent {
   lastTarget: PrintTarget = 'kitchen';
 
   get canKitchen(): boolean { return this.kitchenOrders().length > 0; }
-  get canBar():     boolean { return this.barOrders().length > 0; }
-  get canBoth():    boolean { return this.canKitchen && this.canBar; }
+  get canTheke():   boolean { return this.thekenOrders().length > 0; }
+  get canBoth():    boolean { return this.canKitchen && this.canTheke; }
 
   async print(target: PrintTarget): Promise<void> {
     this.lastTarget = target;
@@ -34,8 +34,8 @@ export class PrintSheetComponent {
       if (target === 'kitchen' || target === 'both') {
         await this.printService.printKitchen(this.kitchenOrders());
       }
-      if (target === 'bar' || target === 'both') {
-        await this.printService.printBar(this.barOrders());
+      if (target === 'theke' || target === 'both') {
+        await this.printService.printTheke(this.thekenOrders());
       }
       this.loading.set(null);
       this.success.set(target);

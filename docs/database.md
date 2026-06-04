@@ -41,7 +41,7 @@ Einzelne Bestellpositionen, direkt einer Session zugeordnet.
 | `category`    | `text`         | NOT NULL                      | `kombinieren` \| `hotcooked` \| `reis_nudel` \| `chef_special`           |
 | `tax_rate`    | `numeric(4,2)` | NOT NULL                      | MwSt-Satz als Dezimalwert: `0.19` (Tisch) oder `0.07` (Mitnehmen)       |
 | `status`      | `text`         | DEFAULT 'pending'             | `pending` \| `sent` \| `completed`                                       |
-| `sent_at`     | `timestamptz`  | NULL                          | Zeitpunkt des Sendens an Küche/Bar                                       |
+| `sent_at`     | `timestamptz`  | NULL                          | Zeitpunkt des Sendens an Küche/Theke                                       |
 | `created_at`  | `timestamptz`  | DEFAULT now()                 | Zeitpunkt der Eingabe                                                    |
 
 > **Hinweis zu `dish_name` und `price` als Snapshot:** Die Speisekarte kann sich ändern. Deshalb werden Name und Preis beim Speichern kopiert – nicht per Join aus der Karte gezogen.

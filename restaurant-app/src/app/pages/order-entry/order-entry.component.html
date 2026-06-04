@@ -168,7 +168,7 @@
   @if (showPrintSheet()) {
     <app-print-sheet
       [kitchenOrders]="unprintedKitchenOrders()"
-      [barOrders]="unprintedBarOrders()"
+      [thekenOrders]="unprintedThekenOrders()"
       (done)="onPrinted($event)"
       (closed)="onSheetClosed()" />
   }

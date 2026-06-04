@@ -1,6 +1,6 @@
 export type OrderStatus =
   | 'new'             // Bestellung aufgenommen, noch nicht gesendet
-  | 'in_progress'     // An Küche/Bar gesendet und ausgedruckt
+  | 'in_progress'     // An Küche/Theke gesendet und ausgedruckt
   | 'payment_pending' // Essen serviert, Bezahlung ausstehend
   | 'completed';      // Bezahlt, Session geschlossen, Bestellung wird aus Übersicht entfernt
 

@@ -23,11 +23,11 @@
     </div>
 
     <div class="section">
-      <div class="section-label">🍹 Bar</div>
-      @if (barOrders().length === 0) {
+      <div class="section-label">🍹 Theke</div>
+      @if (thekenOrders().length === 0) {
         <p class="section-empty">Keine Getränke</p>
       } @else {
-        @for (o of barOrders(); track o.code) {
+        @for (o of thekenOrders(); track o.code) {
           <div class="order-row">
             <span class="order-qty">{{ o.count > 1 ? o.count + '×' : '1×' }}</span>
             <span class="order-code">{{ o.code }}</span>
@@ -53,15 +53,15 @@
           @if (loading() === 'kitchen') { <span class="btn-spinner"></span> } @else { An Küche }
         </button>
         <button class="action-btn"
-                [disabled]="loading() !== null || !canBar"
-                (click)="print('bar')">
-          @if (loading() === 'bar') { <span class="btn-spinner"></span> } @else { An Bar }
+                [disabled]="loading() !== null || !canTheke"
+                (click)="print('theke')">
+          @if (loading() === 'theke') { <span class="btn-spinner"></span> } @else { An Theke }
         </button>
       </div>
       <button class="action-btn action-btn--both"
               [disabled]="loading() !== null || !canBoth"
               (click)="print('both')">
-        @if (loading() === 'both') { <span class="btn-spinner"></span> } @else { An Bar + Küche }
+        @if (loading() === 'both') { <span class="btn-spinner"></span> } @else { An Theke + Küche }
       </button>
 
       @if (error()) {

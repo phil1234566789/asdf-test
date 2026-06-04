@@ -138,9 +138,9 @@ export class OrderEntryComponent implements AfterViewInit {
     return Array.from(map.values());
   });
 
-  readonly unprintedBarOrders = computed((): PrintOrder[] => {
+  readonly unprintedThekenOrders = computed((): PrintOrder[] => {
     const map = new Map<string, PrintOrder>();
-    for (const order of this.allOrders().filter(o => !o.printed && o.destination === 'bar')) {
+    for (const order of this.allOrders().filter(o => !o.printed && o.destination === 'theke')) {
       const e = map.get(order.code);
       if (e) e.count++;
       else map.set(order.code, { code: order.code, name: order.name, count: 1 });
@@ -435,7 +435,7 @@ export class OrderEntryComponent implements AfterViewInit {
           printed: o.printed
             || target === 'both'
             || (target === 'kitchen' && o.destination === 'kitchen')
-            || (target === 'bar'     && o.destination === 'bar'),
+            || (target === 'theke'     && o.destination === 'theke'),
         })),
       }))
     );

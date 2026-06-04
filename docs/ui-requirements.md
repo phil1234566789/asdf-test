@@ -163,7 +163,7 @@ Jede Karte zeigt genau diese vier Informationen – nicht mehr:
 - Die Bedienung entscheidet **manuell und bewusst**, wann eine Bestellung abgeschickt wird – kein automatisches Senden
 - Es gibt zwei separate Sendeziele:
   - **Küche** – für alle Speisen (wird ausgedruckt)
-  - **Bar** – für alle Getränke (wird separat ausgedruckt)
+  - **Theke** – für alle Getränke (wird separat ausgedruckt)
 - Begründung: B nimmt ggf. mehrere Bestellungen hintereinander auf und kennt die gewünschte Reihenfolge selbst (z.B. Mitnehmen-Bestellung soll erst später in die Küche, damit das Essen nicht zu früh fertig ist)
 - Die App zeigt klar an, welche Positionen/Gerichte bereits gesendet wurden und welche noch ausstehen
 - Bereits gesendete Positionen können nicht versehentlich nochmals gesendet werden
@@ -185,13 +185,13 @@ Jede Karte zeigt genau diese vier Informationen – nicht mehr:
 ## Verbindung, Ladeindikator & Fehlerbehandlung
 
 - Die App muss für **langsame oder instabile Internetverbindungen** ausgelegt sein
-- Jede Netzwerkaktion (Senden an Küche/Bar, Laden von Daten) zeigt einen **klaren Ladeindikator** – der Nutzer weiß immer, ob die App noch arbeitet
+- Jede Netzwerkaktion (Senden an Küche/Theke, Laden von Daten) zeigt einen **klaren Ladeindikator** – der Nutzer weiß immer, ob die App noch arbeitet
 - **Fehlerzustände müssen explizit kommuniziert werden**, z.B.:
   - „Verbindung unterbrochen – bitte erneut versuchen"
   - „Senden fehlgeschlagen – Bestellung wurde nicht übermittelt"
 - Fehlermeldungen sind so platziert, dass sie nicht stören, aber unmissverständlich sichtbar sind (kein leises Scheitern im Hintergrund)
 - Das UI-Konzept muss von Anfang an **Platz und Struktur für diese Zustände** einplanen (Loading-State, Error-State, Success-State) – kein nachträgliches Hinzufügen
-- Kritische Aktionen (Senden an Küche/Bar) benötigen eine **Bestätigung nach erfolgreichem Senden**
+- Kritische Aktionen (Senden an Küche/Theke) benötigen eine **Bestätigung nach erfolgreichem Senden**
 
 ---
 
@@ -199,4 +199,4 @@ Jede Karte zeigt genau diese vier Informationen – nicht mehr:
 
 - Weitere Gerichte/Kategorien werden nachgereicht und in `menu.config.json` ergänzt
 - Schwellenwerte für Wartezeit-Eskalation (grün/gelb/rot) noch festzulegen
-- Druckeranbindung (Küche & Bar) technisch noch zu klären
+- Druckeranbindung (Küche & Theke) technisch noch zu klären

@@ -33,9 +33,9 @@
 - Alle Druckaufträge werden **gemockt** (simulierte Verzögerung + Erfolg/Fehler)
 
 ### Zielarchitektur
-- Zwei separate Drucker: **Küche** und **Bar**, angesteuert per **WLAN** (ESC/POS-Protokoll oder HTTP)
+- Zwei separate Drucker: **Küche** und **Theke**, angesteuert per **WLAN** (ESC/POS-Protokoll oder HTTP)
 - Die Drucklogik ist in einem eigenen `PrintService` gekapselt – aktuell Mocks, später echter Netzwerkaufruf
-- B kann wählen: An Küche / An Bar / An Bar + Küche (simultan, ein Tap)
+- B kann wählen: An Küche / An Theke / An Theke + Küche (simultan, ein Tap)
 
 ### Druckauslösung
 - Drucken wird immer durch „Bestellung abschließen" angestoßen
@@ -58,6 +58,43 @@ Was wegfällt (im Vergleich zum Beispielbild):
 ### Vorschau im Bottom Sheet (Story 10)
 - Die Positionsliste im „Drucken"-Bottom Sheet soll **optisch dem Beleg ähneln**: Menge × Code + Name, kein Preis, Zone einmalig oben
 - Was B auf dem Handy sieht = was aus dem Drucker kommt – keine Überraschungen
+
+---
+
+## Kassenbeleg (Gästebeleg)
+
+*Hinweis: Detailanforderungen werden noch gesammelt. Dieser Abschnitt wird laufend ergänzt.*
+
+### Abgrenzung zum Küchenbon
+
+| | Küchenbon | Kassenbeleg |
+|---|---|---|
+| Empfänger | Küche / Theke | Gast |
+| Preise | Nein | Ja |
+| Gesamtsumme | Nein | Ja |
+| Restaurantinfo | Nein | Ja (TBD) |
+| Gedruckt von | Küchendrucker | Kassendrucker (oder selber?) |
+
+### Vorschau in der App
+
+- B soll vor dem Druck eine **Vorschauansicht des Kassenbelegs** sehen können
+- Die Vorschau soll **gut aussehen und dem gedruckten Beleg ähneln** (kein rohes Listenformat)
+- HTML-Vorschau und tatsächlicher Druckinhalt dürfen **doppelt gepflegt** werden – kein Problem
+
+### Inhalte (wird ergänzt)
+
+- [ ] Restaurantname / Logo / Adresse
+- [ ] Tischnummer
+- [ ] Datum & Uhrzeit
+- [ ] Positionen mit Einzelpreisen
+- [ ] Gesamtsumme
+- [ ] MwSt.-Ausweisung (falls nötig)
+- [ ] *(weitere TBD)*
+
+### Getrennte Rechnungen
+
+- Gäste eines Tisches können in **Zahlgruppen** aufgeteilt werden (z.B. 4 Gäste → 2 Pärchen → 2 separate Belege)
+- Details zur Gruppenbildung: TBD
 
 ---
 

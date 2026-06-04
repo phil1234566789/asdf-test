@@ -615,14 +615,14 @@ Die Übersichtskarte (`TableCardComponent`) zeigt den aktuellen Bestellstatus al
 
 ---
 
-## ✅ Story 10 – Drucken-Flow (Küche & Bar)
+## ✅ Story 10 – Drucken-Flow (Küche & Theke)
 
 **Datum:** 2026-06-04
 **Status:** Fertig
 
 ### Ziel
 
-Nach „Bestellung abschließen" kann B die neuen Gerichte an Küche und/oder Bar drucken. Kommen später Nachbestellungen dazu, erscheint „Bestellung abschließen" erneut – und nur die neuen, noch nicht gedruckten Positionen werden ans nächste Ticket weitergegeben. Kein separater Screen – der Flow läuft über ein Bottom Sheet direkt in der Bestellansicht.
+Nach „Bestellung abschließen" kann B die neuen Gerichte an Küche und/oder Theke drucken. Kommen später Nachbestellungen dazu, erscheint „Bestellung abschließen" erneut – und nur die neuen, noch nicht gedruckten Positionen werden ans nächste Ticket weitergegeben. Kein separater Screen – der Flow läuft über ein Bottom Sheet direkt in der Bestellansicht.
 
 ---
 
@@ -660,10 +660,10 @@ Die Vorschau im Sheet soll **dem tatsächlichen Beleg ähneln** (→ `docs/requi
 │   1× HC2  Thai Basilikum Huhn   │
 │   1× 11   Gemüse + Chop Suey    │
 │                                  │
-│ 🍹 Bar      Keine Getränke      │
+│ 🍹 Theke    Keine Getränke      │
 ├──────────────────────────────────┤
-│ [An Küche]  [An Bar]            │
-│ [An Bar + Küche]                │
+│ [An Küche]  [An Theke]            │
+│ [An Theke + Küche]                │
 └──────────────────────────────────┘
 ```
 
@@ -671,8 +671,8 @@ Die Vorschau im Sheet soll **dem tatsächlichen Beleg ähneln** (→ `docs/requi
 - Gleiche Gerichte werden gruppiert (2× statt zwei Zeilen)
 - Nur **ungedruckte** Positionen werden angezeigt
 - Bereits gedruckte Positionen erscheinen **nicht** im Sheet (B muss nicht filtern)
-- „An Bar" ist disabled wenn keine Getränke ausstehen; „An Küche" entsprechend
-- „An Bar + Küche" ist disabled wenn eine der beiden Seiten leer ist
+- „An Theke" ist disabled wenn keine Getränke ausstehen; „An Küche" entsprechend
+- „An Theke + Küche" ist disabled wenn eine der beiden Seiten leer ist
 
 #### Während des Druckens
 
@@ -697,11 +697,11 @@ Die Vorschau im Sheet soll **dem tatsächlichen Beleg ähneln** (→ `docs/requi
 
 ---
 
-### Küche vs. Bar – Kategorisierung
+### Küche vs. Theke – Kategorisierung
 
 - Jedes `MenuItem` in `menu.config.json` bekommt ein optionales Feld `destination: 'kitchen' | 'bar'`
 - Default wenn nicht gesetzt: `'kitchen'`
-- Aktuell sind keine Getränke definiert → Bar-Sektion zeigt immer „Keine Getränke"
+- Aktuell sind keine Getränke definiert → Theken-Sektion zeigt immer „Keine Getränke"
 - Vorbereitet für spätere Getränke-Ergänzung in der Config
 
 ---
@@ -725,7 +725,7 @@ export type SeatOrder = {
 
 ```typescript
 printToKitchen(orders: SeatOrder[]): Observable<void>
-printToBar(orders: SeatOrder[]): Observable<void>
+printToTheke(orders: SeatOrder[]): Observable<void>
 ```
 
 - Aktuell: Mock mit `delay(1000)` und `of(void 0)`
@@ -764,7 +764,7 @@ Unterhalb der Price Bar, oberhalb des Numpads:
 
 ```
 ┌──────────────────────────────────┐
-│  3 Gerichte · 32,60 €  [Abschl.] │  ← Price Bar
+│  3 Gerichte · 32,60 €  [Abschl.] │  ← Price Theke
 ├──────────────────────────────────┤
 │ ◀────── Serviert ───────── ✓ ──▶ │  ← Swipe Button
 └──────────────────────────────────┘
