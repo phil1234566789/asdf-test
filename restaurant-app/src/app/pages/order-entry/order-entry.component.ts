@@ -59,6 +59,9 @@ export class OrderEntryComponent implements AfterViewInit {
   private tblAreaH = 0;
 
   private longPressTimer?: ReturnType<typeof setTimeout>;
+  private longPressStartX = 0;
+  private longPressStartY = 0;
+  private longPressDidFire = false;
 
   readonly tableLabel = computed(() => {
     if (this.key.startsWith('D')) return `Draußen ${this.key}`;
@@ -321,7 +324,11 @@ export class OrderEntryComponent implements AfterViewInit {
 
   startLongPress(event: PointerEvent, id: number): void {
     event.stopPropagation();
+    this.longPressStartX = event.clientX;
+    this.longPressStartY = event.clientY;
+    this.longPressDidFire = false;
     this.longPressTimer = setTimeout(() => {
+      this.longPressDidFire = true;
       this.seats.update(seats => seats.map(s => ({ ...s, isRef: s.id === id })));
       if (navigator.vibrate) navigator.vibrate(30);
     }, 500);
@@ -329,6 +336,17 @@ export class OrderEntryComponent implements AfterViewInit {
 
   cancelLongPress(): void {
     clearTimeout(this.longPressTimer);
+  }
+
+  cancelLongPressOnMove(event: PointerEvent): void {
+    const dx = event.clientX - this.longPressStartX;
+    const dy = event.clientY - this.longPressStartY;
+    if (Math.hypot(dx, dy) > 8) clearTimeout(this.longPressTimer);
+  }
+
+  onGdotClick(id: number): void {
+    if (this.longPressDidFire) { this.longPressDidFire = false; return; }
+    this.selectSeat(id);
   }
 
   seatTotal(seat: Seat): number {

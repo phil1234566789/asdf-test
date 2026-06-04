@@ -74,10 +74,11 @@
                [class.ref]="seat.isRef"
                [style.left.px]="seat.x"
                [style.top.px]="seat.y"
-               (click)="$event.stopPropagation(); selectSeat(seat.id)"
+               (click)="$event.stopPropagation(); onGdotClick(seat.id)"
+               (contextmenu)="$event.preventDefault()"
                (pointerdown)="startLongPress($event, seat.id)"
                (pointerup)="cancelLongPress()"
-               (pointermove)="cancelLongPress()"
+               (pointermove)="cancelLongPressOnMove($event)"
                (pointercancel)="cancelLongPress()">
             {{ seat.id }}
           </div>
