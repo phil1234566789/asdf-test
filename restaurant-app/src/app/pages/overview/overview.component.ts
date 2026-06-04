@@ -49,8 +49,27 @@ export class OverviewComponent implements OnInit {
     this.fabOpen.set(false);
   }
 
+  readonly toast = signal<string | null>(null);
+
   navigateTo(path: string): void {
     this.fabOpen.set(false);
     this.router.navigateByUrl(path);
+  }
+
+  startTakeaway(): void {
+    this.fabOpen.set(false);
+    const occupied = new Set(
+      this.sessions()
+        .filter(s => s.zoneId === 'takeaway')
+        .map(s => s.tableKey)
+    );
+    for (let i = 1; i <= 5; i++) {
+      if (!occupied.has(`M${i}`)) {
+        this.router.navigate(['/table', `M${i}`]);
+        return;
+      }
+    }
+    this.toast.set('Alle Mitnehmen-Plätze belegt');
+    setTimeout(() => this.toast.set(null), 3000);
   }
 }

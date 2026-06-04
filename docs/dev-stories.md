@@ -460,10 +460,10 @@ Kleines Label neben dem Dot (nach Bestätigung):
 
 ---
 
-## Story 7 – Mitnehmen-Flow
+## ✅ Story 7 – Mitnehmen-Flow
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** Fertig
 
 ### Ziel
 

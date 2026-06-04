@@ -6,6 +6,30 @@
     <button class="send-btn" (click)="navigateToSend()">Senden →</button>
   </header>
 
+  @if (isTakeaway) {
+    <div class="takeaway-list" (click)="selectSeat(1)">
+      @if (groupedTakeawayOrders().length === 0) {
+        <p class="to-empty">Noch keine Gerichte erfasst</p>
+      }
+      @for (item of groupedTakeawayOrders(); track item.code) {
+        <div class="to-item">
+          <span class="to-code">
+            @if (item.count > 1) { {{ item.count }}× }{{ item.code }}
+          </span>
+          <span class="to-name">{{ item.name }}</span>
+          <span class="to-price">{{ formatPrice(item.unitPrice * item.count) }}</span>
+        </div>
+      }
+      @if (groupedTakeawayOrders().length > 0) {
+        <div class="to-total">
+          <span>Gesamt</span>
+          <span>{{ formatPrice(takeawayTotal()) }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isTakeaway) {
   <div class="tbl-area" #tblArea (click)="deselectSeat()">
     @for (shape of tableShapes(); track $index) {
       <div class="tbl-shape"
@@ -54,7 +78,7 @@
       }
     }
   </div>
-
+  }
 
   @if (activeSeat(); as seat) {
     <app-numpad

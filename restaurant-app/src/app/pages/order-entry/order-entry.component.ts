@@ -34,7 +34,7 @@ type ShapeView = { x: number; y: number; shape: 'rect' | 'round' };
   imports: [NumpadComponent],
 })
 export class OrderEntryComponent implements OnInit, AfterViewInit {
-  @ViewChild('tblArea') private tblAreaRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('tblArea') private tblAreaRef?: ElementRef<HTMLDivElement>;
 
   private readonly location = inject(Location);
   private readonly router = inject(Router);
@@ -43,6 +43,7 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly key = inject(ActivatedRoute).snapshot.paramMap.get('key') ?? '';
+  readonly isTakeaway = this.key.startsWith('M');
   private readonly resolvedTable = this.tablesConfig.getResolvedTable(this.key);
 
   readonly extTop = signal(false);
@@ -99,6 +100,15 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    if (this.isTakeaway) {
+      this.seats.set([{
+        id: 1, x: 0, y: 0, isLeft: false, isRound: false,
+        tagDirX: 0, tagDirY: 0, isRef: false, orders: [],
+      }]);
+      this.activeSeatId.set(1);
+      return;
+    }
+    if (!this.tblAreaRef) return;
     this.recalcLayout();
     const observer = new ResizeObserver(() => this.recalcLayout());
     observer.observe(this.tblAreaRef.nativeElement);
@@ -106,7 +116,8 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
   }
 
   private recalcLayout(): void {
-    const el = this.tblAreaRef.nativeElement;
+    const el = this.tblAreaRef?.nativeElement;
+    if (!el) return;
     const w = el.offsetWidth;
     const h = el.offsetHeight;
     if (!w || !h || !this.resolvedTable) return;
@@ -224,8 +235,8 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
 
   /** Safety check: don't render tags whose center falls outside the tbl-area */
   isTagInBounds(x: number, y: number): boolean {
-    return x >= 0 && x <= this.tblAreaRef?.nativeElement.offsetWidth
-        && y >= 0 && y <= this.tblAreaH;
+    const w = this.tblAreaRef?.nativeElement.offsetWidth ?? 0;
+    return x >= 0 && x <= w && y >= 0 && y <= this.tblAreaH;
   }
 
   tagX(seat: SeatView, index: number): number {
@@ -285,6 +296,28 @@ export class OrderEntryComponent implements OnInit, AfterViewInit {
 
   onNumpadClosed(): void {
     this.deselectSeat();
+  }
+
+  readonly takeawayOrders = computed(() =>
+    this.seats().find(s => s.id === 1)?.orders ?? []
+  );
+
+  readonly groupedTakeawayOrders = computed(() => {
+    const map = new Map<string, { code: string; name: string; unitPrice: number; count: number }>();
+    for (const order of this.takeawayOrders()) {
+      const entry = map.get(order.code);
+      if (entry) entry.count++;
+      else map.set(order.code, { code: order.code, name: order.name, unitPrice: order.price, count: 1 });
+    }
+    return Array.from(map.values());
+  });
+
+  readonly takeawayTotal = computed(() =>
+    this.takeawayOrders().reduce((sum, o) => sum + o.price, 0)
+  );
+
+  formatPrice(price: number): string {
+    return price.toFixed(2).replace('.', ',') + ' €';
   }
 
   startLongPress(event: PointerEvent, id: number): void {
