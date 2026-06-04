@@ -9,6 +9,7 @@ import { MockSessionService } from '../../services/mock-session.service';
 import { Seat, GuestOrder } from '../../models/seat.model';
 import { NumpadComponent } from '../../components/numpad/numpad.component';
 import { PrintSheetComponent, PrintTarget } from '../../components/print-sheet/print-sheet.component';
+import { SwipeButtonComponent } from '../../components/swipe-button/swipe-button.component';
 import { PrintOrder } from '../../services/print.service';
 
 const SEAT_X = 27;
@@ -33,7 +34,7 @@ type ShapeView = { x: number; y: number; shape: 'rect' | 'round' };
   selector: 'app-order-entry',
   templateUrl: './order-entry.component.html',
   styleUrl: './order-entry.component.scss',
-  imports: [NumpadComponent, PrintSheetComponent],
+  imports: [NumpadComponent, PrintSheetComponent, SwipeButtonComponent],
 })
 export class OrderEntryComponent implements AfterViewInit {
   @ViewChild('tblArea') private tblAreaRef?: ElementRef<HTMLDivElement>;
@@ -110,6 +111,17 @@ export class OrderEntryComponent implements AfterViewInit {
 
   readonly showPriceBar = computed(() =>
     this.activeSeatId() === null && this.totalCount() > 0
+  );
+
+  readonly sessionStatus = computed(() =>
+    this.sessionService.sessions().find(s => s.tableKey === this.key)?.status ?? 'new'
+  );
+
+  readonly showServedSwipe = computed(() =>
+    !this.isTakeaway &&
+    this.viewMode() === 'table' &&
+    this.activeSeatId() === null &&
+    this.sessionStatus() === 'in_progress'
   );
 
   readonly hasUnprinted = computed(() =>
@@ -404,6 +416,10 @@ export class OrderEntryComponent implements AfterViewInit {
     if (mode === 'table') {
       requestAnimationFrame(() => this.recalcLayout());
     }
+  }
+
+  onServed(): void {
+    this.sessionService.updateStatus(this.key, 'payment_pending');
   }
 
   openPrintSheet(): void {

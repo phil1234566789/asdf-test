@@ -743,6 +743,56 @@ printToBar(orders: SeatOrder[]): Observable<void>
 
 ---
 
+## ✅ Story 11 – „Serviert"-Swipe in der Tischansicht
+
+**Datum:** 2026-06-04
+**Status:** Offen
+
+### Ziel
+
+B serviert das Essen und wischt den Swipe-Button nach rechts → Session-Status wechselt auf `payment_pending`. Der Swipe verhindert versehentliche Auslösung und fühlt sich in der Hektik des Servierens gut an.
+
+### Wann sichtbar
+
+- Nur in der **Tischansicht** (nicht Listenansicht, nicht Mitnehmen)
+- Nur wenn Session-Status `in_progress` ist (d.h. mindestens einmal gedruckt wurde)
+- Numpad geschlossen (analog zur Price Bar)
+
+### Platzierung
+
+Unterhalb der Price Bar, oberhalb des Numpads:
+
+```
+┌──────────────────────────────────┐
+│  3 Gerichte · 32,60 €  [Abschl.] │  ← Price Bar
+├──────────────────────────────────┤
+│ ◀────── Serviert ───────── ✓ ──▶ │  ← Swipe Button
+└──────────────────────────────────┘
+```
+
+### Swipe-Mechanik
+
+- Thumb (Kreis) startet **in der Mitte** des Tracks – funktioniert für Rechts- und Linkshänder gleich
+- B wischt in **beliebige Richtung** (links oder rechts)
+- Track füllt sich von der Mitte zur Thumb-Position hin mit Akzentfarbe
+- Loslassen vor Ende → Thumb federt zur Mitte zurück (keine Aktion)
+- Am Ende angekommen (> 85 % einer Seite) → Auslösung
+- Kurze Vibration bei Auslösung (`navigator.vibrate(40)`)
+- Implementierung rein mit Pointer Events – keine externe Library
+
+### Nach Auslösung
+
+- Session-Status → `payment_pending` im `MockSessionService`
+- Swipe-Button verschwindet
+- Übersichtskarte zeigt `€`
+
+### Ergebnis
+
+- B kann intuitiv und unfallsicher den Tisch als serviert markieren
+- Kein Extra-Screen, kein Popup
+
+---
+
 ## Offene Fragen / Backlog
 
 - **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter. Sobald Menü-Gerichte in `menu.config.json` erscheinen, muss das automatisch aus den bestellten Items abgeleitet werden.

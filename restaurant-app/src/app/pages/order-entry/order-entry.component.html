@@ -150,6 +150,12 @@
     }
   }
 
+  @if (showServedSwipe()) {
+    <div class="served-swipe">
+      <app-swipe-button (confirmed)="onServed()" />
+    </div>
+  }
+
   @if (activeSeat(); as seat) {
     <app-numpad
       [seat]="seat"

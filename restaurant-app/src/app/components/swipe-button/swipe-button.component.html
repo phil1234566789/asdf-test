@@ -1,0 +1,25 @@
+<div class="swipe-wrap">
+  <span class="swipe-caption">
+    @if (isConfirmed()) { ✓ Serviert } @else { {{ label() }} }
+  </span>
+  <div class="swipe-track" #track
+       [class.is-confirmed]="isConfirmed()"
+       (pointerdown)="onPointerDown($event)"
+       (pointermove)="onPointerMove($event)"
+       (pointerup)="onPointerUp()"
+       (pointercancel)="onPointerCancel()">
+
+    <div class="swipe-fill"
+         [style.left.px]="fillLeft()"
+         [style.width.px]="fillWidth()"></div>
+
+    <span class="swipe-arrow swipe-arrow--left">◀</span>
+    <span class="swipe-arrow swipe-arrow--right">▶</span>
+
+    <div class="swipe-thumb"
+         [class.no-transition]="isDragging()"
+         [style.transform]="thumbTransform()">
+      @if (isConfirmed()) { ✓ }
+    </div>
+  </div>
+</div>
