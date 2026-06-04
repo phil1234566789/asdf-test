@@ -142,30 +142,35 @@
 - Gäste eines Tisches können in Zahlgruppen eingeteilt werden (z.B. 4 Gäste → 2 Pärchen → 2 Rechnungen)
 
 ### Rechnungsanzeige auf dem Handy
-- Rechnung für ausgewählte Gäste/Positionen direkt auf dem Bildschirm anzeigen
-- Zeigt: Gerichte, Einzelpreise, Gesamtsumme – übersichtlich und gut lesbar
+- 🧾-Button im Header öffnet vollbildige Belegvorschau (Story 12)
+- Zeigt: Restaurantdaten, Tisch-Nr., alle Gerichte mit Preisen, Gesamt + MwSt
+- Gedacht um dem Gast die Rechnung direkt zu zeigen
 
-### Rechnungsdruck (optional)
-- Nach der Anzeige kann die Rechnung optional ausgedruckt werden
-- Eine angezeigte oder gedruckte Rechnung markiert die Bestellung als abgeschlossen
+### Rechnungsdruck (geplant)
+- Druck des Kassenbelegs über Thekendrucker – noch nicht implementiert
+- Voraussetzung: Druckerintegration (ESC/POS, Epson ePOS SDK)
 
 ---
 
-## Bestellungsübermittlung
+## Bestellungsübermittlung (Drucken)
 
-### Manuelles Senden
-- Bedienung entscheidet selbst, wann gesendet wird – kein automatisches Abschicken
+### Manuelles Drucken
+- Bedienung entscheidet selbst, wann gedruckt wird – kein automatisches Abschicken
+- Auslösung über „Bestellung abschließen" → Bottom Sheet mit Druckoptionen
 
-### Getrennte Sendeziele
+### Getrennte Druckziele
 - **Küche** – für alle Speisen
 - **Theke** – für alle Getränke
+- Simultan möglich: „An Theke + Küche" druckt beide mit einem Tap
 
-### Gesendet/Ausstehend-Status
-- App zeigt pro Position klar an, ob sie bereits gesendet wurde oder noch aussteht
-- Bereits gesendete Positionen können nicht versehentlich erneut gesendet werden
+### Gedruckt/Ausstehend-Status
+- Jede Position hat `printed: boolean` – gedruckte Positionen werden visuell gedimmt
+- Bereits gedruckte Positionen können nicht versehentlich erneut gedruckt werden
+- Nachbestellungen erscheinen als neue ungedruckte Positionen → „Bestellung abschließen" Button erscheint erneut
 
-### Sendebestätigung
-- Nach erfolgreichem Senden an Küche oder Theke erscheint eine explizite Bestätigung
+### Druckbestätigung
+- Nach erfolgreichem Druck erscheint eine Bestätigung im Bottom Sheet (✓ Gedruckt)
+- Bei Fehler: Meldung bleibt sichtbar mit Retry-Option
 
 ---
 

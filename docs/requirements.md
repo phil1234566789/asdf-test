@@ -81,19 +81,56 @@ Was wegfällt (im Vergleich zum Beispielbild):
 - Die Vorschau soll **gut aussehen und dem gedruckten Beleg ähneln** (kein rohes Listenformat)
 - HTML-Vorschau und tatsächlicher Druckinhalt dürfen **doppelt gepflegt** werden – kein Problem
 
-### Inhalte (wird ergänzt)
+### Belegaufbau (Referenz: `docs/beispiel_beleg.jpeg`)
 
-- [ ] Restaurantname / Logo / Adresse
-- [ ] Tischnummer
-- [ ] Datum & Uhrzeit
-- [ ] Positionen mit Einzelpreisen
-- [ ] Gesamtsumme
-- [ ] MwSt.-Ausweisung (falls nötig)
-- [ ] *(weitere TBD)*
+#### 1. Header
+```
+[LOGO-PLATZHALTER]   TAI KING
+                     Vietnamesisches Restaurant
+                     Inhaber: [Name]
+                     Telefon: [Nummer]
+                     [Straße]
+                     [PLZ Ort]
+```
+- Logo: Platzhalter bis das echte Logo vorliegt (z.B. Initialen-Kreis „TK")
+- Restaurantdaten kommen aus einer Config (kein Hardcoding im Code)
+
+#### 2. Rechnungskopf
+```
+RECHNUNG             [Nr.]
+Tisch-Nr.            [Tischnummer]
+```
+- Rechnungsnummer: fortlaufend pro Session (wird später vom Backend vergeben, aktuell Mock)
+- Bei Mitnehmen: „Außer Haus" statt Tischnummer
+
+#### 3. Positionen
+```
+[Menge] [Gerichtname]          [Preis]
+```
+- Menge nur wenn > 1 (wie auf dem Beispielbeleg: `1 Peking Suppe`)
+- Preis rechtsbündig
+- Keine Codes — nur Gerichtnamen
+- Modifier/Zusätze (z.B. Sauce-Wahl) als eingerückte Zeile darunter: `* Süß Sauer Sauce`
+
+#### 4. Summenblock
+```
+Gesamt               [Betrag]
+inkl. 19% MwSt       [Betrag]   ← Innen/Draußen (Regelsteuersatz)
+inkl. 7% MwSt        [Betrag]   ← Außer Haus (reduzierter Satz)
+```
+- **Zwei MwSt-Sätze**: 19% für Tisch Innen/Draußen, 7% für Mitnehmen (Außer Haus) — deutsche Steuerregelung
+- Kein Zahlungsart-Feld — das ist nur eine Vorschau, der tatsächliche Ausdruck läuft separat
+
+#### 5. Footer
+- Steuer-Nr. des Restaurants (aus Config)
+- Öffnungszeiten (aus Config, optional)
+- Dankesformel: „Vielen Dank für Ihren Besuch"
+- TSE-Pflichtangaben (Technische Sicherungseinrichtung – gesetzlich vorgeschrieben für elektronische Kassensysteme): Serial#, Signatur, Transaktionsnummer, TSE Start/Ende – **vorerst weglassen**, kommt wenn echtes Kassensystem integriert wird
 
 ### Getrennte Rechnungen
 
 - Gäste eines Tisches können in **Zahlgruppen** aufgeteilt werden (z.B. 4 Gäste → 2 Pärchen → 2 separate Belege)
+- Jede Zahlgruppe bekommt einen eigenen Kassenbeleg mit eigenem Summenblock
 - Details zur Gruppenbildung: TBD
 
 ---

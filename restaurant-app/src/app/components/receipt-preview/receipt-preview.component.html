@@ -1,0 +1,43 @@
+<div class="receipt-page">
+  <button class="close-x" (click)="closed.emit()">×</button>
+
+  <div class="receipt-header">
+    <div class="logo-placeholder">TK</div>
+    <div class="resto-info">
+      <div class="resto-name">{{ config.name }}</div>
+      <div class="resto-sub">{{ config.subtitle }}</div>
+      <div class="resto-detail">Inhaber: {{ config.owner }}</div>
+      <div class="resto-detail">Telefon: {{ config.phone }}</div>
+      <div class="resto-detail">{{ config.address.street }}</div>
+      <div class="resto-detail">{{ config.address.zip }} {{ config.address.city }}</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="meta-row">
+    <span>Tisch-Nr.</span><span>{{ tableLabel() }}</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="items">
+    @for (item of groupedItems(); track item.name) {
+      <div class="item-row">
+        <span class="item-name">{{ item.count > 1 ? item.count + ' ' : '1 ' }}{{ item.name }}</span>
+        <span class="item-price">{{ formatPrice(item.unitPrice * item.count) }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="total-row total-row--main">
+    <span>Gesamt</span>
+    <span>{{ formatPrice(total()) }}</span>
+  </div>
+  <div class="total-row total-row--vat">
+    <span>inkl. {{ vatLabel() }}</span>
+    <span>{{ formatPrice(vatAmount()) }}</span>
+  </div>
+</div>

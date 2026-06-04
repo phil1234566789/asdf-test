@@ -1,0 +1,22 @@
+{
+  "name": "TAI KING",
+  "subtitle": "Vietnamesisches Restaurant",
+  "owner": "Thu-Cuc Guyen",
+  "phone": "0821 / 30919",
+  "address": {
+    "street": "Neuburger Straße 238",
+    "zip": "86169",
+    "city": "Augsburg"
+  },
+  "taxId": "109/255/00382",
+  "logo": null,
+  "openingHours": {
+    "monFri": "11:30–15:00 und 17:00–22:30",
+    "satSunHolidays": "11:00–22:30",
+    "closedOn": "Dienstag (Ruhetag, außer Feiertag)"
+  },
+  "vatRates": {
+    "indoor": 0.19,
+    "takeaway": 0.07
+  }
+}

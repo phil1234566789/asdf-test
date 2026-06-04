@@ -2,6 +2,9 @@
   <header class="header">
     <button class="back-btn" (click)="back()">‹</button>
     <span class="table-label">{{ tableLabel() }}</span>
+    @if (totalCount() > 0) {
+      <button class="receipt-btn" (click)="showReceiptPreview.set(true)">🧾</button>
+    }
     @if (!isTakeaway) {
       <div class="view-toggle">
         <button class="view-toggle__btn" [class.active]="viewMode() === 'table'"
@@ -171,6 +174,13 @@
       [thekenOrders]="unprintedThekenOrders()"
       (done)="onPrinted($event)"
       (closed)="onSheetClosed()" />
+  }
+
+  @if (showReceiptPreview()) {
+    <app-receipt-preview
+      [seats]="seats()"
+      [tableKey]="key"
+      (closed)="showReceiptPreview.set(false)" />
   }
 
   @if (showSuccessToast()) {

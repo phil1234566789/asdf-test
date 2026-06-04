@@ -10,6 +10,7 @@ import { Seat, GuestOrder } from '../../models/seat.model';
 import { NumpadComponent } from '../../components/numpad/numpad.component';
 import { PrintSheetComponent, PrintTarget } from '../../components/print-sheet/print-sheet.component';
 import { SwipeButtonComponent } from '../../components/swipe-button/swipe-button.component';
+import { ReceiptPreviewComponent } from '../../components/receipt-preview/receipt-preview.component';
 import { PrintOrder } from '../../services/print.service';
 
 const SEAT_X = 27;
@@ -34,7 +35,7 @@ type ShapeView = { x: number; y: number; shape: 'rect' | 'round' };
   selector: 'app-order-entry',
   templateUrl: './order-entry.component.html',
   styleUrl: './order-entry.component.scss',
-  imports: [NumpadComponent, PrintSheetComponent, SwipeButtonComponent],
+  imports: [NumpadComponent, PrintSheetComponent, SwipeButtonComponent, ReceiptPreviewComponent],
 })
 export class OrderEntryComponent implements AfterViewInit {
   @ViewChild('tblArea') private tblAreaRef?: ElementRef<HTMLDivElement>;
@@ -56,6 +57,7 @@ export class OrderEntryComponent implements AfterViewInit {
   readonly inputCode = signal('');
   readonly viewMode = signal<'table' | 'list'>('table');
   readonly showPrintSheet = signal(false);
+  readonly showReceiptPreview = signal(false);
   readonly showSuccessToast = signal(false);
 
   // Tracked for tag-visibility safety check

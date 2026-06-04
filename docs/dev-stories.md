@@ -746,7 +746,7 @@ printToTheke(orders: SeatOrder[]): Observable<void>
 ## ✅ Story 11 – „Serviert"-Swipe in der Tischansicht
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** Fertig
 
 ### Ziel
 
@@ -790,6 +790,31 @@ Unterhalb der Price Bar, oberhalb des Numpads:
 
 - B kann intuitiv und unfallsicher den Tisch als serviert markieren
 - Kein Extra-Screen, kein Popup
+
+---
+
+## ✅ Story 12 – Kassenbeleg-Vorschau
+
+**Datum:** 2026-06-05
+**Status:** Fertig
+
+### Ziel
+
+B kann dem Gast die Rechnung direkt auf dem Handy zeigen. Tippen auf 🧾 im Header öffnet eine vollbildige, scrollbare Belegvorschau im Stil eines echten Kassenzettels.
+
+### Inhalt
+
+- Header: Logo-Platzhalter „TK", Restaurantname, Inhaber, Telefon, Adresse (aus `restaurant.config.json`)
+- Tisch-Nr.
+- Alle Gerichte gruppiert (gleiche Gerichte zusammengefasst) mit Einzelpreisen
+- Gesamt + inkl. MwSt (19% Innen/Draußen, 7% Mitnehmen)
+- × zum Schließen oben rechts
+
+### Technisches
+
+- `RestaurantConfigService` liest `config/restaurant.config.json`
+- Vollseite (`position: fixed; inset: 0`), kein Modal – natürlich scrollbar, keine dunklen Ränder
+- Trigger: 🧾-Button im Header von `OrderEntryComponent`, sichtbar wenn Gerichte vorhanden
 
 ---
 

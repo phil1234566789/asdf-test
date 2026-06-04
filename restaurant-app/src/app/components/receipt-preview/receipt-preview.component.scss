@@ -1,0 +1,131 @@
+.receipt-page {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  color: #111;
+  overflow-y: auto;
+  z-index: 100;
+  padding: 48px 24px 48px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+// ── Close ────────────────────────────────────────────────────────────────────
+
+.close-x {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #888;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  z-index: 101;
+}
+
+// ── Header ───────────────────────────────────────────────────────────────────
+
+.receipt-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.logo-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.resto-info {
+  line-height: 1.4;
+}
+
+.resto-name {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.resto-sub {
+  font-size: 11px;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+.resto-detail {
+  font-size: 11px;
+  color: #333;
+}
+
+// ── Divider ──────────────────────────────────────────────────────────────────
+
+.divider {
+  border: none;
+  border-top: 1px dashed #aaa;
+  margin: 14px 0;
+}
+
+// ── Meta ─────────────────────────────────────────────────────────────────────
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  line-height: 1.8;
+  font-weight: 700;
+}
+
+// ── Items ────────────────────────────────────────────────────────────────────
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  line-height: 1.5;
+}
+
+.item-name { flex: 1; }
+
+.item-price {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+// ── Totals ───────────────────────────────────────────────────────────────────
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  line-height: 1.8;
+
+  &--main {
+    font-size: 15px;
+    font-weight: 700;
+    border-top: 1px solid #111;
+    padding-top: 6px;
+    margin-top: 4px;
+  }
+
+  &--vat {
+    font-size: 11px;
+    color: #555;
+  }
+}

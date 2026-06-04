@@ -47,6 +47,16 @@
   &.chip--red    { background: var(--danger-light);  color: var(--danger); }
 }
 
+.receipt-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .view-toggle {
   display: flex;
   background: var(--surface2);
