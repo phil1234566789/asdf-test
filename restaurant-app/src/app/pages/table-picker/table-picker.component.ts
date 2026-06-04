@@ -20,9 +20,9 @@ export class TablePickerComponent {
 
   readonly title = this.mode === 'takeaway' ? 'Mitnehmen' : 'Tisch wählen';
 
-  readonly indoorTables = computed(() => this.tablesConfig.getTablesForZone('indoor'));
-  readonly outdoorTables = computed(() => this.tablesConfig.getTablesForZone('outdoor'));
-  readonly takeawayTables = computed(() => this.tablesConfig.getTablesForZone('takeaway'));
+  readonly indoorTables = this.tablesConfig.getTablesForZone('indoor');
+  readonly outdoorTables = this.tablesConfig.getTablesForZone('outdoor');
+  readonly takeawayTables = this.tablesConfig.getTablesForZone('takeaway');
 
   readonly occupiedKeys = computed(() =>
     new Set(
