@@ -2,7 +2,7 @@
   <header class="header">
     <button class="back-btn" (click)="back()">‹</button>
     <span class="table-label">{{ tableLabel() }}</span>
-@if (!isTakeaway) {
+    @if (!isTakeaway) {
       <div class="view-toggle">
         <button class="view-toggle__btn" [class.active]="viewMode() === 'table'"
                 (click)="setViewMode('table')">Tisch</button>
@@ -33,13 +33,13 @@
         </div>
       }
     </div>
-    <div class="submit-footer">
-      <button class="submit-btn"
-              [disabled]="isLoading() || takeawayOrders().length === 0"
-              (click)="submitOrder()">
-        Bestellung abschließen
-      </button>
-    </div>
+    @if (hasUnprinted()) {
+      <div class="submit-footer">
+        <button class="submit-btn" (click)="openPrintSheet()">
+          Bestellung abschließen
+        </button>
+      </div>
+    }
   }
 
   @if (!isTakeaway) {
@@ -87,6 +87,7 @@
             @if (isTagInBounds(tagX(seat, $index), tagY(seat, $index))) {
               <div class="order-tag"
                    [class.order-tag--radial]="seat.isRound"
+                   [class.order-tag--printed]="order.printed"
                    [style.left.px]="tagX(seat, $index)"
                    [style.top.px]="tagY(seat, $index)">
                 {{ order.code }}
@@ -111,7 +112,7 @@
                   <span class="ol-seat__total">{{ formatPrice(seatTotal(seat)) }}</span>
                 </div>
                 @for (order of seat.orders; track $index) {
-                  <div class="ol-item">
+                  <div class="ol-item" [class.ol-item--printed]="order.printed">
                     <span class="ol-code">{{ order.code }}</span>
                     <span class="ol-name">{{ order.name }}</span>
                     <span class="ol-price">{{ formatPrice(order.price) }}</span>
@@ -126,13 +127,13 @@
               </div>
             }
           </div>
-          <div class="submit-footer">
-            <button class="submit-btn"
-                    [disabled]="isLoading() || totalCount() === 0"
-                    (click)="submitOrder()">
-              Bestellung abschließen
-            </button>
-          </div>
+          @if (hasUnprinted()) {
+            <div class="submit-footer">
+              <button class="submit-btn" (click)="openPrintSheet()">
+                Bestellung abschließen
+              </button>
+            </div>
+          }
         </div>
       }
     </div>
@@ -140,9 +141,11 @@
     @if (showPriceBar() && viewMode() === 'table') {
       <div class="price-bar">
         <span class="price-bar__summary">{{ totalCount() }} {{ totalCount() === 1 ? 'Gericht' : 'Gerichte' }} · {{ formatPrice(totalPrice()) }}</span>
-        <button class="price-bar__submit" [disabled]="isLoading()" (click)="submitOrder()">
-          Abschließen
-        </button>
+        @if (hasUnprinted()) {
+          <button class="price-bar__submit" (click)="openPrintSheet()">
+            Abschließen
+          </button>
+        }
       </div>
     }
   }
@@ -156,13 +159,15 @@
       (closed)="onNumpadClosed()" />
   }
 
-  @if (isLoading()) {
-    <div class="loading-overlay">
-      <div class="spinner"></div>
-    </div>
+  @if (showPrintSheet()) {
+    <app-print-sheet
+      [kitchenOrders]="unprintedKitchenOrders()"
+      [barOrders]="unprintedBarOrders()"
+      (done)="onPrinted($event)"
+      (closed)="onSheetClosed()" />
   }
 
   @if (showSuccessToast()) {
-    <div class="success-toast">✓ Bestellung gespeichert</div>
+    <div class="success-toast">✓ Gedruckt</div>
   }
 </div>

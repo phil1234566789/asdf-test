@@ -6,8 +6,10 @@ import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { TablesConfigService } from '../../services/tables-config.service';
 import { MockSessionService } from '../../services/mock-session.service';
-import { Seat, SeatOrder } from '../../models/seat.model';
+import { Seat, GuestOrder } from '../../models/seat.model';
 import { NumpadComponent } from '../../components/numpad/numpad.component';
+import { PrintSheetComponent, PrintTarget } from '../../components/print-sheet/print-sheet.component';
+import { PrintOrder } from '../../services/print.service';
 
 const SEAT_X = 27;
 const SEAT_Y = 38;
@@ -31,7 +33,7 @@ type ShapeView = { x: number; y: number; shape: 'rect' | 'round' };
   selector: 'app-order-entry',
   templateUrl: './order-entry.component.html',
   styleUrl: './order-entry.component.scss',
-  imports: [NumpadComponent],
+  imports: [NumpadComponent, PrintSheetComponent],
 })
 export class OrderEntryComponent implements AfterViewInit {
   @ViewChild('tblArea') private tblAreaRef?: ElementRef<HTMLDivElement>;
@@ -52,7 +54,7 @@ export class OrderEntryComponent implements AfterViewInit {
   readonly activeSeatId = signal<number | null>(null);
   readonly inputCode = signal('');
   readonly viewMode = signal<'table' | 'list'>('table');
-  readonly isLoading = signal(false);
+  readonly showPrintSheet = signal(false);
   readonly showSuccessToast = signal(false);
 
   // Tracked for tag-visibility safety check
@@ -100,6 +102,30 @@ export class OrderEntryComponent implements AfterViewInit {
   readonly showPriceBar = computed(() =>
     this.activeSeatId() === null && this.totalCount() > 0
   );
+
+  readonly hasUnprinted = computed(() =>
+    this.seats().some(s => s.orders.some(o => !o.printed))
+  );
+
+  readonly unprintedKitchenOrders = computed((): PrintOrder[] => {
+    const map = new Map<string, PrintOrder>();
+    for (const order of this.allOrders().filter(o => !o.printed && o.destination === 'kitchen')) {
+      const e = map.get(order.code);
+      if (e) e.count++;
+      else map.set(order.code, { code: order.code, name: order.name, count: 1 });
+    }
+    return Array.from(map.values());
+  });
+
+  readonly unprintedBarOrders = computed((): PrintOrder[] => {
+    const map = new Map<string, PrintOrder>();
+    for (const order of this.allOrders().filter(o => !o.printed && o.destination === 'bar')) {
+      const e = map.get(order.code);
+      if (e) e.count++;
+      else map.set(order.code, { code: order.code, name: order.name, count: 1 });
+    }
+    return Array.from(map.values());
+  });
 
   ngAfterViewInit(): void {
     if (this.isTakeaway) {
@@ -283,7 +309,7 @@ export class OrderEntryComponent implements AfterViewInit {
     }
   }
 
-  onConfirmed(order: SeatOrder): void {
+  onConfirmed(order: GuestOrder): void {
     const id = this.activeSeatId();
     if (id === null) return;
     this.seats.update(seats =>
@@ -361,15 +387,30 @@ export class OrderEntryComponent implements AfterViewInit {
     }
   }
 
-  submitOrder(): void {
-    if (this.isLoading()) return;
-    this.isLoading.set(true);
-    setTimeout(() => {
-      this.sessionService.updateStatus(this.key, 'in_progress');
-      this.isLoading.set(false);
-      this.showSuccessToast.set(true);
-      setTimeout(() => this.showSuccessToast.set(false), 3000);
-    }, 1000);
+  openPrintSheet(): void {
+    this.showPrintSheet.set(true);
+  }
+
+  onPrinted(target: PrintTarget): void {
+    this.seats.update(seats =>
+      seats.map(s => ({
+        ...s,
+        orders: s.orders.map(o => ({
+          ...o,
+          printed: o.printed
+            || target === 'both'
+            || (target === 'kitchen' && o.destination === 'kitchen')
+            || (target === 'bar'     && o.destination === 'bar'),
+        })),
+      }))
+    );
+    this.sessionService.updateStatus(this.key, 'in_progress');
+    this.showSuccessToast.set(true);
+    setTimeout(() => this.showSuccessToast.set(false), 2000);
+  }
+
+  onSheetClosed(): void {
+    this.showPrintSheet.set(false);
   }
 
   back(): void {

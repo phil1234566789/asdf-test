@@ -1,0 +1,184 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 50;
+}
+
+.sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-radius: 18px 18px 0 0;
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  max-height: 80dvh;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sheet-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.sheet-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text3);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+// ── Body ────────────────────────────────────────────────────────────────────
+
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 20px;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.section {
+  padding: 10px 0;
+
+  & + & { border-top: 1px solid var(--border); }
+}
+
+.section-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.section-empty {
+  font-size: 13px;
+  color: var(--text3);
+  margin: 0;
+}
+
+.order-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.order-qty {
+  color: var(--text3);
+  font-weight: 600;
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+.order-code {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 36px;
+  flex-shrink: 0;
+}
+
+.order-name {
+  color: var(--text);
+  flex: 1;
+}
+
+.sheet-error {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: var(--danger-light);
+  color: var(--danger);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+// ── Actions ─────────────────────────────────────────────────────────────────
+
+.sheet-actions {
+  flex-shrink: 0;
+  padding: 12px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.sheet-success {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--success);
+  padding: 12px 0;
+}
+
+.actions-row {
+  display: flex;
+  gap: 8px;
+
+  .action-btn { flex: 1; }
+}
+
+.action-btn {
+  padding: 13px 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+
+  &--both { background: var(--accent); }
+
+  &--retry {
+    background: var(--danger);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+// ── Inline spinner ───────────────────────────────────────────────────────────
+
+.btn-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.7s linear infinite;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}

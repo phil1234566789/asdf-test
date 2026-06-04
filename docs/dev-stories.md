@@ -582,77 +582,164 @@ Keine neuen Models nötig – die bestehenden `Seat`, `SeatOrder`, `OrderSession
 
 ---
 
-## Story 9 – Senden-Screen (zurückgestellt)
+## ✅ Story 9 – Bestellstatus auf Übersichtskarten
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** Fertig
 
 ### Ziel
 
-Wenn B auf „Senden →" tippt, öffnet sich eine Übersicht aller noch nicht gesendeten Gerichte. B kann sie manuell an Küche oder Bar schicken. Nach dem Senden wird der Session-Status aktualisiert.
+Die Übersichtskarte (`TableCardComponent`) zeigt den aktuellen Bestellstatus als Symbol an. B erkennt auf einen Blick welche Tische noch offen, in Bearbeitung oder zahlungsbereit sind.
 
-### Orientierung
+### Status-Symbole
 
-Mockup `design/mockup.html` → Screen „Senden".
+| Status | Symbol | Farbe |
+|---|---|---|
+| `new` | *(kein Symbol)* | – |
+| `in_progress` | `▶` | orange (`var(--warn)`) |
+| `payment_pending` | `€` | gelb (`var(--warn-light)` / eigene Farbe) |
+| `completed` | *(nicht in Übersicht)* | – |
 
-### Route
+### Änderungen
 
-`/send/:key` (Stub bereits vorhanden → `SendComponent` ersetzen)
+#### `TableCardComponent`
 
-### `SendComponent` (`src/app/pages/send/`)
+- Status-Chip unten auf der Karte (oder rechts neben dem Timer)
+- Nur sichtbar wenn Status `in_progress` oder `payment_pending`
+- Kein Symbol bei `new`
 
-#### Header
-- `‹ Tisch X` Zurück-Button → navigiert zurück zur Tischansicht
-- Titel: `"Senden · Tisch X"`
+### Ergebnis
 
-#### Inhalt (scrollbar)
+- Alle Status-Varianten aus den Mock-Daten werden korrekt angezeigt
+- Keine neuen Models oder Services nötig
 
-Zwei Sektionen:
+---
 
-**🍳 Küche** – alle Speisen (alle Gerichte aus `menu.config.json` die keine Getränke sind)
-- Jedes Gericht als Zeile: nummerierter Dot (Farbe = Sitzplatz-Zuordnung), Name, Code, Preis
-- Status-Trennung: **Ausstehend** (noch nicht gesendet) vs. **Bereits gesendet** (ausgegraut, nicht wiederholbar)
+## ✅ Story 10 – Drucken-Flow (Küche & Bar)
 
-**🍹 Bar** – Getränke
-- Solange keine Getränke in `menu.config.json` definiert sind: leerer Zustand „Keine Getränke erfasst"
+**Datum:** 2026-06-04
+**Status:** Fertig
 
-#### Bottom-Bar
+### Ziel
 
-Zwei Buttons nebeneinander:
-- **An Küche** – sendet alle ausstehenden Küchen-Gerichte
-- **An Bar** – sendet alle ausstehenden Bar-Getränke
-- Jeweils mit Anzahl der Positionen als Sub-Label (z.B. „4 Gerichte")
-- Deaktiviert wenn keine ausstehenden Positionen für das jeweilige Ziel
+Nach „Bestellung abschließen" kann B die neuen Gerichte an Küche und/oder Bar drucken. Kommen später Nachbestellungen dazu, erscheint „Bestellung abschließen" erneut – und nur die neuen, noch nicht gedruckten Positionen werden ans nächste Ticket weitergegeben. Kein separater Screen – der Flow läuft über ein Bottom Sheet direkt in der Bestellansicht.
 
-#### Lade- & Erfolgs-Zustand
+---
 
-- Beim Senden: Ladeoverlay mit Spinner
-- Erfolg: Toast „✓ An Küche gesendet" für 3 Sekunden
+### Drucken-Konzept (kein physischer Drucker vorhanden)
 
-### State-Änderungen nach dem Senden
+- Es existiert noch kein physischer Drucker
+- Alle Druckaufträge werden **gemockt** (1 Sek. Verzögerung, immer Erfolg – optional: simulierter Fehler für Fehlerfall-Tests)
+- Die Architektur muss aber so vorbereitet sein, dass die Drucker später per **WLAN** (ESC/POS oder ähnlich) angesteuert werden können
+- Empfehlung: Drucklogik in einem eigenen `PrintService` kapseln, der aktuell nur mockt, später aber den echten HTTP-Call / WebSocket macht
 
-- Gesendete Positionen bekommen `status: 'sent'` (neues Feld in `SeatOrder`)
-- `OrderSession.status` wechselt zu `in_progress` (im MockSessionService)
-- Bereits gesendete Positionen bleiben sichtbar aber ausgegraut
+---
 
-### Neue Felder
+### Wann erscheint „Bestellung abschließen"?
 
-`SeatOrder` bekommt `sent: boolean` (default `false`):
+- Mindestens eine Position hat `printed: false`
+- Nach vollständigem Druck aller Positionen: Button verschwindet
+- Wenn B danach neue Gerichte erfasst: Button erscheint wieder
+
+---
+
+### „Bestellung abschließen" → Bottom Sheet
+
+Tippen auf „Bestellung abschließen" öffnet ein **Bottom Sheet** (schiebt von unten hoch, kein Navigieren).
+
+#### Inhalt des Sheets
+
+Die Vorschau im Sheet soll **dem tatsächlichen Beleg ähneln** (→ `docs/requirements.md`, Abschnitt „Belegformat Küche"):
+
+```
+┌──────────────────────────────────┐
+│ Drucken                        × │
+├──────────────────────────────────┤
+│ 🍳 Küche                        │
+│   2× 33   Hühnerfilet + Kokos   │
+│   1× HC2  Thai Basilikum Huhn   │
+│   1× 11   Gemüse + Chop Suey    │
+│                                  │
+│ 🍹 Bar      Keine Getränke      │
+├──────────────────────────────────┤
+│ [An Küche]  [An Bar]            │
+│ [An Bar + Küche]                │
+└──────────────────────────────────┘
+```
+
+- Format pro Zeile: `Menge× Code  Name` – **kein Preis**
+- Gleiche Gerichte werden gruppiert (2× statt zwei Zeilen)
+- Nur **ungedruckte** Positionen werden angezeigt
+- Bereits gedruckte Positionen erscheinen **nicht** im Sheet (B muss nicht filtern)
+- „An Bar" ist disabled wenn keine Getränke ausstehen; „An Küche" entsprechend
+- „An Bar + Küche" ist disabled wenn eine der beiden Seiten leer ist
+
+#### Während des Druckens
+
+- Kein Full-Screen-Overlay — zu dramatisch in Stresssituationen
+- Der gedrückte Button zeigt einen **Inline-Spinner**, die anderen Buttons werden disabled
+- Sheet bleibt offen
+
+#### Erfolg
+
+- Buttons wechseln kurz zu ✓
+- Sheet schließt sich nach **1,5 Sekunden automatisch**
+- Kleiner Toast am unteren Rand: `✓ An Küche gedruckt` (2 Sek.)
+- Gedruckte Positionen → `printed: true`
+- `OrderSession.status` → `in_progress`
+
+#### Fehler
+
+- Sheet bleibt offen (B verliert keinen Kontext)
+- Rote Meldung im Sheet: `Drucker nicht erreichbar`
+- Prominenter **„Erneut versuchen"** Button
+- Anderen Buttons bleiben aktiv (B kann z.B. stattdessen nur an Küche drucken)
+
+---
+
+### Küche vs. Bar – Kategorisierung
+
+- Jedes `MenuItem` in `menu.config.json` bekommt ein optionales Feld `destination: 'kitchen' | 'bar'`
+- Default wenn nicht gesetzt: `'kitchen'`
+- Aktuell sind keine Getränke definiert → Bar-Sektion zeigt immer „Keine Getränke"
+- Vorbereitet für spätere Getränke-Ergänzung in der Config
+
+---
+
+### Neues Model-Feld
+
+`SeatOrder` bekommt `printed: boolean` (default `false`):
+
 ```typescript
 export type SeatOrder = {
   code: string;
   name: string;
   price: number;
-  sent: boolean;
+  printed: boolean;
 };
 ```
 
+---
+
+### `PrintService` (`src/app/services/print.service.ts`)
+
+```typescript
+printToKitchen(orders: SeatOrder[]): Observable<void>
+printToBar(orders: SeatOrder[]): Observable<void>
+```
+
+- Aktuell: Mock mit `delay(1000)` und `of(void 0)`
+- Später: HTTP-Request oder WebSocket an WLAN-Drucker
+- Fehlerfall-Test: `MOCK_PRINT_FAIL = true` Flag im Service (für manuelle QA)
+
+---
+
 ### Ergebnis
 
-- B sieht alle ungesendeten Gerichte auf einen Blick
-- Senden aktualisiert den Status im Mock
-- Bereits gesendete Positionen können nicht versehentlich erneut gesendet werden
-- Session-Status wechselt auf `in_progress` → Übersichtskarte zeigt `▶`
+- B kann nach „Bestellung abschließen" mit einem Tap alles auf einmal oder getrennt drucken
+- Nachbestellungen erzeugen einen neuen Druckvorgang – nur neue Positionen landen auf dem Ticket
+- Stressgerechtes Feedback: kein Vollbild-Overlay, Fehler ohne Datenverlust behebbar
+- Architektur ist bereit für echten WLAN-Drucker
 
 ---
 

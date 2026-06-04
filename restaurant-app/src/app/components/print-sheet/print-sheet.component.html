@@ -1,0 +1,76 @@
+<div class="backdrop" (click)="close()"></div>
+
+<div class="sheet">
+  <div class="sheet-header">
+    <span class="sheet-title">Drucken</span>
+    <button class="sheet-close" (click)="close()" [disabled]="loading() !== null">×</button>
+  </div>
+
+  <div class="sheet-body">
+    <div class="section">
+      <div class="section-label">🍳 Küche</div>
+      @if (kitchenOrders().length === 0) {
+        <p class="section-empty">Keine Gerichte</p>
+      } @else {
+        @for (o of kitchenOrders(); track o.code) {
+          <div class="order-row">
+            <span class="order-qty">{{ o.count > 1 ? o.count + '×' : '1×' }}</span>
+            <span class="order-code">{{ o.code }}</span>
+            <span class="order-name">{{ o.name }}</span>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="section">
+      <div class="section-label">🍹 Bar</div>
+      @if (barOrders().length === 0) {
+        <p class="section-empty">Keine Getränke</p>
+      } @else {
+        @for (o of barOrders(); track o.code) {
+          <div class="order-row">
+            <span class="order-qty">{{ o.count > 1 ? o.count + '×' : '1×' }}</span>
+            <span class="order-code">{{ o.code }}</span>
+            <span class="order-name">{{ o.name }}</span>
+          </div>
+        }
+      }
+    </div>
+
+    @if (error()) {
+      <div class="sheet-error">{{ error() }}</div>
+    }
+  </div>
+
+  <div class="sheet-actions">
+    @if (success()) {
+      <div class="sheet-success">✓ Gedruckt</div>
+    } @else {
+      <div class="actions-row">
+        <button class="action-btn"
+                [disabled]="loading() !== null || !canKitchen"
+                (click)="print('kitchen')">
+          @if (loading() === 'kitchen') { <span class="btn-spinner"></span> } @else { An Küche }
+        </button>
+        <button class="action-btn"
+                [disabled]="loading() !== null || !canBar"
+                (click)="print('bar')">
+          @if (loading() === 'bar') { <span class="btn-spinner"></span> } @else { An Bar }
+        </button>
+      </div>
+      <button class="action-btn action-btn--both"
+              [disabled]="loading() !== null || !canBoth"
+              (click)="print('both')">
+        @if (loading() === 'both') { <span class="btn-spinner"></span> } @else { An Bar + Küche }
+      </button>
+
+      @if (error()) {
+        <button class="action-btn action-btn--retry"
+                [disabled]="loading() !== null"
+                (click)="print(lastTarget)">
+          Erneut versuchen
+        </button>
+      }
+    }
+  </div>
+</div>

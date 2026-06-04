@@ -26,6 +26,41 @@
 
 ---
 
+## Drucken & Drucker-Integration
+
+### Aktueller Stand
+- Kein physischer Drucker vorhanden
+- Alle Druckaufträge werden **gemockt** (simulierte Verzögerung + Erfolg/Fehler)
+
+### Zielarchitektur
+- Zwei separate Drucker: **Küche** und **Bar**, angesteuert per **WLAN** (ESC/POS-Protokoll oder HTTP)
+- Die Drucklogik ist in einem eigenen `PrintService` gekapselt – aktuell Mocks, später echter Netzwerkaufruf
+- B kann wählen: An Küche / An Bar / An Bar + Küche (simultan, ein Tap)
+
+### Druckauslösung
+- Drucken wird immer durch „Bestellung abschließen" angestoßen
+- Nur **ungedruckte** Positionen landen auf dem nächsten Ticket
+- Kommen nach dem ersten Druck neue Gerichte dazu, erscheint „Bestellung abschließen" erneut – nur die Nachbestellung wird gedruckt
+
+### Belegformat Küche (Referenz: `docs/beispiel_beleg_fuer_kueche_aber_geht_besser.jpg`)
+
+Was der Beleg zeigen soll:
+- **Tischnummer + Zone** – oben, kleine Schrift (z.B. „Tisch 3" / „Außer Haus"); Zone **nicht** pro Position wiederholen
+- **Gerichte** – pro Position: Menge × Code + Name (z.B. `2× 33  Hühnerfilet + Kokos`)
+- Gerichte **ohne** Preis – interessiert die Küche nicht
+- **Kein** Bediener-Name, **keine** Uhrzeit auf dem Beleg
+
+Was wegfällt (im Vergleich zum Beispielbild):
+- Preis pro Position → raus
+- Wiederholtes Zonen-Label pro Gericht → raus
+- Bediener + Timestamp in der Fußzeile → raus
+
+### Vorschau im Bottom Sheet (Story 10)
+- Die Positionsliste im „Drucken"-Bottom Sheet soll **optisch dem Beleg ähneln**: Menge × Code + Name, kein Preis, Zone einmalig oben
+- Was B auf dem Handy sieht = was aus dem Drucker kommt – keine Überraschungen
+
+---
+
 ## Referenzen
 
 - **UI-Anforderungen:** Ausführlich dokumentiert in `docs/ui-requirements.md`

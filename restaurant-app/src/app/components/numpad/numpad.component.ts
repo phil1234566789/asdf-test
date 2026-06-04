@@ -1,6 +1,6 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { MenuConfigService } from '../../services/menu-config.service';
-import { Seat, SeatOrder } from '../../models/seat.model';
+import { Seat, GuestOrder } from '../../models/seat.model';
 
 const KEYS = [
   ['HC', 'RN', 'C'],
@@ -22,7 +22,7 @@ export class NumpadComponent {
   inputCode  = input.required<string>();
 
   keyInput   = output<string>();
-  confirmed  = output<SeatOrder>();
+  confirmed  = output<GuestOrder>();
   closed     = output<void>();
 
   readonly keys = KEYS;
@@ -46,6 +46,6 @@ export class NumpadComponent {
   confirm(): void {
     const r = this.resolution();
     if (r.type !== 'valid') return;
-    this.confirmed.emit({ code: this.inputCode(), name: r.name, price: r.price });
+    this.confirmed.emit({ code: this.inputCode(), name: r.name, price: r.price, destination: 'kitchen', printed: false });
   }
 }
