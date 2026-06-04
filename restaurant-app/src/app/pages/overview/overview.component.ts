@@ -20,7 +20,9 @@ export class OverviewComponent implements OnInit {
   readonly now = signal(Date.now());
   readonly fabOpen = signal(false);
 
-  readonly sessions = this.sessionService.sessions;
+  private readonly sessions = computed(() =>
+    this.sessionService.sessions().filter(s => s.status !== 'completed')
+  );
 
   readonly indoorSessions = computed(() =>
     this.sessions().filter(s => s.zoneId === 'indoor')

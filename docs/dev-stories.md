@@ -5,10 +5,10 @@ Neue Stories werden unten angehängt.
 
 ---
 
-## Story 1 – Angular-Projekt aufsetzen
+## ✅ Story 1 – Angular-Projekt aufsetzen
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** Fertig
 
 ### Ziel
 
@@ -57,10 +57,10 @@ Keine Features, kein Backend – nur Fundament, Build und Deployment-Struktur.
 
 ---
 
-## Story 2 – Models & Config-Services
+## ✅ Story 2 – Models & Config-Services
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** Fertig
 
 ### Ziel
 
@@ -173,10 +173,10 @@ export type MenuConfig = {
 
 ---
 
-## Story 3 – Übersichtsseite
+## ✅ Story 3 – Übersichtsseite
 
 **Datum:** 2026-06-04
-**Status:** Offen
+**Status:** Fertig
 
 ### Ziel
 
@@ -249,10 +249,68 @@ Zeigt genau vier Informationen (laut Requirements):
 
 ---
 
+## Story 4 – Tischauswahl-Seite
+
+**Datum:** 2026-06-04
+**Status:** Offen
+
+### Ziel
+
+Nach dem Tippen auf „Tisch" im FAB öffnet sich eine Seite die alle verfügbaren und belegten Tische auf einen Blick zeigt. Tisch antippen → öffnet die Tischansicht (Story 5).
+
+### Orientierung
+
+Mockup `design/mockup.html` → Screen „Tisch wählen": 5-spaltiges Grid, belegte Tische farbig hervorgehoben, runde Tische als Kreise.
+
+### FAB anpassen
+
+Der FAB bekommt nur zwei Optionen (wie im Mockup):
+- **Tisch** → `/pick` (zeigt Innen + Draußen)
+- **Mitnehmen** → `/pick/takeaway` (zeigt nur M1–M5)
+
+### Route
+
+```
+/pick           → TablePickerComponent (Innen + Draußen)
+/pick/takeaway  → TablePickerComponent (nur Mitnehmen)
+/table/:key     → TableComponent (Stub – kommt Story 5)
+```
+
+### `TablePickerComponent` (`src/app/pages/table-picker/`)
+
+**Header:**
+- Zurück-Button (‹) → navigiert zur Übersicht
+- Titel „Tisch wählen" bzw. „Mitnehmen"
+
+**Grid:**
+- 5-spaltig, `aspect-ratio: 1` (quadratische Buttons)
+- **Freie Tische:** neutrale Farbe (surface + surface3-Rahmen)
+- **Belegte Tische:** Zonenfarbe (Hintergrund + Rahmen), `cursor: not-allowed` oder Navigation zur bestehenden Session
+- **Runde Tische** (8, 9, 11, 12 laut config): `border-radius: 50%`
+- **Rechteckige Tische:** `border-radius: 8px`
+- Tische werden dynamisch aus `TablesConfigService` geladen – kein Hardcoding
+
+**Belegte-Tisch-Logik:**
+- `occupiedKeys = Set<string>` aus den aktiven Sessions (MockSessionService)
+- Belegt = Session vorhanden und Status ≠ `completed`
+- Tippen auf belegten Tisch → navigiert zur bestehenden Session (nicht disabled, sondern Shortcut)
+- Tippen auf freien Tisch → navigiert zu `/table/:key` (neue Session)
+
+**Mitnehmen-Variante:**
+- Zeigt nur M1–M5 als 5 große Buttons
+- Belegte Slots (aus Sessions) hervorgehoben, freie antippen → neue Session
+
+### Ergebnis
+
+- FAB navigiert korrekt zu `/pick` und `/pick/takeaway`
+- Alle Tische werden aus Config geladen, korrekte Form (rund/eckig)
+- Belegte Tische sind sofort erkennbar
+- Navigation zu `/table/:key` funktioniert (Stub reicht)
+
+---
+
 ## Offene Fragen / Backlog
 
 - **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter. Sobald Menü-Gerichte in `menu.config.json` erscheinen, muss das automatisch aus den bestellten Items abgeleitet werden.
-- **Tischnummer-Picker:** Wird in Story 4 gebaut – wie soll er aussehen? Grid aus allen verfügbaren Tischnummern oder Eingabefeld?
-- **Bestellstatus-Werte:** `open | completed` reicht für die Übersicht, aber was wird auf der Karte angezeigt? Noch offen.
 - **GitHub Pages Repo-Name:** Für `base-href` beim Build benötigt.
 - **Supabase-Projekt:** Wird angelegt, sobald Auth/Backend gebraucht wird.

@@ -1,6 +1,13 @@
 import { Component, computed, input } from '@angular/core';
 import { OrderSession } from '../../models/order-session.model';
 
+const STATUS_LABEL: Record<string, string> = {
+  new: '',
+  in_progress: '▶',
+  payment_pending: '€',
+  completed: '',
+};
+
 @Component({
   selector: 'app-table-card',
   templateUrl: './table-card.component.html',
@@ -14,4 +21,6 @@ export class TableCardComponent {
   minutes = computed(() =>
     Math.floor((this.now() - this.session().createdAt.getTime()) / 60_000)
   );
+
+  statusLabel = computed(() => STATUS_LABEL[this.session().status] ?? '');
 }

@@ -6,12 +6,25 @@
   @if (session().isMenu) {
     <span class="menu-badge">N</span>
   }
-  <div class="card-num">{{ session().tableKey }}</div>
-  <div class="card-bname">{{ session().createdByName }}</div>
-  <span class="card-timer"
-        [class.timer--green]="minutes() < 15"
-        [class.timer--yellow]="minutes() >= 15 && minutes() < 30"
-        [class.timer--red]="minutes() >= 30">
-    {{ minutes() }}
-  </span>
+  <div class="card-top">
+    <span class="card-num">{{ session().tableKey }}</span>
+  </div>
+  <div class="card-bottom">
+    <span class="card-bname">{{ session().createdByName }}</span>
+    <div class="card-meta">
+      @if (statusLabel()) {
+        <span class="card-status"
+              [class.status--progress]="session().status === 'in_progress'"
+              [class.status--payment]="session().status === 'payment_pending'">
+          {{ statusLabel() }}
+        </span>
+      }
+      <span class="card-timer"
+            [class.timer--green]="minutes() < 15"
+            [class.timer--yellow]="minutes() >= 15 && minutes() < 30"
+            [class.timer--red]="minutes() >= 30">
+        {{ minutes() }}
+      </span>
+    </div>
+  </div>
 </div>
