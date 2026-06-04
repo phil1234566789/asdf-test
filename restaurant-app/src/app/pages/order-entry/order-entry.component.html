@@ -1,0 +1,47 @@
+<div class="order-entry">
+  <header class="header">
+    <button class="back-btn" (click)="back()">‹</button>
+    <span class="table-label">{{ tableLabel() }}</span>
+    <span class="timer-chip" [class]="timerClass()">{{ minutes() }}</span>
+    <button class="send-btn" (click)="navigateToSend()">Senden →</button>
+  </header>
+
+  <div class="tbl-area" #tblArea (click)="deselectSeat()">
+    @for (shape of tableShapes(); track $index) {
+      <div class="tbl-shape"
+           [class.rect]="shape.shape === 'rect'"
+           [class.round]="shape.shape === 'round'"
+           [style.left.px]="shape.x"
+           [style.top.px]="shape.y">
+      </div>
+    }
+
+    @if (showExtTop()) {
+      <button class="ext-btn ext-btn--top"
+              (click)="$event.stopPropagation(); addExtension('top')">+</button>
+    }
+    @if (showExtBottom()) {
+      <button class="ext-btn ext-btn--bottom"
+              (click)="$event.stopPropagation(); addExtension('bottom')">+</button>
+    }
+
+    @for (seat of seats(); track seat.id) {
+      <div class="gdot"
+           [class.active]="seat.id === activeSeatId()"
+           [class.ref]="seat.isRef"
+           [style.left.px]="seat.x"
+           [style.top.px]="seat.y"
+           (click)="$event.stopPropagation(); selectSeat(seat.id)"
+           (pointerdown)="startLongPress($event, seat.id)"
+           (pointerup)="cancelLongPress()"
+           (pointermove)="cancelLongPress()"
+           (pointercancel)="cancelLongPress()">
+        {{ seat.id }}
+      </div>
+    }
+  </div>
+
+  <div class="mode-bar">
+    <span class="mode-txt">{{ statusText() }}</span>
+  </div>
+</div>

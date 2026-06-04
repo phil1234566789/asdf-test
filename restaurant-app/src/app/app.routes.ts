@@ -23,4 +23,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/order-entry/order-entry.component').then(m => m.OrderEntryComponent),
   },
+  {
+    path: 'send/:key',
+    loadComponent: () =>
+      import('./pages/send/send.component').then(m => m.SendComponent),
+  },
 ];

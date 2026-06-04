@@ -1,0 +1,157 @@
+.order-entry {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 44px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.table-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.timer-chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  flex-shrink: 0;
+
+  &.chip--green  { background: var(--success-light); color: var(--success); }
+  &.chip--yellow { background: var(--warn-light);    color: var(--warn); }
+  &.chip--red    { background: var(--danger-light);  color: var(--danger); }
+}
+
+.send-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+// Dunkler Bereich – sieht in beiden Themes gut aus als "Restaurantboden"
+.tbl-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #0e0e12;
+}
+
+.tbl-shape {
+  position: absolute;
+  background: #2c2c2e;
+  border: 2.5px solid rgba(255, 255, 255, 0.15);
+  transform: translate(-50%, -50%);
+
+  &.rect {
+    width: 104px;
+    height: 140px;
+    border-radius: 12px;
+  }
+
+  &.round {
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+  }
+}
+
+.ext-btn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 22px;
+  cursor: pointer;
+  width: 72px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+
+  &--top    { top: 10px; }
+  &--bottom { bottom: 10px; }
+}
+
+.gdot {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #2c2c2e;
+  border: 2.5px solid #48484a;
+  color: rgba(235, 235, 245, 0.6);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 10;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: width 0.1s, height 0.1s, font-size 0.1s;
+
+  &.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    width: 48px;
+    height: 48px;
+    font-size: 15px;
+    z-index: 15;
+  }
+
+  &.ref { border-color: var(--warn); }
+}
+
+.mode-bar {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.mode-txt {
+  font-size: 13px;
+  color: var(--text3);
+}
