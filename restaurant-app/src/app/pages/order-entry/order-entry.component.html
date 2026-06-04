@@ -13,6 +13,9 @@
            [class.round]="shape.shape === 'round'"
            [style.left.px]="shape.x"
            [style.top.px]="shape.y">
+        @if ($index === 0) {
+          <span class="tbl-num">{{ key }}</span>
+        }
       </div>
     }
 
