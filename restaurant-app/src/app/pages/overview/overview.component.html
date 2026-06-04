@@ -13,7 +13,8 @@
     @if (indoorSessions().length > 0) {
       <div class="table-grid">
         @for (s of indoorSessions(); track s.id) {
-          <app-table-card [session]="s" [isOwn]="s.createdBy === currentUserId" [now]="now()" />
+          <app-table-card [session]="s" [isOwn]="s.createdBy === currentUserId" [now]="now()"
+                          (click)="router.navigate(['/table', s.tableKey])" />
         }
       </div>
     }
@@ -21,7 +22,8 @@
     @if (outdoorSessions().length > 0) {
       <div class="table-grid section-gap">
         @for (s of outdoorSessions(); track s.id) {
-          <app-table-card [session]="s" [isOwn]="s.createdBy === currentUserId" [now]="now()" />
+          <app-table-card [session]="s" [isOwn]="s.createdBy === currentUserId" [now]="now()"
+                          (click)="router.navigate(['/table', s.tableKey])" />
         }
       </div>
     }
@@ -29,7 +31,8 @@
     @if (takeawaySessions().length > 0) {
       <div class="table-grid section-gap">
         @for (s of takeawaySessions(); track s.id) {
-          <app-table-card [session]="s" [isOwn]="s.createdBy === currentUserId" [now]="now()" />
+          <app-table-card [session]="s" [isOwn]="s.createdBy === currentUserId" [now]="now()"
+                          (click)="router.navigate(['/table', s.tableKey])" />
         }
       </div>
     }

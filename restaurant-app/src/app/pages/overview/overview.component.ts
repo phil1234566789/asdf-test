@@ -11,7 +11,7 @@ import { TableCardComponent } from '../../components/table-card/table-card.compo
   imports: [TableCardComponent],
 })
 export class OverviewComponent implements OnInit {
-  private readonly router = inject(Router);
+  readonly router = inject(Router);
   private readonly sessionService = inject(MockSessionService);
   readonly themeService = inject(ThemeService);
   private readonly destroyRef = inject(DestroyRef);

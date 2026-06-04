@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, DestroyRef, ElementRef,
-  ViewChild, computed, inject, signal,
+  ViewChild, computed, effect, inject, signal,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
@@ -64,6 +64,15 @@ export class OrderEntryComponent implements AfterViewInit {
   private longPressStartX = 0;
   private longPressStartY = 0;
   private longPressDidFire = false;
+
+  constructor() {
+    effect(() => {
+      const seats = this.seats();
+      if (seats.length > 0) {
+        this.sessionService.saveSeats(this.key, seats);
+      }
+    });
+  }
 
   readonly tableLabel = computed(() => {
     if (this.key.startsWith('D')) return `Draußen ${this.key}`;
@@ -129,15 +138,25 @@ export class OrderEntryComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.isTakeaway) {
+      const stored = this.sessionService.getSeats(this.key);
       this.seats.set([{
         id: 1, x: 0, y: 0, isLeft: false, isRound: false,
-        tagDirX: 0, tagDirY: 0, isRef: false, orders: [],
+        tagDirX: 0, tagDirY: 0,
+        isRef: stored[0]?.isRef ?? false,
+        orders: stored[0]?.orders ?? [],
       }]);
       this.activeSeatId.set(1);
       return;
     }
     if (!this.tblAreaRef) return;
     this.recalcLayout();
+    const stored = this.sessionService.getSeats(this.key);
+    if (stored.length > 0) {
+      this.seats.update(seats => seats.map(s => {
+        const prev = stored.find(p => p.id === s.id);
+        return prev ? { ...s, orders: prev.orders, isRef: prev.isRef } : s;
+      }));
+    }
     const observer = new ResizeObserver(() => this.recalcLayout());
     observer.observe(this.tblAreaRef.nativeElement);
     this.destroyRef.onDestroy(() => observer.disconnect());

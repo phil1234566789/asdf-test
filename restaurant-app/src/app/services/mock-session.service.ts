@@ -1,7 +1,27 @@
 import { Injectable, signal } from '@angular/core';
 import { OrderSession, OrderStatus } from '../models/order-session.model';
+import { Seat } from '../models/seat.model';
 
 const m = (minutes: number) => new Date(Date.now() - minutes * 60_000);
+
+// Sample pre-populated seat data for manual testing
+const SAMPLE_SEATS: Record<string, Seat[]> = {
+  '2': [
+    { id: 1, isRef: true,  orders: [{ code: '33',  name: 'Hühnerfilet + Kokos Curry',   price: 9.90,  destination: 'kitchen', printed: true }] },
+    { id: 2, isRef: false, orders: [{ code: 'HC2', name: 'Thai Basilikum Huhn',          price: 12.80, destination: 'kitchen', printed: true }] },
+    { id: 3, isRef: false, orders: [] },
+    { id: 4, isRef: false, orders: [] },
+  ],
+  '5': [
+    { id: 1, isRef: true,  orders: [{ code: '11',  name: 'Gemüse + Chop Suey',           price: 9.90,  destination: 'kitchen', printed: true  }, { code: 'RN1', name: 'Gebratener Reis', price: 3.50, destination: 'kitchen', printed: false }] },
+    { id: 2, isRef: false, orders: [{ code: 'HC1', name: 'Rindfleisch scharf gebraten',  price: 12.80, destination: 'kitchen', printed: true  }] },
+    { id: 3, isRef: false, orders: [{ code: '23',  name: 'Tofu + Kokos Curry',           price: 9.90,  destination: 'kitchen', printed: false }] },
+    { id: 4, isRef: false, orders: [] },
+  ],
+  'M1': [
+    { id: 1, isRef: false, orders: [{ code: '33',  name: 'Hühnerfilet + Kokos Curry', price: 9.90, destination: 'kitchen', printed: true }, { code: 'HC3', name: 'Garnelen gebraten', price: 14.50, destination: 'kitchen', printed: true }] },
+  ],
+};
 
 @Injectable({ providedIn: 'root' })
 export class MockSessionService {
@@ -26,10 +46,12 @@ export class MockSessionService {
     { id: '15', tableKey: 'D5', zoneId: 'outdoor',  isMenu: false, createdAt: m(12), createdBy: 'user-1', createdByName: 'Anna', status: 'new' },
     { id: '16', tableKey: 'D8', zoneId: 'outdoor',  isMenu: false, createdAt: m(29), createdBy: 'user-2', createdByName: 'Ben',  status: 'in_progress' },
     // Mitnehmen
-    { id: '17', tableKey: 'M1', zoneId: 'takeaway', isMenu: false, createdAt: m(5),  createdBy: 'user-1', createdByName: 'Anna', status: 'new' },
+    { id: '17', tableKey: 'M1', zoneId: 'takeaway', isMenu: false, createdAt: m(5),  createdBy: 'user-1', createdByName: 'Anna', status: 'in_progress' },
     { id: '18', tableKey: 'M2', zoneId: 'takeaway', isMenu: false, createdAt: m(17), createdBy: 'user-2', createdByName: 'Ben',  status: 'in_progress' },
     { id: '19', tableKey: 'M3', zoneId: 'takeaway', isMenu: false, createdAt: m(31), createdBy: 'user-1', createdByName: 'Anna', status: 'payment_pending' },
   ]);
+
+  private readonly _seatData = signal<Map<string, Seat[]>>(new Map(Object.entries(SAMPLE_SEATS)));
 
   readonly sessions = this._sessions.asReadonly();
 
@@ -37,5 +59,17 @@ export class MockSessionService {
     this._sessions.update(sessions =>
       sessions.map(s => s.tableKey === tableKey ? { ...s, status } : s)
     );
+  }
+
+  getSeats(tableKey: string): Seat[] {
+    return this._seatData().get(tableKey) ?? [];
+  }
+
+  saveSeats(tableKey: string, seats: Seat[]): void {
+    this._seatData.update(map => {
+      const next = new Map(map);
+      next.set(tableKey, seats.map(s => ({ id: s.id, orders: s.orders, isRef: s.isRef })));
+      return next;
+    });
   }
 }
