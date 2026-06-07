@@ -5,7 +5,7 @@
       "label": "Innen",
       "prefix": "",
       "tables": {
-        "count": 40,
+        "count": 20,
         "defaultShape": "rect",
         "defaultSeats": 4,
         "overrides": [
