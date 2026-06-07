@@ -140,9 +140,12 @@ inkl. 7% MwSt        [Betrag]   ← Außer Haus (reduzierter Satz)
 
 ### Getrennte Rechnungen
 
-- Gäste eines Tisches können in **Zahlgruppen** aufgeteilt werden (z.B. 4 Gäste → 2 Pärchen → 2 separate Belege)
-- Jede Zahlgruppe bekommt einen eigenen Kassenbeleg mit eigenem Summenblock
-- Details zur Gruppenbildung: TBD
+- Gäste werden über den **✂-Button** im Header der Bestellansicht in Zahlgruppen (A, B, C, ...) eingeteilt
+- Zuweisung läuft direkt im Tischplan: Dot antippen cyclt den Gruppenbuchstaben; Farbe + Buchstabe auf den Dots
+- **Gruppengesamtpreis** wird einmal pro Gruppe als farbiger Pill im Tischplan angezeigt → B kann ohne Rechnungsöffnung abrechnen
+- In der Rechnungsvorschau: `‹ A ›` Navigation oben links, Beleg zeigt nur Positionen der aktiven Gruppe
+- Zuweisung bleibt gespeichert; Aufteilen-Modus ist ein Toggle (Zuweisung geht beim Ausschalten nicht verloren)
+- Nicht verfügbar für Mitnehmen
 
 ---
 

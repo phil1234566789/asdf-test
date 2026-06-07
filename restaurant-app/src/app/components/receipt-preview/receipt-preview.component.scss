@@ -12,7 +12,7 @@
   &::-webkit-scrollbar { display: none; }
 }
 
-// ── Close ────────────────────────────────────────────────────────────────────
+// ── Fixed corner buttons ──────────────────────────────────────────────────────
 
 .close-x {
   position: fixed;
@@ -26,6 +26,37 @@
   line-height: 1;
   padding: 4px;
   z-index: 101;
+}
+
+.group-nav {
+  position: fixed;
+  top: 10px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 101;
+}
+
+.group-nav__btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #555;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-family: 'Courier New', Courier, monospace;
+  line-height: 1;
+
+  &:disabled { color: #ccc; cursor: default; }
+}
+
+.group-nav__label {
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Courier New', Courier, monospace;
+  min-width: 16px;
+  text-align: center;
 }
 
 // ── Header ───────────────────────────────────────────────────────────────────

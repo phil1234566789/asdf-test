@@ -12,6 +12,7 @@ import { PrintSheetComponent, PrintTarget } from '../../components/print-sheet/p
 import { SwipeButtonComponent } from '../../components/swipe-button/swipe-button.component';
 import { ReceiptPreviewComponent } from '../../components/receipt-preview/receipt-preview.component';
 import { PrintOrder } from '../../services/print.service';
+import { groupColor } from '../../utils/group-colors';
 
 type DeleteTarget = {
   displayCode: string;
@@ -69,6 +70,8 @@ export class OrderEntryComponent implements AfterViewInit {
   readonly showSuccessToast = signal(false);
   readonly deleteConfirm = signal<DeleteTarget | null>(null);
   readonly extConfirm = signal<'top' | 'bottom' | null>(null);
+  readonly splitActive = signal(false);
+  readonly seatGroups = signal<Map<number, string>>(new Map());
 
   // Tracked for tag-visibility safety check
   private tblAreaH = 0;
@@ -184,6 +187,20 @@ export class OrderEntryComponent implements AfterViewInit {
     const observer = new ResizeObserver(() => this.recalcLayout());
     observer.observe(this.tblAreaRef.nativeElement);
     this.destroyRef.onDestroy(() => observer.disconnect());
+    this.initSeatGroups();
+  }
+
+  private initSeatGroups(): void {
+    const stored = this.sessionService.getSplitGroups(this.key);
+    if (stored.size > 0) {
+      this.seatGroups.set(new Map(stored));
+    } else {
+      const groups = new Map<number, string>();
+      for (const seat of this.seats()) {
+        if (seat.orders.length > 0) groups.set(seat.id, 'A');
+      }
+      this.seatGroups.set(groups);
+    }
   }
 
   private recalcLayout(): void {
@@ -426,7 +443,75 @@ export class OrderEntryComponent implements AfterViewInit {
 
   onGdotClick(id: number): void {
     if (this.longPressDidFire) { this.longPressDidFire = false; return; }
+    if (this.splitActive()) { this.cycleGroup(id); return; }
     this.selectSeat(id);
+  }
+
+  seatGroupLabel(seatId: number): string {
+    return this.seatGroups().get(seatId) ?? 'A';
+  }
+
+  groupColor(letter: string): string {
+    return groupColor(letter);
+  }
+
+  readonly splitGroupTotals = computed(() => {
+    const groups = this.seatGroups();
+    const result = new Map<string, { total: number; repId: number }>();
+    for (const seat of this.seats()) {
+      if (seat.orders.length === 0) continue;
+      const letter = groups.get(seat.id) ?? 'A';
+      const prev = result.get(letter);
+      const t = this.seatTotal(seat);
+      if (prev) {
+        prev.total += t;
+        if (seat.id < prev.repId) prev.repId = seat.id;
+      } else {
+        result.set(letter, { total: t, repId: seat.id });
+      }
+    }
+    return result;
+  });
+
+  isRepresentativeSeat(seatId: number): boolean {
+    const letter = this.seatGroups().get(seatId);
+    if (!letter) return false;
+    return this.splitGroupTotals().get(letter)?.repId === seatId;
+  }
+
+  groupTotalForSeat(seatId: number): number {
+    const letter = this.seatGroups().get(seatId) ?? 'A';
+    return this.splitGroupTotals().get(letter)?.total ?? 0;
+  }
+
+  splitPriceTagTransform(seat: SeatView): string {
+    return seat.isLeft ? 'translate(-100%, -50%)' : 'translateY(-50%)';
+  }
+
+  cycleGroup(seatId: number): void {
+    const seat = this.seats().find(s => s.id === seatId);
+    if (!seat || seat.orders.length === 0) return;
+    const groups = new Map(this.seatGroups());
+    const current = groups.get(seatId) ?? 'A';
+    const seatsWithOrdersCount = this.seats().filter(s => s.orders.length > 0).length;
+    const maxCode = 'A'.charCodeAt(0) + seatsWithOrdersCount - 1;
+    const next = current.charCodeAt(0) >= maxCode ? 'A' : String.fromCharCode(current.charCodeAt(0) + 1);
+    groups.set(seatId, next);
+    this.seatGroups.set(groups);
+    this.sessionService.saveSplitGroups(this.key, groups);
+  }
+
+  toggleSplit(): void {
+    if (!this.splitActive()) {
+      this.deselectSeat();
+      const groups = new Map(this.seatGroups());
+      for (const seat of this.seats()) {
+        if (seat.orders.length > 0 && !groups.has(seat.id)) groups.set(seat.id, 'A');
+      }
+      this.seatGroups.set(groups);
+      this.sessionService.saveSplitGroups(this.key, groups);
+    }
+    this.splitActive.update(v => !v);
   }
 
   seatTotal(seat: Seat): number {

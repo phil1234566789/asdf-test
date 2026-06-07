@@ -1,4 +1,11 @@
 <div class="receipt-page">
+  @if (groupCount() > 1) {
+    <div class="group-nav">
+      <button class="group-nav__btn" (click)="prevGroup()" [disabled]="activeGroupIdx() === 0">‹</button>
+      <span class="group-nav__label" [style.color]="groupColor(currentGroupLetter())">{{ currentGroupLetter() }}</span>
+      <button class="group-nav__btn" (click)="nextGroup()" [disabled]="activeGroupIdx() >= groupCount() - 1">›</button>
+    </div>
+  }
   <button class="close-x" (click)="closed.emit()">×</button>
 
   <div class="receipt-header">
@@ -22,7 +29,7 @@
   <div class="divider"></div>
 
   <div class="items">
-    @for (item of groupedItems(); track item.name) {
+    @for (item of displayedItems(); track item.name) {
       <div class="item-row">
         <span class="item-name">{{ item.count > 1 ? item.count + ' ' : '1 ' }}{{ item.name }}</span>
         <span class="item-price">{{ formatPrice(item.unitPrice * item.count) }}</span>
@@ -34,10 +41,10 @@
 
   <div class="total-row total-row--main">
     <span>Gesamt</span>
-    <span>{{ formatPrice(total()) }}</span>
+    <span>{{ formatPrice(displayedTotal()) }}</span>
   </div>
   <div class="total-row total-row--vat">
     <span>inkl. {{ vatLabel() }}</span>
-    <span>{{ formatPrice(vatAmount()) }}</span>
+    <span>{{ formatPrice(displayedVatAmount()) }}</span>
   </div>
 </div>

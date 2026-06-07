@@ -6,6 +6,9 @@
       <button class="receipt-btn" (click)="showReceiptPreview.set(true)">🧾</button>
     }
     @if (!isTakeaway) {
+      <button class="split-btn" [class.split-btn--active]="splitActive()" (click)="toggleSplit()">✂</button>
+    }
+    @if (!isTakeaway) {
       <div class="view-toggle">
         <button class="view-toggle__btn" [class.active]="viewMode() === 'table'"
                 (click)="setViewMode('table')">Tisch</button>
@@ -74,8 +77,12 @@
 
         @for (seat of seats(); track seat.id) {
           <div class="gdot"
-               [class.active]="seat.id === activeSeatId()"
+               [class.active]="!splitActive() && seat.id === activeSeatId()"
                [class.ref]="seat.isRef"
+               [class.gdot--split]="splitActive() && seat.orders.length > 0"
+               [class.gdot--split-empty]="splitActive() && seat.orders.length === 0"
+               [style.background-color]="splitActive() && seat.orders.length > 0 ? groupColor(seatGroupLabel(seat.id)) : null"
+               [style.border-color]="splitActive() && seat.orders.length > 0 ? groupColor(seatGroupLabel(seat.id)) : null"
                [style.left.px]="seat.x"
                [style.top.px]="seat.y"
                (click)="$event.stopPropagation(); onGdotClick(seat.id)"
@@ -84,19 +91,34 @@
                (pointerup)="cancelLongPress()"
                (pointermove)="cancelLongPressOnMove($event)"
                (pointercancel)="cancelLongPress()">
-            {{ seat.id }}
+            @if (splitActive() && seat.orders.length > 0) {
+              {{ seatGroupLabel(seat.id) }}
+            } @else {
+              {{ seat.id }}
+            }
           </div>
 
-          @for (order of seat.orders; track $index) {
-            @if (isTagInBounds(tagX(seat, $index), tagY(seat, $index))) {
-              <div class="order-tag"
-                   [class.order-tag--radial]="seat.isRound"
-                   [class.order-tag--printed]="order.printed"
-                   [style.left.px]="tagX(seat, $index)"
-                   [style.top.px]="tagY(seat, $index)">
-                {{ order.code }}
-              </div>
+          @if (!splitActive()) {
+            @for (order of seat.orders; track $index) {
+              @if (isTagInBounds(tagX(seat, $index), tagY(seat, $index))) {
+                <div class="order-tag"
+                     [class.order-tag--radial]="seat.isRound"
+                     [class.order-tag--printed]="order.printed"
+                     [style.left.px]="tagX(seat, $index)"
+                     [style.top.px]="tagY(seat, $index)">
+                  {{ order.code }}
+                </div>
+              }
             }
+          }
+          @if (splitActive() && isRepresentativeSeat(seat.id) && isTagInBounds(tagX(seat, 0), tagY(seat, 0))) {
+            <div class="split-price-tag"
+                 [style.left.px]="tagX(seat, 0)"
+                 [style.top.px]="tagY(seat, 0)"
+                 [style.color]="groupColor(seatGroupLabel(seat.id))"
+                 [style.transform]="splitPriceTagTransform(seat)">
+              {{ formatPrice(groupTotalForSeat(seat.id)) }}
+            </div>
           }
         }
       </div>

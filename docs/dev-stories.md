@@ -928,6 +928,74 @@ Wenn eine Person für den ganzen Tisch bestellt, ist die Listenansicht praktisch
 
 ---
 
+## ✅ Story 15 – Getrennte Rechnungen
+
+**Datum:** 2026-06-07
+**Status:** Fertig
+
+### Ziel
+
+Gäste eines Tisches können in Zahlgruppen (A, B, C, ...) eingeteilt werden. B sieht auf einen Blick was jede Gruppe zahlt und kann direkt abrechnen – ohne Rechnungsvorschau aufmachen zu müssen. Buchstaben statt Zahlen, um Verwechslung mit Tisch- und Platznummern zu vermeiden.
+
+---
+
+### ✂ Toggle in der Bestellansicht
+
+- **✂-Button** im Header der Bestellansicht (neben 🧾), nur für Tische (nicht Mitnehmen)
+- Antippen → Aufteilen-Modus ein; erneut antippen → aus. Zuweisung bleibt gespeichert.
+- Im Aufteilen-Modus wird das Numpad geschlossen; Tippen auf Dots ordnet Gruppen zu statt Numpad zu öffnen
+
+---
+
+### Gruppenaufteilung im Tischplan
+
+Der existierende Tischplan wird für die Zuweisung genutzt – kein separater Screen.
+
+- Dots zeigen **Buchstaben** statt Platznummern; Farbe entspricht der Gruppe
+- Plätze ohne Bestellungen: ausgegraut, nicht tippbar
+- Dot antippen → Buchstabe cyclt: **A → B → C → ... → A**
+- Alle starten auf **A** (= eine gemeinsame Rechnung)
+- Codes/Preistags werden im Aufteilen-Modus ausgeblendet
+
+#### Gruppenpreise
+
+- Pro Gruppe wird der **Gruppengesamtbetrag** genau einmal angezeigt – neben dem Dot mit der niedrigsten Platznummer der Gruppe
+- Preis-Pill: dunkler Hintergrund, Gruppenfarbe als Text → hoher Kontrast, auch bei Farben wie Orange
+- So kann B direkt abrechnen ohne die Rechnungsvorschau zu öffnen
+
+#### Gruppenfarben (`src/app/utils/group-colors.ts`)
+
+| Gruppe | Farbe |
+|---|---|
+| A | #2196F3 Blau |
+| B | #FF9800 Orange |
+| C | #CE93D8 Hellviolett |
+| D | #4CAF50 Grün |
+| E | #FF6B6B Korallrot |
+| F | #00BCD4 Cyan |
+| G | #FFCA28 Gelb-Amber |
+| H | #90CAF9 Hellblau |
+
+---
+
+### Rechnungsvorschau
+
+Die Beleg-Vorschau (🧾) bleibt **vollständig unverändert** – sauber für den Gast.
+
+- Wenn Gruppen vorhanden: `‹ A ›` Navigation **oben links**, auf gleicher Höhe wie `×`
+- Buchstabe ist in der Gruppenfarbe eingefärbt
+- Rechnung zeigt nur Positionen der aktuellen Gruppe; Summe + MwSt entsprechend
+- Keine Split-UI im Beleg sichtbar – Gast sieht nur seine Rechnung
+
+---
+
+### Persistenz
+
+- Gruppenzuweisung wird im `MockSessionService` gespeichert (später Supabase)
+- Bleibt beim erneuten Öffnen von Beleg oder Aufteilen-Modus erhalten
+
+---
+
 ## Offene Fragen / Backlog
 
 - **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter. Sobald Menü-Gerichte in `menu.config.json` erscheinen, muss das automatisch aus den bestellten Items abgeleitet werden.

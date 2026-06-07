@@ -57,6 +57,19 @@
   flex-shrink: 0;
 }
 
+.split-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+
+  &--active { color: var(--accent); }
+}
+
 .view-toggle {
   display: flex;
   background: var(--surface2);
@@ -184,6 +197,16 @@
   }
 
   &.ref { border-color: var(--warn); }
+
+  &--split {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  &--split-empty {
+    opacity: 0.35;
+  }
 }
 
 .order-tag {
@@ -198,6 +221,18 @@
 
   &--radial   { transform: translate(-50%, -50%); }
   &--printed  { color: var(--text3); }
+}
+
+.split-price-tag {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 18;
+  pointer-events: none;
+  white-space: nowrap;
+  background: rgba(28, 28, 28, 0.88);
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 
 // ── Price bar (table view, numpad closed, orders present) ────────────────────

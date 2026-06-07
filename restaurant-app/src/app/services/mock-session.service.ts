@@ -52,6 +52,7 @@ export class MockSessionService {
   ]);
 
   private readonly _seatData = signal<Map<string, Seat[]>>(new Map(Object.entries(SAMPLE_SEATS)));
+  private readonly _splitGroups = signal<Map<string, Map<number, string>>>(new Map());
 
   readonly sessions = this._sessions.asReadonly();
 
@@ -63,6 +64,18 @@ export class MockSessionService {
 
   getSeats(tableKey: string): Seat[] {
     return this._seatData().get(tableKey) ?? [];
+  }
+
+  getSplitGroups(tableKey: string): Map<number, string> {
+    return this._splitGroups().get(tableKey) ?? new Map();
+  }
+
+  saveSplitGroups(tableKey: string, groups: Map<number, string>): void {
+    this._splitGroups.update(m => {
+      const next = new Map(m);
+      next.set(tableKey, new Map(groups));
+      return next;
+    });
   }
 
   saveSeats(tableKey: string, seats: Seat[]): void {
