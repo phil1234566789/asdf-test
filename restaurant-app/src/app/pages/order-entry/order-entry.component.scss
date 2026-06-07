@@ -265,7 +265,14 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 6px;
+  margin: 0 -8px 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &--active {
+    background: var(--surface2);
+  }
 }
 
 .ol-seat__label {

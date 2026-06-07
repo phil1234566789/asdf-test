@@ -434,11 +434,22 @@ export class OrderEntryComponent implements AfterViewInit {
   }
 
   setViewMode(mode: 'table' | 'list'): void {
-    if (mode === 'list') this.deselectSeat();
+    if (mode === 'list') {
+      const refSeat = this.seats().find(s => s.isRef) ?? this.seats()[0];
+      this.activeSeatId.set(refSeat?.id ?? null);
+      this.inputCode.set('');
+    } else {
+      this.deselectSeat();
+    }
     this.viewMode.set(mode);
     if (mode === 'table') {
       requestAnimationFrame(() => this.recalcLayout());
     }
+  }
+
+  selectSeatInList(id: number): void {
+    this.activeSeatId.set(id);
+    this.inputCode.set('');
   }
 
   onServed(): void {

@@ -891,6 +891,43 @@ Wenn `printed: true` (d.h. das Gericht wurde bereits an Küche/Theke gesendet):
 
 ---
 
+## ✅ Story 14 – Bestellaufnahme in der Listenansicht
+
+**Datum:** 2026-06-07
+**Status:** Fertig
+
+### Ziel
+
+Wenn eine Person für den ganzen Tisch bestellt, ist die Listenansicht praktischer als die Tischgrafik. B soll dort direkt Gerichte aufnehmen können, ohne ständig zur Tischansicht wechseln zu müssen.
+
+### Aktiver Platz
+
+- In der Listenansicht gibt es immer genau einen **aktiven Platz**, dem neue Gerichte zugeordnet werden
+- Default beim Wechsel in die Listenansicht: der **★-Gast** (`isRef: true`)
+- B tippt auf den **Platz-Header** (z.B. „Platz 2") → dieser Platz wird aktiv
+- Aktiver Platz-Header bekommt eine visuelle Hervorhebung (z.B. Akzentfarbe Hintergrund oder dickerer Rand)
+- Der aktive Platz bleibt gesetzt bis B einen anderen antippt oder die Ansicht wechselt
+
+### Numpad
+
+- Wenn ein Platz aktiv ist, erscheint das **Numpad unten** (gleiche `app-numpad`-Komponente wie in der Tischansicht)
+- Bestätigtes Gericht → wird dem aktiven Platz zugeordnet, erscheint sofort in der Liste
+- Numpad schließen: eigener Schließen-Button im Numpad (bestehend) → aktiver Platz wird aufgehoben
+
+### Verhältnis zu `activeSeatId`
+
+- `activeSeatId` wird auch in der Listenansicht genutzt – kein separates Signal nötig
+- `setViewMode('list')` setzt `activeSeatId` auf den ★-Gast (statt auf `null` wie bisher)
+- `setViewMode('table')` setzt `activeSeatId` zurück auf `null` (Verhalten unverändert)
+
+### Ergebnis
+
+- B kann in der Listenansicht flüssig Gerichte aufnehmen
+- Kein Ansichtswechsel nötig wenn ein Gast für alle bestellt
+- Bestehende Tischansicht bleibt unverändert
+
+---
+
 ## Offene Fragen / Backlog
 
 - **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter. Sobald Menü-Gerichte in `menu.config.json` erscheinen, muss das automatisch aus den bestellten Items abgeleitet werden.

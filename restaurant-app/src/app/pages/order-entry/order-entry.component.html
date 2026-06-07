@@ -104,16 +104,20 @@
       @if (viewMode() === 'list') {
         <div class="order-list-view">
           <div class="order-list-scroll">
-            @if (seatsWithOrders().length === 0) {
+            @if (totalCount() === 0) {
               <p class="to-empty">Noch keine Gerichte erfasst</p>
             }
-            @for (seat of seatsWithOrders(); track seat.id) {
+            @for (seat of seats(); track seat.id) {
               <div class="ol-seat">
-                <div class="ol-seat__header">
+                <div class="ol-seat__header"
+                     [class.ol-seat__header--active]="seat.id === activeSeatId()"
+                     (click)="selectSeatInList(seat.id)">
                   <span class="ol-seat__label">
                     Platz {{ seat.id }}{{ seat.isRef ? ' ★' : '' }}
                   </span>
-                  <span class="ol-seat__total">{{ formatPrice(seatTotal(seat)) }}</span>
+                  <span class="ol-seat__total">
+                    {{ seat.orders.length > 0 ? formatPrice(seatTotal(seat)) : '' }}
+                  </span>
                 </div>
                 @for (order of seat.orders; track $index) {
                   <div class="ol-item" [class.ol-item--printed]="order.printed">
@@ -125,7 +129,7 @@
                 }
               </div>
             }
-            @if (seatsWithOrders().length > 0) {
+            @if (totalCount() > 0) {
               <div class="ol-total">
                 <span>Gesamt</span>
                 <span>{{ formatPrice(totalPrice()) }}</span>
