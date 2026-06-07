@@ -68,6 +68,7 @@ export class OrderEntryComponent implements AfterViewInit {
   readonly showReceiptPreview = signal(false);
   readonly showSuccessToast = signal(false);
   readonly deleteConfirm = signal<DeleteTarget | null>(null);
+  readonly extConfirm = signal<'top' | 'bottom' | null>(null);
 
   // Tracked for tag-visibility safety check
   private tblAreaH = 0;
@@ -319,10 +320,21 @@ export class OrderEntryComponent implements AfterViewInit {
     return seat.y - 8 + index * 18;
   }
 
-  addExtension(side: 'top' | 'bottom'): void {
+  requestExtension(side: 'top' | 'bottom'): void {
+    this.extConfirm.set(side);
+  }
+
+  confirmExtension(): void {
+    const side = this.extConfirm();
+    if (!side) return;
     if (side === 'top') this.extTop.set(true);
     else this.extBottom.set(true);
+    this.extConfirm.set(null);
     this.recalcLayout();
+  }
+
+  cancelExtension(): void {
+    this.extConfirm.set(null);
   }
 
   selectSeat(id: number): void {

@@ -370,7 +370,7 @@ Positionen in `afterViewInit` berechnet (`cx = width/2`, `cy = height/2`):
 - **Runder Tisch (8, 9, 11):** `angle = 2π×i/seats − π/2`, Radius 110px
 
 **Tisch-Extension (nur 4er):**
-- `+` oben/unten → weiterer Tischabschnitt (104×140px) + 4 neue Plätze
+- `+` oben/unten → Confirmation-Popup → weiterer Tischabschnitt (104×140px) + 4 neue Plätze
 - Max. 1× oben, 1× unten
 
 #### Sitzplatz-Dots
