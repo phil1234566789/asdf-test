@@ -27,6 +27,7 @@
           </span>
           <span class="to-name">{{ item.name }}</span>
           <span class="to-price">{{ formatPrice(item.unitPrice * item.count) }}</span>
+          <button class="ol-delete-btn" (click)="$event.stopPropagation(); requestDeleteTakeaway(item)">×</button>
         </div>
       }
       @if (groupedTakeawayOrders().length > 0) {
@@ -119,6 +120,7 @@
                     <span class="ol-code">{{ order.code }}</span>
                     <span class="ol-name">{{ order.name }}</span>
                     <span class="ol-price">{{ formatPrice(order.price) }}</span>
+                    <button class="ol-delete-btn" (click)="requestDeleteOrder(seat.id, $index, order)">×</button>
                   </div>
                 }
               </div>
@@ -185,5 +187,23 @@
 
   @if (showSuccessToast()) {
     <div class="success-toast">✓ Gedruckt</div>
+  }
+
+  @if (deleteConfirm(); as target) {
+    <div class="delete-backdrop" (click)="cancelDelete()">
+      <div class="delete-dialog" (click)="$event.stopPropagation()">
+        <p class="delete-dialog__title">
+          @if (target.displayCount > 1) { {{ target.displayCount }}× }{{ target.displayCode }} entfernen?
+        </p>
+        <p class="delete-dialog__name">{{ target.displayName }}</p>
+        @if (target.hasPrinted) {
+          <p class="delete-dialog__warn">Bereits gedruckt – ggf. Küche informieren</p>
+        }
+        <div class="delete-dialog__actions">
+          <button class="delete-dialog__cancel" (click)="cancelDelete()">Abbrechen</button>
+          <button class="delete-dialog__confirm" (click)="confirmDelete()">Entfernen</button>
+        </div>
+      </div>
+    </div>
   }
 </div>

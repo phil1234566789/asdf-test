@@ -818,7 +818,85 @@ B kann dem Gast die Rechnung direkt auf dem Handy zeigen. Tippen auf 🧾 im Hea
 
 ---
 
+## ✅ Story 13 – Gericht entfernen
+
+**Datum:** 2026-06-07
+**Status:** Fertig
+
+### Ziel
+
+B hat sich vertippt oder der Gast hat sich umentschieden. In der Listenansicht kann ein einzelnes Gericht mit einem Tap entfernt werden – solange die Session noch nicht als „Serviert" markiert wurde.
+
+### Wann ist Entfernen möglich?
+
+**Immer** – unabhängig vom Session-Status. Auch nach dem Servieren kann ein Gericht noch entfernt werden (falsches Essen serviert, Reklamation, etc.).
+
+### Nur in der Listenansicht
+
+- Entfernen-Button erscheint **nur in View B (Bestellliste)**
+- In der Tischvisualisierung (View A) gibt es kein Entfernen-Interface
+- Mitnehmen-Ansicht: Entfernen ebenfalls möglich (dort ist die Listenansicht der einzige Modus)
+
+### UI – Entfernen-Button
+
+Jede Bestellposition in der Liste bekommt einen Entfernen-Button:
+
+```
+Platz 1 ★                    12,80 €
+  HC2  Thai Basilikum Huhn   12,80 €  [×]
+
+Platz 2                       9,90 €
+  33   Hühnerfilet + Kokos    9,90 €  [×]
+```
+
+- `[×]` – Icon-Button rechts neben jeder Position, immer sichtbar
+
+### Confirmation-Popup
+
+Tap auf `[×]` öffnet ein Popup (kein vollbildiges Modal – eher ein kompaktes Bottom Sheet oder Alert):
+
+```
+┌─────────────────────────────┐
+│  HC2 entfernen?             │
+│  Thai Basilikum Huhn        │
+│                             │
+│  [Abbrechen]   [Entfernen]  │
+└─────────────────────────────┘
+```
+
+- Zeigt Code + Name des betroffenen Gerichts
+- „Abbrechen" → schließt, nichts passiert
+- „Entfernen" → Gericht wird gelöscht
+
+### Bereits gedruckte Gerichte
+
+Wenn `printed: true` (d.h. das Gericht wurde bereits an Küche/Theke gesendet):
+- Popup erscheint wie normal
+- Zusätzlicher Hinweis im Popup: `„Bereits gedruckt – ggf. Küche informieren"`
+- Der Hinweis bleibt sichtbar bis B das Popup aktiv schließt (kein Auto-dismiss)
+
+### Logik
+
+1. B tippt `[×]` neben einer Position
+2. Confirmation-Popup erscheint (mit Warn-Hinweis wenn `printed: true`)
+3. B bestätigt → `GuestOrder` wird aus `seat.orders` (bzw. Mitnehmen-Liste) entfernt
+4. Preisleiste und Gesamtpreis werden sofort neu berechnet
+5. Leere Sitzplätze (keine Gerichte mehr) werden aus der Liste ausgeblendet
+
+### Ergebnis
+
+- Tippfehler und Änderungswünsche sind jederzeit korrigierbar
+- Popup verhindert versehentliche Löschungen
+- Gedruckte Gerichte können entfernt werden, aber mit explizitem Hinweis der aktiv weggeklickt werden muss
+
+---
+
 ## Offene Fragen / Backlog
 
 - **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter. Sobald Menü-Gerichte in `menu.config.json` erscheinen, muss das automatisch aus den bestellten Items abgeleitet werden.
 - **Supabase-Projekt:** Wird angelegt, sobald Auth/Backend gebraucht wird.
+- Getrennte Rechnungen — Gäste in Zahlgruppen aufteilen, eigene Belege pro Gruppe
+- Supabase-Backend — Auth, PostgreSQL, Realtime-Sync (ersetzt MockSessionService)
+- Login/Auth-Flow — Bedienung einloggen, Session persistieren
+- Kassenbeleg-Druck — tatsächlicher Druck über Thekendrucker (Epson ePOS)
+- Verkaufsanalyse — Daten für den Inhaber (setzt Backend voraus)

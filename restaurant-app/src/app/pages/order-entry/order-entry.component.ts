@@ -13,6 +13,14 @@ import { SwipeButtonComponent } from '../../components/swipe-button/swipe-button
 import { ReceiptPreviewComponent } from '../../components/receipt-preview/receipt-preview.component';
 import { PrintOrder } from '../../services/print.service';
 
+type DeleteTarget = {
+  displayCode: string;
+  displayName: string;
+  displayCount: number;
+  hasPrinted: boolean;
+  action: () => void;
+};
+
 const SEAT_X = 27;
 const SEAT_Y = 38;
 const TABLE_H = 140;
@@ -59,6 +67,7 @@ export class OrderEntryComponent implements AfterViewInit {
   readonly showPrintSheet = signal(false);
   readonly showReceiptPreview = signal(false);
   readonly showSuccessToast = signal(false);
+  readonly deleteConfirm = signal<DeleteTarget | null>(null);
 
   // Tracked for tag-visibility safety check
   private tblAreaH = 0;
@@ -448,6 +457,51 @@ export class OrderEntryComponent implements AfterViewInit {
 
   onSheetClosed(): void {
     this.showPrintSheet.set(false);
+  }
+
+  requestDeleteOrder(seatId: number, orderIndex: number, order: GuestOrder): void {
+    this.deleteConfirm.set({
+      displayCode: order.code,
+      displayName: order.name,
+      displayCount: 1,
+      hasPrinted: order.printed,
+      action: () => {
+        this.seats.update(seats =>
+          seats.map(s => s.id === seatId
+            ? { ...s, orders: s.orders.filter((_, i) => i !== orderIndex) }
+            : s
+          )
+        );
+      },
+    });
+  }
+
+  requestDeleteTakeaway(item: { code: string; name: string; count: number }): void {
+    const hasPrinted = this.seats().find(s => s.id === 1)?.orders
+      .some(o => o.code === item.code && o.printed) ?? false;
+    this.deleteConfirm.set({
+      displayCode: item.code,
+      displayName: item.name,
+      displayCount: item.count,
+      hasPrinted,
+      action: () => {
+        this.seats.update(seats =>
+          seats.map(s => s.id === 1
+            ? { ...s, orders: s.orders.filter(o => o.code !== item.code) }
+            : s
+          )
+        );
+      },
+    });
+  }
+
+  confirmDelete(): void {
+    this.deleteConfirm()?.action();
+    this.deleteConfirm.set(null);
+  }
+
+  cancelDelete(): void {
+    this.deleteConfirm.set(null);
   }
 
   back(): void {

@@ -21,6 +21,12 @@
 - Kein Öffnen der System-Tastatur – ausschließlich eigenes In-App-Tastenfeld
 - Ziffern `0`–`9`, Kategorie-Präfixe `HC` / `RN` / `C`, `⌫` Löschen, `✓` Bestätigen
 
+### Gericht entfernen
+
+- In der **Listenansicht** hat jede Bestellposition einen `×`-Button – immer sichtbar, unabhängig vom Session-Status
+- Tap → Confirmation-Popup mit Code + Name des Gerichts; „Entfernen" bestätigen → Gericht weg, Gesamtpreis aktualisiert sich
+- War das Gericht bereits gedruckt (`printed: true`): Popup zeigt Hinweis `„Bereits gedruckt – ggf. Küche informieren"` (muss aktiv weggeklickt werden)
+
 ### Live Code-Auflösung
 - Eingegebener Code wird sofort aufgelöst:
   - **Gültiger Code** → Gerichtname + Preis in Grün

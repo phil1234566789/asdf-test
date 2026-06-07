@@ -61,6 +61,17 @@ Was wegfällt (im Vergleich zum Beispielbild):
 
 ---
 
+## Bestellkorrektur
+
+### Gericht entfernen
+
+- Gerichte können in der **Listenansicht** jederzeit entfernt werden – unabhängig vom Session-Status
+- Tap auf `×` neben einer Position öffnet ein **Confirmation-Popup** mit Code + Name des Gerichts (verhindert versehentliche Löschungen)
+- **Bereits gedruckte Gerichte** (`printed: true`) können ebenfalls entfernt werden; das Popup enthält dann einen Hinweis `„Bereits gedruckt – ggf. Küche informieren"`, der aktiv weggeklickt werden muss (kein Auto-dismiss)
+- In der **Tischvisualisierung** gibt es kein Entfernen-Interface – ausschließlich Listenansicht
+
+---
+
 ## Kassenbeleg (Gästebeleg)
 
 *Hinweis: Detailanforderungen werden noch gesammelt. Dieser Abschnitt wird laufend ergänzt.*

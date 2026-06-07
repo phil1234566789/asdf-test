@@ -312,6 +312,19 @@
   flex-shrink: 0;
 }
 
+.ol-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 20px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:active { color: var(--danger); }
+}
+
 .ol-total {
   display: flex;
   justify-content: space-between;
@@ -415,6 +428,80 @@
   padding: 6px 16px 8px;
   background: var(--bg);
   border-top: 1px solid var(--border);
+}
+
+// ── Delete confirmation popup ────────────────────────────────────────────────
+
+.delete-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.delete-dialog {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 20px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.delete-dialog__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.delete-dialog__name {
+  font-size: 14px;
+  color: var(--text3);
+  margin: 0 0 16px;
+}
+
+.delete-dialog__warn {
+  font-size: 13px;
+  color: var(--danger);
+  background: var(--danger-light);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0 0 16px;
+}
+
+.delete-dialog__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.delete-dialog__cancel {
+  flex: 1;
+  padding: 12px;
+  background: var(--surface2);
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.delete-dialog__confirm {
+  flex: 1;
+  padding: 12px;
+  background: var(--danger);
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  cursor: pointer;
 }
 
 // ── Success toast ────────────────────────────────────────────────────────────
