@@ -1275,10 +1275,96 @@ Alle anderen Services injecten `SupabaseService` und nutzen `this.supabase.clien
 
 ---
 
+## ✅ Story 18 – Auth & Bedienungsname
+
+**Datum:** 2026-06-16
+**Status:** Fertig
+
+### Ziel
+
+Ein einziger geteilter Supabase-Account für das Restaurant. Jede Bedienung hinterlegt einmalig ihren Namen in der App (localStorage). Ohne Login kommt man nicht in die App.
+
+---
+
+### Konzept
+
+- **Ein Account** – Owner legt ihn einmalig im Supabase Dashboard an
+- **Login** – Email + Passwort, Session bleibt dank Supabase auto-refresh dauerhaft bestehen
+- **Bedienungsname** – einmalig im Popup eingeben, in `localStorage` gespeichert. Bei Verlust: Popup erscheint erneut automatisch
+- `created_by` in `order_sessions` = dieser Name (plain text)
+
+---
+
+### Flow
+
+```
+App start
+  └── eingeloggt? (Supabase Session)
+        Nein → /login
+        Ja  → Name in localStorage?
+                Nein → Name-Popup (blockiert UI)
+                Ja  → App normal
+```
+
+---
+
+### Neue Dateien
+
+#### `AuthService` (`services/auth.service.ts`)
+```typescript
+signIn(email, password): Promise<void>
+signOut(): Promise<void>
+session(): Signal<Session | null>
+```
+
+#### `WaiterNameService` (`services/waiter-name.service.ts`)
+```typescript
+getName(): string | null          // aus localStorage
+setName(name: string): void       // in localStorage speichern
+readonly hasName: Signal<boolean>
+```
+
+#### `LoginComponent` (`pages/login/`)
+- Vollbild, mobil-optimiert
+- Email + Passwort Input
+- „Einloggen"-Button mit Spinner
+- Fehlermeldung bei falschen Credentials
+
+#### `NameDialogComponent` (`components/name-dialog/`)
+- Overlay über der gesamten App (kein Routing)
+- Einfaches Textfeld: „Wie heißt du?"
+- Bestätigen → Name gespeichert → Dialog verschwindet
+- Kein Abbrechen-Button (Name ist Pflicht)
+
+#### `AuthGuard` (`guards/auth.guard.ts`)
+- Schützt alle Routen außer `/login`
+- Kein Supabase-Session → redirect zu `/login`
+
+---
+
+### `AppComponent`
+
+Zeigt `<app-name-dialog>` wenn eingeloggt aber kein Name vorhanden.
+
+---
+
+### Supabase – Account anlegen
+
+Einmalig im Dashboard: **Authentication → Users → Add user** (Email + Passwort festlegen).
+
+---
+
+### Ergebnis
+
+- App ist geschützt, ohne Login kein Zugriff
+- Bedienung wird einmalig nach ihrem Namen gefragt
+- Kein tägliches Einloggen, keine komplexe Benutzerverwaltung
+
+---
+
 ## Offene Fragen / Backlog
 
 - **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter. Sobald Menü-Gerichte in `menu.config.json` erscheinen, muss das automatisch aus den bestellten Items abgeleitet werden.
-- Story 18 – Auth/Login-Flow (Bedienung einloggen, Session persistieren)
 - Story 19 – Session-Persistenz (MockSessionService → Supabase)
 - Story 20 – CloudPRNT Edge Function (setzt Story 17 + print_jobs voraus)
 - Drucker-Test — Story 16 testen sobald Druckerpapier vorhanden

@@ -1,0 +1,31 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">TAI KING</div>
+
+    <input
+      class="login-input"
+      type="email"
+      placeholder="E-Mail"
+      [(ngModel)]="email"
+      [disabled]="loading()"
+      autocomplete="email"
+    />
+    <input
+      class="login-input"
+      type="password"
+      placeholder="Passwort"
+      [(ngModel)]="password"
+      [disabled]="loading()"
+      autocomplete="current-password"
+      (keydown.enter)="submit()"
+    />
+
+    @if (error()) {
+      <div class="login-error">{{ error() }}</div>
+    }
+
+    <button class="login-btn" [disabled]="loading()" (click)="submit()">
+      @if (loading()) { <span class="btn-spinner"></span> } @else { Einloggen }
+    </button>
+  </div>
+</div>

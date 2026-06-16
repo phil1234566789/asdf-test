@@ -1,0 +1,19 @@
+<div class="name-overlay">
+  <div class="name-card">
+    <div class="name-title">Wie heißt du?</div>
+    <input
+      class="name-input"
+      type="text"
+      placeholder="Dein Name"
+      [(ngModel)]="name"
+      (keydown.enter)="confirm()"
+      autofocus
+    />
+    <button class="name-btn" [disabled]="!canConfirm" (click)="confirm()">
+      Speichern
+    </button>
+    @if (waiterName.isEditing()) {
+      <button class="name-btn name-btn--cancel" (click)="cancel()">Abbrechen</button>
+    }
+  </div>
+</div>

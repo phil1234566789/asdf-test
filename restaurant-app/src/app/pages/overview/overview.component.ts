@@ -2,6 +2,7 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { Router } from '@angular/router';
 import { MockSessionService } from '../../services/mock-session.service';
 import { ThemeService } from '../../services/theme.service';
+import { WaiterNameService } from '../../services/waiter-name.service';
 import { TableCardComponent } from '../../components/table-card/table-card.component';
 
 @Component({
@@ -14,10 +15,11 @@ export class OverviewComponent implements OnInit {
   readonly router = inject(Router);
   private readonly sessionService = inject(MockSessionService);
   readonly themeService = inject(ThemeService);
+  readonly waiterNameService = inject(WaiterNameService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly currentUserId = 'user-1';
-  readonly currentUserName = 'Anna';
+  get currentUserName(): string { return this.waiterNameService.name() ?? ''; }
 
   readonly now = signal(Date.now());
   readonly fabOpen = signal(false);

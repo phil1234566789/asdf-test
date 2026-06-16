@@ -1,0 +1,67 @@
+.name-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.name-card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.name-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+.name-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 16px;
+  padding: 12px 14px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: var(--accent);
+  }
+}
+
+.name-btn {
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &--cancel {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted, var(--text));
+    font-weight: 400;
+  }
+}

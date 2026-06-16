@@ -2,7 +2,7 @@
   <header class="header">
     <span class="app-title">Restaurant</span>
     <div class="header-actions">
-      <span class="user-chip">{{ currentUserName }}</span>
+      <span class="user-chip" (click)="waiterNameService.startEditing()">{{ currentUserName }}</span>
       <button class="theme-btn" (click)="themeService.toggle()">
         @if (themeService.theme() === 'dark') { ☀ } @else { ☾ }
       </button>

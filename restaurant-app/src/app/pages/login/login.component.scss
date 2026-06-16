@@ -1,0 +1,83 @@
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.login-logo {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 4px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.login-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 16px;
+  padding: 14px 16px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: var(--accent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.login-error {
+  color: var(--danger, #ff5555);
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-btn {
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px;
+  margin-top: 4px;
+  cursor: pointer;
+  min-height: 50px;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

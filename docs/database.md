@@ -22,7 +22,7 @@ Eine Session entspricht einem aktiven Tisch oder einer Mitnehmen-Bestellung.
 | `total_gross`    | `numeric(8,2)`       | NULL                     | Bruttobetrag (= total_net + total_tax)                |
 | `created_at`     | `timestamptz`        | DEFAULT now()            | Zeitpunkt der Bestellaufnahme (Basis für Wartezeit-Timer) |
 | `completed_at`   | `timestamptz`        | NULL                     | Zeitpunkt, wenn Session abgeschlossen wurde           |
-| `created_by`     | `uuid`               | FK → `auth.users(id)`    | Welche Bedienung die Session gestartet hat            |
+| `created_by`     | `text`               | NULL                     | Name der Bedienung (aus localStorage, kein FK)        |
 
 ---
 
@@ -52,9 +52,8 @@ Einzelne Bestellpositionen, direkt einer Session zugeordnet.
 ## Beziehungen
 
 ```
-auth.users
-    └── order_sessions (created_by)
-            ├── order_items (session_id)
+order_sessions
+    └── order_items (session_id)
 ```
 
 ---
