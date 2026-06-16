@@ -184,6 +184,9 @@ export class OrderEntryComponent implements AfterViewInit {
       return;
     }
     if (!this.tblAreaRef) return;
+    const { extTop, extBottom } = this.sessionService.getExtensions(this.key);
+    this.extTop.set(extTop);
+    this.extBottom.set(extBottom);
     this.recalcLayout();
     const stored = this.sessionService.getSeats(this.key);
     if (stored.length > 0) {
@@ -355,6 +358,7 @@ export class OrderEntryComponent implements AfterViewInit {
     if (side === 'top') this.extTop.set(true);
     else this.extBottom.set(true);
     this.extConfirm.set(null);
+    this.sessionService.saveExtensions(this.key, this.extTop(), this.extBottom());
     this.recalcLayout();
   }
 

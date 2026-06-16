@@ -12,6 +12,7 @@ export class SessionService {
   private readonly _sessions = signal<OrderSession[]>([]);
   private readonly _seatCache = new Map<string, Seat[]>();
   private readonly _splitGroupsCache = new Map<string, Map<number, string>>();
+  private readonly _extensionsCache = new Map<string, { extTop: boolean; extBottom: boolean }>();
   private readonly _sessionIdByKey = new Map<string, string>();
   private readonly _saveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly _loadedKeys = new Set<string>();
@@ -59,7 +60,7 @@ export class SessionService {
         .order('created_at', { ascending: true }),
       this.supabase.client
         .from('order_sessions')
-        .select('ref_seat_number, split_groups')
+        .select('ref_seat_number, split_groups, table_state')
         .eq('id', sessionId)
         .single(),
     ]);
@@ -96,13 +97,20 @@ export class SessionService {
       }
       this._splitGroupsCache.set(tableKey, groups);
     }
+
+    const tableState = (sessionMeta?.table_state ?? {}) as Record<string, unknown>;
+    this._extensionsCache.set(tableKey, {
+      extTop: (tableState['extTop'] as boolean) ?? false,
+      extBottom: (tableState['extBottom'] as boolean) ?? false,
+    });
   }
 
   private async _createSession(tableKey: string): Promise<string> {
     const fields = this._tableKeyToDbFields(tableKey);
+    const ext = this._extensionsCache.get(tableKey) ?? { extTop: false, extBottom: false };
     const { data } = await this.supabase.client
       .from('order_sessions')
-      .insert({ ...fields, created_by: this.waiterName.name() ?? '' })
+      .insert({ ...fields, created_by: this.waiterName.name() ?? '', table_state: ext })
       .select('id')
       .single();
 
@@ -172,6 +180,21 @@ export class SessionService {
       .from('order_sessions')
       .update({ ref_seat_number: refSeat?.id ?? 1 })
       .eq('id', sessionId);
+  }
+
+  getExtensions(tableKey: string): { extTop: boolean; extBottom: boolean } {
+    return this._extensionsCache.get(tableKey) ?? { extTop: false, extBottom: false };
+  }
+
+  saveExtensions(tableKey: string, extTop: boolean, extBottom: boolean): void {
+    this._extensionsCache.set(tableKey, { extTop, extBottom });
+    const sessionId = this._sessionIdByKey.get(tableKey);
+    if (!sessionId) return;
+    this.supabase.client
+      .from('order_sessions')
+      .update({ table_state: { extTop, extBottom } })
+      .eq('id', sessionId)
+      .then();
   }
 
   getSplitGroups(tableKey: string): Map<number, string> {
