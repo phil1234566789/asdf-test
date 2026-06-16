@@ -42,11 +42,13 @@ export class SessionService {
 
   async loadSession(tableKey: string): Promise<void> {
     if (this._loadedKeys.has(tableKey)) return;
+    this._loadedKeys.add(tableKey);
 
-    let sessionId = this._sessionIdByKey.get(tableKey);
+    const sessionId = this._sessionIdByKey.get(tableKey);
 
     if (!sessionId) {
-      sessionId = await this._createSession(tableKey);
+      this._seatCache.set(tableKey, []);
+      return;
     }
 
     const [itemsResult, sessionResult] = await Promise.all([
@@ -66,7 +68,6 @@ export class SessionService {
     const sessionMeta = sessionResult.data;
     const refSeatNumber: number = sessionMeta?.ref_seat_number ?? 1;
 
-    // Group items by seat
     const seatMap = new Map<number, GuestOrder[]>();
     for (const item of items) {
       const seatId: number = item.seat_number ?? 1;
@@ -88,7 +89,6 @@ export class SessionService {
     }));
     this._seatCache.set(tableKey, seats);
 
-    // Load split groups
     if (sessionMeta?.split_groups) {
       const groups = new Map<number, string>();
       for (const [k, v] of Object.entries(sessionMeta.split_groups as Record<string, string>)) {
@@ -96,8 +96,6 @@ export class SessionService {
       }
       this._splitGroupsCache.set(tableKey, groups);
     }
-
-    this._loadedKeys.add(tableKey);
   }
 
   private async _createSession(tableKey: string): Promise<string> {
@@ -138,8 +136,13 @@ export class SessionService {
   }
 
   private async _flushSeats(tableKey: string, seats: Seat[]): Promise<void> {
-    const sessionId = this._sessionIdByKey.get(tableKey);
-    if (!sessionId) return;
+    const allOrders = seats.flatMap(s => s.orders);
+    let sessionId = this._sessionIdByKey.get(tableKey);
+
+    if (!sessionId) {
+      if (allOrders.length === 0) return;
+      sessionId = await this._createSession(tableKey);
+    }
 
     const isTakeaway = tableKey.startsWith('M');
     const taxRate = isTakeaway ? 0.07 : 0.19;
