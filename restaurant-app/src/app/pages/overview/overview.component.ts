@@ -1,6 +1,6 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { MockSessionService } from '../../services/mock-session.service';
+import { SessionService } from '../../services/session.service';
 import { ThemeService } from '../../services/theme.service';
 import { WaiterNameService } from '../../services/waiter-name.service';
 import { TableCardComponent } from '../../components/table-card/table-card.component';
@@ -13,7 +13,7 @@ import { TableCardComponent } from '../../components/table-card/table-card.compo
 })
 export class OverviewComponent implements OnInit {
   readonly router = inject(Router);
-  private readonly sessionService = inject(MockSessionService);
+  private readonly sessionService = inject(SessionService);
   readonly themeService = inject(ThemeService);
   readonly waiterNameService = inject(WaiterNameService);
   private readonly destroyRef = inject(DestroyRef);

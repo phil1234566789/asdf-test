@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { TablesConfigService } from '../../services/tables-config.service';
-import { MockSessionService } from '../../services/mock-session.service';
+import { SessionService } from '../../services/session.service';
 import { ResolvedTable } from '../../models/table.model';
 
 @Component({
@@ -14,7 +14,7 @@ export class TablePickerComponent {
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly tablesConfig = inject(TablesConfigService);
-  private readonly sessionService = inject(MockSessionService);
+  private readonly sessionService = inject(SessionService);
 
   readonly mode = inject(ActivatedRoute).snapshot.data['mode'] as 'tables' | 'takeaway';
 

@@ -1,4 +1,9 @@
-<div class="order-entry">
+@if (loading()) {
+  <div class="loading-screen">
+    <div class="loading-spinner"></div>
+  </div>
+}
+<div class="order-entry" [class.hidden]="loading()">
   <header class="header">
     <button class="back-btn" (click)="back()">‹</button>
     <span class="table-label">{{ tableLabel() }}</span>

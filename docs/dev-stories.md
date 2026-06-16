@@ -1362,10 +1362,90 @@ Einmalig im Dashboard: **Authentication → Users → Add user** (Email + Passwo
 
 ---
 
+## ✅ Story 19 – Session-Persistenz (MockSessionService → Supabase)
+
+**Datum:** 2026-06-16
+**Status:** Fertig
+
+### Ziel
+
+`MockSessionService` wird durch einen echten `SessionService` ersetzt. Sessions und Bestellungen werden in Supabase gespeichert und bleiben über App-Neustarts und Gerätewechsel erhalten.
+
+---
+
+### DB-Erweiterungen
+
+Vor der Implementierung im Supabase SQL Editor ausführen:
+
+```sql
+ALTER TABLE order_items
+  ADD COLUMN seat_number smallint NOT NULL DEFAULT 1;
+
+ALTER TABLE order_sessions
+  ADD COLUMN ref_seat_number smallint DEFAULT 1,
+  ADD COLUMN split_groups jsonb DEFAULT '{}';
+```
+
+---
+
+### Architektur
+
+**Cache-first:** `getSeats()` und `getSplitGroups()` bleiben synchron (lesen aus In-Memory-Cache). Supabase-Calls laufen im Hintergrund.
+
+**Debounced saves:** `saveSeats()` schreibt erst nach 1s ohne weitere Änderung in Supabase (verhindert DB-Calls bei jedem Tastendruck im Numpad).
+
+**Session-Erstellung:** Wenn `loadSession(tableKey)` aufgerufen wird und keine Session in Supabase existiert → wird automatisch eine neue erstellt.
+
+---
+
+### Interface (identisch zu MockSessionService)
+
+```typescript
+readonly sessions: Signal<OrderSession[]>
+
+loadSession(tableKey: string): Promise<void>   // NEU – von order-entry aufzurufen
+getSeats(tableKey: string): Seat[]
+getSplitGroups(tableKey: string): Map<number, string>
+saveSeats(tableKey: string, seats: Seat[]): void
+saveSplitGroups(tableKey: string, groups: Map<number, string>): void
+updateStatus(tableKey: string, status: OrderStatus): void
+```
+
+---
+
+### Mapping: Modell ↔ Supabase
+
+| Modell | DB |
+|---|---|
+| `tableKey` ('5', 'D1', 'M2') | `table_number` + `is_takeaway` + `takeaway_slot` |
+| `zoneId` | abgeleitet: M* → takeaway, D* → outdoor, sonst indoor |
+| `createdBy` / `createdByName` | `created_by` (plain text) |
+| `GuestOrder.destination` 'theke' | `destination` 'bar' (DB) |
+| `GuestOrder.printed` | `status`: 'pending'=false, 'sent'=true |
+| `Seat.isRef` | `ref_seat_number` auf der Session |
+| `Seat.id` | `seat_number` auf order_items |
+| Split groups | `split_groups` JSONB auf order_sessions |
+
+---
+
+### `order-entry` – Anpassung
+
+Neuer Loading-State: Spinner solange `loadSession()` läuft. Erst danach Layout initialisieren.
+
+---
+
+### Ergebnis
+
+- Sessions und Bestellungen überleben App-Neustart
+- Beide Handys sehen denselben Stand (nach Refresh/Navigation)
+- `MockSessionService` kann gelöscht werden
+
+---
+
 ## Offene Fragen / Backlog
 
-- **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter. Sobald Menü-Gerichte in `menu.config.json` erscheinen, muss das automatisch aus den bestellten Items abgeleitet werden.
-- Story 19 – Session-Persistenz (MockSessionService → Supabase)
+- **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter.
 - Story 20 – CloudPRNT Edge Function (setzt Story 17 + print_jobs voraus)
 - Drucker-Test — Story 16 testen sobald Druckerpapier vorhanden
+- Echtzeit-Sync (Supabase Realtime) — beide Handys sehen Änderungen live ohne Refresh
 - Verkaufsanalyse — Daten für den Inhaber (setzt Backend voraus)

@@ -5,7 +5,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { TablesConfigService } from '../../services/tables-config.service';
-import { MockSessionService } from '../../services/mock-session.service';
+import { SessionService } from '../../services/session.service';
 import { Seat, GuestOrder } from '../../models/seat.model';
 import { NumpadComponent } from '../../components/numpad/numpad.component';
 import { PrintSheetComponent, PrintTarget } from '../../components/print-sheet/print-sheet.component';
@@ -51,7 +51,7 @@ export class OrderEntryComponent implements AfterViewInit {
 
   private readonly location = inject(Location);
   private readonly tablesConfig = inject(TablesConfigService);
-  private readonly sessionService = inject(MockSessionService);
+  private readonly sessionService = inject(SessionService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly key = inject(ActivatedRoute).snapshot.paramMap.get('key') ?? '';
@@ -65,6 +65,7 @@ export class OrderEntryComponent implements AfterViewInit {
   readonly activeSeatId = signal<number | null>(null);
   readonly inputCode = signal('');
   readonly viewMode = signal<'table' | 'list'>('table');
+  readonly loading = signal(true);
   readonly showPrintSheet = signal(false);
   readonly showReceiptPreview = signal(false);
   readonly showSuccessToast = signal(false);
@@ -164,6 +165,13 @@ export class OrderEntryComponent implements AfterViewInit {
   });
 
   ngAfterViewInit(): void {
+    this.sessionService.loadSession(this.key).then(() => {
+      this.loading.set(false);
+      this._initAfterLoad();
+    });
+  }
+
+  private _initAfterLoad(): void {
     if (this.isTakeaway) {
       const stored = this.sessionService.getSeats(this.key);
       this.seats.set([{

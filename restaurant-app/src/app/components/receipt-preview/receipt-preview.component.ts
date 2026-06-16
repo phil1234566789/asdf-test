@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { Seat } from '../../models/seat.model';
 import { RestaurantConfigService } from '../../services/restaurant-config.service';
-import { MockSessionService } from '../../services/mock-session.service';
+import { SessionService } from '../../services/session.service';
 import { groupColor } from '../../utils/group-colors';
 
 @Component({
@@ -11,7 +11,7 @@ import { groupColor } from '../../utils/group-colors';
 })
 export class ReceiptPreviewComponent implements OnInit {
   private readonly restaurantConfig = inject(RestaurantConfigService);
-  private readonly sessionService = inject(MockSessionService);
+  private readonly sessionService = inject(SessionService);
 
   seats    = input.required<Seat[]>();
   tableKey = input.required<string>();
