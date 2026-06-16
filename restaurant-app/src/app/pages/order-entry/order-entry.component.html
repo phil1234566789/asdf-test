@@ -54,6 +54,18 @@
     }
   }
 
+  @if (showTakeawayServedButton()) {
+    <div class="submit-footer">
+      <button class="served-btn" (click)="onTakeawayServed()">Serviert</button>
+    </div>
+  }
+
+  @if (showPaidButton()) {
+    <div class="submit-footer">
+      <button class="paid-btn" (click)="onPaid()">✓ Bezahlt</button>
+    </div>
+  }
+
   @if (!isTakeaway) {
     <div class="content-area">
       <div class="tbl-area" #tblArea

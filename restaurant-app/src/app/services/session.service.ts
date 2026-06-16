@@ -149,6 +149,7 @@ export class SessionService {
 
     if (!sessionId) {
       if (allOrders.length === 0) return;
+      if (tableKey.startsWith('M')) return;
       sessionId = await this._createSession(tableKey);
     }
 
@@ -180,6 +181,16 @@ export class SessionService {
       .from('order_sessions')
       .update({ ref_seat_number: refSeat?.id ?? 1 })
       .eq('id', sessionId);
+  }
+
+  async ensureSessionAndFlush(tableKey: string): Promise<void> {
+    const seats = this._seatCache.get(tableKey) ?? [];
+    if (seats.flatMap(s => s.orders).length === 0) return;
+    clearTimeout(this._saveTimers.get(tableKey));
+    if (!this._sessionIdByKey.get(tableKey)) {
+      await this._createSession(tableKey);
+    }
+    await this._flushSeats(tableKey, seats);
   }
 
   getExtensions(tableKey: string): { extTop: boolean; extBottom: boolean } {

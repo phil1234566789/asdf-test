@@ -2,8 +2,7 @@ import {
   AfterViewInit, Component, DestroyRef, ElementRef,
   ViewChild, computed, effect, inject, signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Location } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TablesConfigService } from '../../services/tables-config.service';
 import { SessionService } from '../../services/session.service';
 import { Seat, GuestOrder } from '../../models/seat.model';
@@ -49,7 +48,7 @@ type ShapeView = { x: number; y: number; shape: 'rect' | 'round' };
 export class OrderEntryComponent implements AfterViewInit {
   @ViewChild('tblArea') private tblAreaRef?: ElementRef<HTMLDivElement>;
 
-  private readonly location = inject(Location);
+  private readonly router = inject(Router);
   private readonly tablesConfig = inject(TablesConfigService);
   private readonly sessionService = inject(SessionService);
   private readonly destroyRef = inject(DestroyRef);
@@ -138,6 +137,17 @@ export class OrderEntryComponent implements AfterViewInit {
     this.viewMode() === 'table' &&
     this.activeSeatId() === null &&
     this.sessionStatus() === 'in_progress'
+  );
+
+  readonly showTakeawayServedButton = computed(() =>
+    this.isTakeaway &&
+    this.sessionStatus() === 'in_progress' &&
+    !this.hasUnprinted() &&
+    this.totalCount() > 0
+  );
+
+  readonly showPaidButton = computed(() =>
+    this.sessionStatus() === 'payment_pending'
   );
 
   readonly hasUnprinted = computed(() =>
@@ -553,7 +563,19 @@ export class OrderEntryComponent implements AfterViewInit {
     this.sessionService.updateStatus(this.key, 'payment_pending');
   }
 
-  openPrintSheet(): void {
+  onTakeawayServed(): void {
+    this.sessionService.updateStatus(this.key, 'payment_pending');
+  }
+
+  onPaid(): void {
+    this.sessionService.updateStatus(this.key, 'completed');
+    this.router.navigate(['/']);
+  }
+
+  async openPrintSheet(): Promise<void> {
+    if (this.isTakeaway) {
+      await this.sessionService.ensureSessionAndFlush(this.key);
+    }
     this.showPrintSheet.set(true);
   }
 
@@ -625,6 +647,6 @@ export class OrderEntryComponent implements AfterViewInit {
   }
 
   back(): void {
-    this.location.back();
+    this.router.navigate(['/']);
   }
 }

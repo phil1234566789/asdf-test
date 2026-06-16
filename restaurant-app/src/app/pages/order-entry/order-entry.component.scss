@@ -486,6 +486,32 @@
   }
 }
 
+.served-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--warn);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.paid-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--success);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 // ── Serviert Swipe ───────────────────────────────────────────────────────────
 
 .served-swipe {
