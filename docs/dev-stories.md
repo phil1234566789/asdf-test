@@ -996,12 +996,290 @@ Die Beleg-Vorschau (🧾) bleibt **vollständig unverändert** – sauber für d
 
 ---
 
+## Story 16 – Drucker anbinden (Star CloudPRNT)
+
+**Datum:** 2026-06-16
+**Status:** Ausstehend – setzt Story 17 (Supabase-Backend) voraus
+
+### Ziel
+
+Den vorhandenen **Star Micronics TSP143IV X4** über **Star CloudPRNT** anbinden. Die App läuft auf GitHub Pages (HTTPS), der Drucker kommuniziert mit dem Supabase-Backend – kein lokaler Server, kein technischer Eingriff im Restaurant nötig.
+
+---
+
+### Warum CloudPRNT statt WebPRNT direkt
+
+WebPRNT (HTTP POST direkt an Drucker-IP) ist aus einer HTTPS-App heraus nicht nutzbar: Browser blockieren HTTP-Requests von HTTPS-Seiten (Mixed Content). Bluetooth wäre instabil (Kellner geht nach draußen → Verbindung bricht ab).
+
+**CloudPRNT** dreht den Spieß um: Der Drucker pollt selbst einen HTTPS-Endpunkt alle paar Sekunden. Damit ist die App von überall erreichbar, und im Restaurant muss niemand technisch eingreifen.
+
+---
+
+### Drucker
+
+| Eigenschaft | Wert |
+|---|---|
+| Modell | Star Micronics TSP143IV X4 |
+| Protokoll | Star CloudPRNT |
+| Verbindung | LAN (Drucker ins Resto-WLAN einhängen) |
+| Druckbreite | 80 mm / 48 Zeichen bei Standardschrift |
+
+---
+
+### Architektur
+
+```
+App (GitHub Pages)
+  │
+  │  INSERT print_job
+  ▼
+Supabase (print_jobs-Tabelle + Edge Function)
+  ▲
+  │  pollt alle ~3 Sek.
+Drucker (Star TSP143IV)
+```
+
+1. B tippt „An Küche" → App schreibt Job in `print_jobs` (Supabase)
+2. Drucker pollt `GET /cloudprnt` → Edge Function antwortet: Job vorhanden
+3. Drucker holt Job: `POST /cloudprnt` → Edge Function liefert StarPRNT-Daten
+4. Drucker druckt, meldet Erfolg → Edge Function markiert Job als `done`
+
+---
+
+### Supabase – `print_jobs`-Tabelle
+
+```sql
+create table print_jobs (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz default now(),
+  target      text not null,          -- 'kitchen' | 'theke'
+  payload     jsonb not null,         -- { tableLabel, orders: [{code, name, count}] }
+  status      text default 'pending', -- 'pending' | 'delivered' | 'done'
+  printer_id  text                    -- für spätere Mehrdruckerkonfiguration
+);
+```
+
+---
+
+### Edge Function: `/cloudprnt`
+
+Implementiert das CloudPRNT-Protokoll:
+
+- `GET /cloudprnt` → `{ jobReady: true/false, mediaTypes: ["application/vnd.star.starprnt"] }`
+- `POST /cloudprnt` mit `clientAction: "GET_JOB"` → ältesten `pending`-Job holen, StarPRNT-XML zurückgeben, Status → `delivered`
+- `POST /cloudprnt` mit `clientAction: "SET_JOB_DONE"` → Status → `done`
+
+---
+
+### `PrintService` – Anpassung
+
+Statt direktem HTTP-Call an den Drucker: INSERT in `print_jobs` via Supabase-Client.
+
+#### API-Erweiterung
+
+Bon-Header braucht Tischkontext. Neuer Typ:
+
+```typescript
+export type PrintContext = {
+  tableLabel: string;   // z.B. "Tisch 5" oder "Mitnehmen M1"
+  timestamp: Date;
+};
+```
+
+Neue Signaturen (abwärtskompatibel durch optionalen Parameter):
+
+```typescript
+printKitchen(orders: PrintOrder[], context: PrintContext): Promise<void>
+printTheke(orders: PrintOrder[], context: PrintContext): Promise<void>
+```
+
+#### Implementierung
+
+1. `PrinterConfigService.getConfig()` → IP + Port laden
+2. Star WebPRNT Builder → XML-Payload aufbauen (siehe Bon-Format)
+3. `fetch('http://<ip>/StarWebPRNT/SendMessage', { method: 'POST', body: xml })` 
+4. Timeout via `AbortController` (aus `printer.config.json`)
+5. HTTP-Fehler oder Netzwerk-Fehler → `reject('Drucker nicht erreichbar')`
+
+Der `MOCK_FAIL`-Flag bleibt für QA erhalten.
+
+---
+
+### Bon-Format
+
+Beide Bons sind rein textbasiert (keine Grafiken).
+
+#### Küche-Bon
+
+```
+================================
+           KÜCHE
+================================
+Tisch 5                   14:32
+--------------------------------
+ 2x  HC2  Thai Basilikum Huhn
+ 1x  33   Hühnerfilet + Kokos
+ 1x  11   Gemüse + Chop Suey
+================================
+```
+
+#### Theke-Bon
+
+```
+================================
+           THEKE
+================================
+Tisch 5                   14:32
+--------------------------------
+ 2x  G1   Wasser
+ 1x  B3   Bier
+================================
+```
+
+- Breite: 32 Zeichen (passt auf 58-mm-Bon; bei 80 mm gibt es mehr Luft)
+- Kein Preis auf dem Bon (Küche/Theke braucht den nicht)
+- `CutPaper Method="Partial"` am Ende
+
+---
+
+### Aufrufer-Anpassung
+
+`PrintSheetComponent` und alle anderen Aufrufer von `printKitchen`/`printTheke` müssen `PrintContext` mitgeben. Der Tischname kommt aus dem aktiven Session-Key (z.B. `"5"` → `"Tisch 5"`, `"M1"` → `"Mitnehmen M1"`).
+
+---
+
+### Ergebnis
+
+- `PrintService` druckt echte Bons auf den Star TSP143IV per LAN
+- Konfiguration über `printer.config.json` (kein Hardcode)
+- Mock-Fallback (`MOCK_FAIL`) bleibt für QA ohne Drucker
+- Test ausstehend – wird nachgeholt sobald Druckerpapier vorhanden
+
+---
+
+## ✅ Story 17 – Supabase Grundsetup
+
+**Datum:** 2026-06-16
+**Status:** Fertig
+
+### Ziel
+
+Supabase-Projekt anlegen, Datenbankschema deployen, Angular-Client einbinden. Ist die Voraussetzung für alle weiteren Backend-Stories (Auth, Session-Persistenz, CloudPRNT).
+
+---
+
+### 1. Supabase-Projekt anlegen
+
+- Auf [supabase.com](https://supabase.com) neues Projekt erstellen
+- Region: `eu-central-1` (Frankfurt) – DSGVO, niedrige Latenz
+- Projekt-Name: `tai-king` o.ä.
+- Notieren: **Project URL** + **anon public key** (aus Settings → API)
+
+---
+
+### 2. Datenbank-Schema
+
+SQL-Migration ausführen (in Supabase SQL-Editor oder via `supabase` CLI):
+
+```sql
+-- order_sessions
+create table order_sessions (
+  id             uuid primary key default gen_random_uuid(),
+  table_number   text,
+  is_takeaway    boolean default false,
+  takeaway_slot  smallint,
+  status         text default 'open',        -- 'open' | 'completed'
+  total_net      numeric(8,2),
+  total_tax      numeric(8,2),
+  total_gross    numeric(8,2),
+  created_at     timestamptz default now(),
+  completed_at   timestamptz,
+  created_by     uuid references auth.users(id)
+);
+
+-- order_items
+create table order_items (
+  id          uuid primary key default gen_random_uuid(),
+  session_id  uuid references order_sessions(id) on delete cascade,
+  bill_group  smallint,
+  dish_code   text not null,
+  dish_name   text not null,
+  price       numeric(6,2) not null,
+  category    text not null,
+  tax_rate    numeric(4,2) not null,
+  destination text not null default 'kitchen',  -- 'kitchen' | 'bar'
+  status      text default 'pending',            -- 'pending' | 'sent' | 'completed'
+  sent_at     timestamptz,
+  created_at  timestamptz default now()
+);
+
+-- print_jobs (für CloudPRNT, Story 16)
+create table print_jobs (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz default now(),
+  target      text not null,           -- 'kitchen' | 'theke'
+  payload     jsonb not null,          -- { tableLabel, orders: [{code, name, count}] }
+  status      text default 'pending'   -- 'pending' | 'delivered' | 'done'
+);
+```
+
+**RLS:** Zunächst deaktiviert – erst aktivieren wenn Auth in Story 18 steht.
+
+---
+
+### 3. Angular-Client einbinden
+
+```
+npm install @supabase/supabase-js
+```
+
+**Environment-Config** (`src/environments/environment.ts`):
+
+```typescript
+export const environment = {
+  production: false,
+  supabaseUrl: 'https://<project-id>.supabase.co',
+  supabaseAnonKey: '<anon-key>'
+};
+```
+
+`environment.prod.ts` identisch – gleiche URL und Key (anon key ist öffentlich, kein Secret).
+
+**`.gitignore`:** Environments sind kein Secret (anon key darf im Repo sein). Keine Änderung nötig.
+
+---
+
+### 4. `SupabaseService`
+
+Neuer Singleton-Service `src/app/services/supabase.service.ts`:
+
+```typescript
+@Injectable({ providedIn: 'root' })
+export class SupabaseService {
+  readonly client = createClient(
+    environment.supabaseUrl,
+    environment.supabaseAnonKey
+  );
+}
+```
+
+Alle anderen Services injecten `SupabaseService` und nutzen `this.supabase.client`.
+
+---
+
+### Ergebnis
+
+- Supabase-Projekt läuft, Schema ist deployed
+- Angular-App kann Supabase-Client nutzen
+- Basis für Story 18 (Auth) und Session-Persistenz
+
+---
+
 ## Offene Fragen / Backlog
 
 - **Menü-Kategorie in Config:** `isMenu` im Session-Modell ist ein Platzhalter. Sobald Menü-Gerichte in `menu.config.json` erscheinen, muss das automatisch aus den bestellten Items abgeleitet werden.
-- **Supabase-Projekt:** Wird angelegt, sobald Auth/Backend gebraucht wird.
-- Getrennte Rechnungen — Gäste in Zahlgruppen aufteilen, eigene Belege pro Gruppe
-- Supabase-Backend — Auth, PostgreSQL, Realtime-Sync (ersetzt MockSessionService)
-- Login/Auth-Flow — Bedienung einloggen, Session persistieren
-- Kassenbeleg-Druck — tatsächlicher Druck über Thekendrucker (Epson ePOS)
+- Story 18 – Auth/Login-Flow (Bedienung einloggen, Session persistieren)
+- Story 19 – Session-Persistenz (MockSessionService → Supabase)
+- Story 20 – CloudPRNT Edge Function (setzt Story 17 + print_jobs voraus)
+- Drucker-Test — Story 16 testen sobald Druckerpapier vorhanden
 - Verkaufsanalyse — Daten für den Inhaber (setzt Backend voraus)
