@@ -5,9 +5,14 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const SUPPORTED_MEDIA_TYPES = ['text/plain'];
 
-const W = 46;
+const LEFT_PAD = 12; // printable area starts 12 chars in - left of that is off the paper
+const W = 36;
 const SEP = '='.repeat(W);
 const DASH = '-'.repeat(W);
+
+function emit(line: string): string {
+  return ' '.repeat(LEFT_PAD) + line;
+}
 
 const UMLAUT_MAP: Record<string, string> = {
   ä: 'ae', ö: 'oe', ü: 'ue', Ä: 'Ae', Ö: 'Oe', Ü: 'Ue', ß: 'ss',
@@ -29,21 +34,21 @@ function buildBon(job: { target: string; payload: { tableLabel: string; orders: 
   const time = new Date(timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' });
 
   const lines: string[] = [];
-  lines.push(SEP);
-  lines.push(center(title));
-  lines.push(SEP);
+  lines.push(emit(SEP));
+  lines.push(emit(center(title)));
+  lines.push(emit(SEP));
   const headerRight = time;
-  const headerLeft = transliterate(tableLabel).substring(0, W - headerRight.length - 1);
-  lines.push(headerLeft.padEnd(W - headerRight.length) + headerRight);
-  lines.push(DASH);
+  const headerLeft = transliterate(tableLabel).substring(0, W - headerRight.length - 2);
+  lines.push(emit(' ' + headerLeft.padEnd(W - headerRight.length - 1) + headerRight));
+  lines.push(emit(DASH));
 
   for (const order of orders) {
     const prefix = `${String(order.count).padStart(2)}x  ${order.code.padEnd(4)}  `;
     const maxName = W - prefix.length;
-    lines.push(prefix + transliterate(order.name).substring(0, maxName));
+    lines.push(emit(prefix + transliterate(order.name).substring(0, maxName)));
   }
 
-  lines.push(SEP);
+  lines.push(emit(SEP));
   lines.push('');
   lines.push('');
   lines.push('');
