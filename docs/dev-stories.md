@@ -996,10 +996,10 @@ Die Beleg-Vorschau (🧾) bleibt **vollständig unverändert** – sauber für d
 
 ---
 
-## Story 16 – Drucker anbinden (Star CloudPRNT)
+## Story 16 – Drucker anbinden (Star CloudPRNT) ✅
 
-**Datum:** 2026-06-16
-**Status:** Ausstehend – setzt Story 17 (Supabase-Backend) voraus
+**Datum:** 2026-06-16, getestet & fertiggestellt 2026-06-20
+**Status:** Fertig
 
 ### Ziel
 
@@ -1148,12 +1148,20 @@ Tisch 5                   14:32
 
 ---
 
-### Ergebnis
+### Ergebnis (tatsächliche Umsetzung, abweichend von der ursprünglichen Planung oben)
 
-- `PrintService` druckt echte Bons auf den Star TSP143IV per LAN
-- Konfiguration über `printer.config.json` (kein Hardcode)
-- Mock-Fallback (`MOCK_FAIL`) bleibt für QA ohne Drucker
-- Test ausstehend – wird nachgeholt sobald Druckerpapier vorhanden
+Die ursprüngliche Planung (StarPRNT-XML, `clientAction: GET_JOB`/`SET_JOB_DONE` per POST, WebPRNT direkt an die Drucker-IP) entsprach nicht dem tatsächlichen Protokoll dieses Druckers (Firmware `CloudPRNT/5.1`, `TSP100IV/3.3`). Reale Umsetzung:
+
+- **`PrintService`** schreibt nur noch einen Job in die Supabase-Tabelle `print_jobs` (`target`, `payload: {tableLabel, orders, timestamp}`). Kein direkter Netzwerkzugriff auf den Drucker.
+- **Edge Function `supabase/functions/cloudprnt/index.ts`** (Deno, deployed mit `--no-verify-jwt`, da der Drucker keine Auth-Header sendet) implementiert das tatsächliche CloudPRNT-Protokoll:
+  - `GET /cloudprnt` (ohne `type`-Param) = reines Polling → `{jobReady, mediaTypes}`. Manche Firmware-Versionen pollen stattdessen per `POST` mit JSON-Body (`clientAction: null`, Statusfelder) – wird identisch behandelt.
+  - `GET /cloudprnt?type=text/plain` = tatsächlicher Job-Abruf (nicht `POST clientAction=GET_JOB` wie ursprünglich angenommen!). Response-Body = die rohen Bon-Bytes.
+  - `DELETE /cloudprnt?mac=...&code=200%20OK` = Druckergebnis-Meldung (ersetzt das angenommene `POST clientAction=SET_JOB_DONE`). Bei Code `200...` → Job-Status `done`, sonst zurück auf `pending`.
+  - Einziger angebotener `mediaType`: `text/plain` (passt zum `Accept`-Header des Druckers, kein StarPRNT-XML nötig).
+- **Druckerseitige Konfiguration:** Admin-Oberfläche unter `http://<drucker-ip>/` (Login `root`/Passwort siehe Restaurant-Notizen). CloudPRNT-Settings → Server-URL = Edge-Function-URL, Polling 5s. TLS-Trust-Level musste nicht dauerhaft auf "Accept all" bleiben (war nur Diagnose-Zwischenschritt).
+- **Hardware-Eigenheit (wichtig für künftige Layout-Anpassungen):** Der Druckkopf ist breiter als die eingelegte 58mm-Papierrolle; die Rolle sitzt (fix, per Plastik-Trennstück) im **rechten** Teil des Druckkopf-Bereichs. Die ersten **12 Zeichen** jeder Zeile landen dadurch im papierlosen Bereich (unsichtbar), danach sind exakt **36 Zeichen** sichtbar bedruckbar. Lösung in `index.ts`: jede Zeile wird über `emit()` mit `LEFT_PAD = 12` Leerzeichen-Präfix versehen, Inhaltsbreite `W = 36`.
+- **Umlaute:** Der Drucker dekodiert `text/plain` nicht als UTF-8 (Mojibake bei ü/ö/ä). Lösung: `transliterate()` wandelt ä/ö/ü/ß vor dem Druck in ae/oe/ue/ss um, statt Codepage-Frickelei.
+- Kalibrierung wurde per einmaligem Test-Bon (eindeutige Zeichenfolge `0-9A-Za...`) ermittelt, nicht durch Spekulation.
 
 ---
 
@@ -1439,6 +1447,23 @@ Neuer Loading-State: Spinner solange `loadSession()` läuft. Erst danach Layout 
 - Sessions und Bestellungen überleben App-Neustart
 - Beide Handys sehen denselben Stand (nach Refresh/Navigation)
 - `MockSessionService` kann gelöscht werden
+
+---
+
+## ✅ Story 20 – Reprint-Button
+
+**Datum:** 2026-06-20
+**Status:** Fertig
+
+### Ziel
+
+Falls ein Bon verloren geht oder durch Küchenfett unlesbar wird, soll die B den Bon erneut drucken können – auch wenn er bereits gedruckt wurde. Zusätzlich nützlich, um Küche und Theke zeitlich getrennt zu drucken.
+
+### Umsetzung
+
+- Neuer 🖨-Button im Header von `order-entry`, neben dem 🧾-Button. Sichtbar wenn `sessionStatus()` `in_progress` oder `payment_pending` ist und mindestens eine Position existiert (`canReprint`).
+- Öffnet das bestehende `PrintSheetComponent`, aber mit **allen** Positionen (`allKitchenOrders`/`allThekenOrders`) statt nur den ungedruckten (`unprintedKitchenOrders`/`unprintedThekenOrders`). Gesteuert über `printSheetMode: 'unprinted' | 'all'`.
+- Reprint ändert keine `printed`-Flags und keinen Session-Status – reiner Side-Effect-freier Druck.
 
 ---
 

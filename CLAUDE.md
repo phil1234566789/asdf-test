@@ -19,6 +19,7 @@ Mobile-only Web-App für 1–2 Bedienungen in einem asiatischen Restaurant. Erse
 - `docs/ui-requirements.md` – UI-Anforderungen (ausführlich)
 - `docs/features.md` – Feature-Liste
 - `docs/database.md` – Datenbankschema
+- `docs/printer.md` – Drucker-Anbindung (CloudPRNT-Protokoll, Hardware-Eigenheiten) – vor jeder Änderung an Bon-Layout oder Edge Function lesen
 - `design/mockup.html` – visuelles Mockup (grobe Idee)
 - `config/menu.config.json` – Speisekarte (einzige Quelle für Gerichte, Preise, Kategorien)
 
