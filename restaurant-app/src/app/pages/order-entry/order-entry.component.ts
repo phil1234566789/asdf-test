@@ -66,6 +66,7 @@ export class OrderEntryComponent implements AfterViewInit {
   readonly viewMode = signal<'table' | 'list'>('table');
   readonly loading = signal(true);
   readonly showPrintSheet = signal(false);
+  readonly printSheetMode = signal<'unprinted' | 'all'>('unprinted');
   readonly showReceiptPreview = signal(false);
   readonly showSuccessToast = signal(false);
   readonly deleteConfirm = signal<DeleteTarget | null>(null);
@@ -154,25 +155,35 @@ export class OrderEntryComponent implements AfterViewInit {
     this.seats().some(s => s.orders.some(o => !o.printed))
   );
 
-  readonly unprintedKitchenOrders = computed((): PrintOrder[] => {
+  private groupOrders(orders: GuestOrder[]): PrintOrder[] {
     const map = new Map<string, PrintOrder>();
-    for (const order of this.allOrders().filter(o => !o.printed && o.destination === 'kitchen')) {
+    for (const order of orders) {
       const e = map.get(order.code);
       if (e) e.count++;
       else map.set(order.code, { code: order.code, name: order.name, count: 1 });
     }
     return Array.from(map.values());
-  });
+  }
 
-  readonly unprintedThekenOrders = computed((): PrintOrder[] => {
-    const map = new Map<string, PrintOrder>();
-    for (const order of this.allOrders().filter(o => !o.printed && o.destination === 'theke')) {
-      const e = map.get(order.code);
-      if (e) e.count++;
-      else map.set(order.code, { code: order.code, name: order.name, count: 1 });
-    }
-    return Array.from(map.values());
-  });
+  readonly unprintedKitchenOrders = computed((): PrintOrder[] =>
+    this.groupOrders(this.allOrders().filter(o => !o.printed && o.destination === 'kitchen'))
+  );
+
+  readonly unprintedThekenOrders = computed((): PrintOrder[] =>
+    this.groupOrders(this.allOrders().filter(o => !o.printed && o.destination === 'theke'))
+  );
+
+  readonly allKitchenOrders = computed((): PrintOrder[] =>
+    this.groupOrders(this.allOrders().filter(o => o.destination === 'kitchen'))
+  );
+
+  readonly allThekenOrders = computed((): PrintOrder[] =>
+    this.groupOrders(this.allOrders().filter(o => o.destination === 'theke'))
+  );
+
+  readonly canReprint = computed(() =>
+    (this.sessionStatus() === 'in_progress' || this.sessionStatus() === 'payment_pending') && this.totalCount() > 0
+  );
 
   ngAfterViewInit(): void {
     this.sessionService.loadSession(this.key).then(() => {
@@ -576,23 +587,31 @@ export class OrderEntryComponent implements AfterViewInit {
     if (this.isTakeaway) {
       await this.sessionService.ensureSessionAndFlush(this.key);
     }
+    this.printSheetMode.set('unprinted');
+    this.showPrintSheet.set(true);
+  }
+
+  openReprintSheet(): void {
+    this.printSheetMode.set('all');
     this.showPrintSheet.set(true);
   }
 
   onPrinted(target: PrintTarget): void {
-    this.seats.update(seats =>
-      seats.map(s => ({
-        ...s,
-        orders: s.orders.map(o => ({
-          ...o,
-          printed: o.printed
-            || target === 'both'
-            || (target === 'kitchen' && o.destination === 'kitchen')
-            || (target === 'theke'     && o.destination === 'theke'),
-        })),
-      }))
-    );
-    this.sessionService.updateStatus(this.key, 'in_progress');
+    if (this.printSheetMode() === 'unprinted') {
+      this.seats.update(seats =>
+        seats.map(s => ({
+          ...s,
+          orders: s.orders.map(o => ({
+            ...o,
+            printed: o.printed
+              || target === 'both'
+              || (target === 'kitchen' && o.destination === 'kitchen')
+              || (target === 'theke'     && o.destination === 'theke'),
+          })),
+        }))
+      );
+      this.sessionService.updateStatus(this.key, 'in_progress');
+    }
     this.showSuccessToast.set(true);
     setTimeout(() => this.showSuccessToast.set(false), 2000);
   }

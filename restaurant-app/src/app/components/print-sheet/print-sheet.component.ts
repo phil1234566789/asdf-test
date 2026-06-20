@@ -1,5 +1,5 @@
 import { Component, inject, input, output, signal } from '@angular/core';
-import { PrintOrder, PrintService } from '../../services/print.service';
+import { PrintContext, PrintOrder, PrintService } from '../../services/print.service';
 
 export type PrintTarget = 'kitchen' | 'theke' | 'both';
 
@@ -13,6 +13,7 @@ export class PrintSheetComponent {
 
   kitchenOrders = input.required<PrintOrder[]>();
   thekenOrders  = input.required<PrintOrder[]>();
+  tableLabel    = input.required<string>();
 
   done   = output<PrintTarget>();
   closed = output<void>();
@@ -30,12 +31,13 @@ export class PrintSheetComponent {
     this.lastTarget = target;
     this.loading.set(target);
     this.error.set(null);
+    const context: PrintContext = { tableLabel: this.tableLabel(), timestamp: new Date() };
     try {
       if (target === 'kitchen' || target === 'both') {
-        await this.printService.printKitchen(this.kitchenOrders());
+        await this.printService.printKitchen(this.kitchenOrders(), context);
       }
       if (target === 'theke' || target === 'both') {
-        await this.printService.printTheke(this.thekenOrders());
+        await this.printService.printTheke(this.thekenOrders(), context);
       }
       this.loading.set(null);
       this.success.set(target);

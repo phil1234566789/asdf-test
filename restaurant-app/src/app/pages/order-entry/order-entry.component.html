@@ -10,6 +10,9 @@
     @if (totalCount() > 0) {
       <button class="receipt-btn" (click)="showReceiptPreview.set(true)">🧾</button>
     }
+    @if (canReprint()) {
+      <button class="reprint-btn" (click)="openReprintSheet()">🖨</button>
+    }
     @if (!isTakeaway) {
       <button class="split-btn" [class.split-btn--active]="splitActive()" (click)="toggleSplit()">✂</button>
     }
@@ -215,8 +218,9 @@
 
   @if (showPrintSheet()) {
     <app-print-sheet
-      [kitchenOrders]="unprintedKitchenOrders()"
-      [thekenOrders]="unprintedThekenOrders()"
+      [kitchenOrders]="printSheetMode() === 'all' ? allKitchenOrders() : unprintedKitchenOrders()"
+      [thekenOrders]="printSheetMode() === 'all' ? allThekenOrders() : unprintedThekenOrders()"
+      [tableLabel]="tableLabel()"
       (done)="onPrinted($event)"
       (closed)="onSheetClosed()" />
   }

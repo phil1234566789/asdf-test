@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { SupabaseService } from './supabase.service';
 
 export type PrintOrder = {
   code: string;
@@ -6,25 +7,32 @@ export type PrintOrder = {
   count: number;
 };
 
+export type PrintContext = {
+  tableLabel: string;
+  timestamp: Date;
+};
+
 @Injectable({ providedIn: 'root' })
 export class PrintService {
-  // Flip to true to simulate printer failure during QA
-  private readonly MOCK_FAIL = false;
+  private readonly supabase = inject(SupabaseService);
 
-  printKitchen(orders: PrintOrder[]): Promise<void> {
-    return this.mockPrint();
+  async printKitchen(orders: PrintOrder[], context: PrintContext): Promise<void> {
+    await this._insertJob('kitchen', orders, context);
   }
 
-  printTheke(orders: PrintOrder[]): Promise<void> {
-    return this.mockPrint();
+  async printTheke(orders: PrintOrder[], context: PrintContext): Promise<void> {
+    await this._insertJob('theke', orders, context);
   }
 
-  private mockPrint(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (this.MOCK_FAIL) reject(new Error('Drucker nicht erreichbar'));
-        else resolve();
-      }, 1000);
+  private async _insertJob(target: 'kitchen' | 'theke', orders: PrintOrder[], context: PrintContext): Promise<void> {
+    const { error } = await this.supabase.client.from('print_jobs').insert({
+      target,
+      payload: {
+        tableLabel: context.tableLabel,
+        orders,
+        timestamp: context.timestamp.toISOString(),
+      },
     });
+    if (error) throw new Error(error.message);
   }
 }
